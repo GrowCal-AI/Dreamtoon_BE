@@ -1,0 +1,57 @@
+services:
+  # PostgreSQL 데이터베이스
+  postgres:
+    image: postgres:15
+    container_name: dreamtoon-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dreamtoon_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}  # 개발용 기본값
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dreamtoon-network
+
+  # Spring Boot 백엔드
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dreamtoon-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-dreamtoon_dev}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # .env 파일에서 환경 변수 가져오기
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-your-openai-api-key}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-your-google-client-id}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-your-kakao-client-id}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-your-kakao-client-secret}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-your-aws-access-key}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-your-aws-secret-key}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-dreamtoon-dev-bucket}
+      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-key-must-be-at-least-256-bits-long}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dreamtoon-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  dreamtoon-network:
+    driver: bridge
