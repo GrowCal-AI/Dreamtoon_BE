@@ -8,10 +8,15 @@ import com.dreamtoon.domain.scene.entity.Scene;
 import com.dreamtoon.infrastructure.ai.OpenAiClient;
 import com.dreamtoon.infrastructure.ai.prompt.DreamAnalysisPrompt;
 import com.dreamtoon.infrastructure.storage.S3StorageService;
+import com.dreamtoon.domain.dream.repository.DreamRepository;
+import com.dreamtoon.global.error.EntityNotFoundException;
+import com.dreamtoon.global.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +34,50 @@ public class DreamAiService {
     private final OpenAiClient openAiClient;
     private final S3StorageService s3StorageService;
     private final ObjectMapper objectMapper;
+    private final DreamRepository dreamRepository;
+
+    /**
+     * 비동기로 꿈 분석 시작 (백그라운드 처리)
+     *
+     * @param dreamId 분석할 꿈 ID
+     */
+    @Async("dreamProcessingExecutor")
+    @Transactional
+    public void analyzeDreamAsync(Long dreamId) {
+        Dream dream = dreamRepository.findById(dreamId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
+
+        try {
+            log.info("[ASYNC] Starting dream processing for dream ID: {}", dreamId);
+
+            // 상태를 PROCESSING으로 변경
+            dream.startProcessing();
+            dreamRepository.save(dream);
+
+            // AI 분석 실행 (기존 로직)
+            analyzeDream(dream);
+
+            // 상태를 COMPLETED로 변경
+            dream.completeProcessing();
+            dreamRepository.save(dream);
+
+            log.info("[ASYNC] Dream processing completed successfully for dream ID: {}", dreamId);
+
+        } catch (Exception e) {
+            log.error("[ASYNC] Dream processing failed for dream ID: {}", dreamId, e);
+
+            // 상태를 FAILED로 변경
+            dream.failProcessing(e.getMessage());
+            dreamRepository.save(dream);
+
+            // Fallback 데이터 생성
+            createFallbackData(dream);
+            dream.completeProcessing(); // Fallback 후에는 COMPLETED로 처리
+            dreamRepository.save(dream);
+
+            log.info("[ASYNC] Dream processing completed with fallback data for dream ID: {}", dreamId);
+        }
+    }
 
     /**
      * 꿈을 분석하여 장면과 분석 데이터 생성
@@ -113,13 +162,12 @@ public class DreamAiService {
         try {
             String[] keywords = sceneDto.getBackgroundKeywords() != null
                     ? sceneDto.getBackgroundKeywords().toArray(new String[0])
-                    : new String[]{};
+                    : new String[] {};
 
             String prompt = DreamAnalysisPrompt.createImagePrompt(
                     sceneDto.getDescription(),
                     keywords,
-                    style
-            );
+                    style);
 
             // 1. DALL-E로 이미지 생성 (임시 URL, 60분 유효)
             String tempDalleUrl = openAiClient.generateImage(prompt);
@@ -165,7 +213,8 @@ public class DreamAiService {
     /**
      * 건강 점수 계산
      */
-    private int calculateHealthScore(Map<com.dreamtoon.domain.dream.entity.EmotionType, Double> emotions, Boolean isNightmare) {
+    private int calculateHealthScore(Map<com.dreamtoon.domain.dream.entity.EmotionType, Double> emotions,
+            Boolean isNightmare) {
         double peace = emotions.getOrDefault(com.dreamtoon.domain.dream.entity.EmotionType.PEACE, 0.0);
         double joy = emotions.getOrDefault(com.dreamtoon.domain.dream.entity.EmotionType.JOY, 0.0);
         double anxiety = emotions.getOrDefault(com.dreamtoon.domain.dream.entity.EmotionType.ANXIETY, 0.0);
