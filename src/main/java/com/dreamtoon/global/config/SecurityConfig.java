@@ -53,6 +53,10 @@ public class SecurityConfig {
                                                                                 .requestMatchers(HttpMethod.POST, "/api/v1/dreams")
                                                                                 .permitAll() // TODO: Remove after testing
 
+                                                                                // Test login endpoint (dev only)
+                                                                                .requestMatchers("/api/v1/auth/test-login")
+                                                                                .permitAll()
+
                                                                                 // OAuth2 login (Spring Security 기본 경로)
                                                                                 .requestMatchers("/oauth2/**", "/login/oauth2/**")
                                                                                 .permitAll()
@@ -67,7 +71,6 @@ public class SecurityConfig {
                                                                                 .authenticated()
                                                                                 .requestMatchers("/api/v1/users/**")
                                                                                 .authenticated()
-
                                                                                 .anyRequest()
                                                                                 .authenticated())
                                 .oauth2Login(
@@ -77,7 +80,8 @@ public class SecurityConfig {
                                                                                                                 userInfo.userService(
                                                                                                                                 customOAuth2UserService))
                                                                                 .successHandler(oAuth2AuthenticationSuccessHandler))
-                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                                .addFilterBefore(
+                                                jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                                 .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();

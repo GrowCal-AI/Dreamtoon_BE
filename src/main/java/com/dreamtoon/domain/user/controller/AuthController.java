@@ -23,6 +23,26 @@ public class AuthController {
         private final JwtTokenProvider jwtTokenProvider;
 
         @Operation(
+                        summary = "[DEV] 테스트 로그인",
+                        description = "개발 환경 전용: userId로 JWT 토큰을 발급받습니다. (로컬/개발 환경에서만 활성화)")
+        @PostMapping("/test-login")
+        @org.springframework.context.annotation.Profile({"local", "dev"})
+        public ResponseEntity<ApiResponse<TestTokenResponse>> testLogin(
+                        @RequestParam(defaultValue = "1") Long userId) {
+
+                String accessToken =
+                                jwtTokenProvider.createAccessToken(userId, "test@dreamtoon.com", "ROLE_USER");
+                String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+
+                TestTokenResponse response = new TestTokenResponse(accessToken, refreshToken);
+
+                return ResponseEntity.ok(
+                                ApiResponse.success(
+                                                "테스트 토큰이 발급되었습니다. Swagger의 'Authorize' 버튼을 눌러 Bearer 토큰을 입력하세요.",
+                                                response));
+        }
+
+        @Operation(
                         summary = "토큰 갱신",
                         description =
                                         "Refresh Token을 사용하여 새로운 Access Token을 발급합니다. "
@@ -81,4 +101,6 @@ public class AuthController {
                         return refreshToken;
                 }
         }
+
+        public record TestTokenResponse(String accessToken, String refreshToken) {}
 }
