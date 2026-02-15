@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * 장면 대사 DTO
- */
+/** 장면 대사 DTO */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DialogueDto {
 
-    private String character;
-    private String text;
+        private String character;
+        private String text;
 }

@@ -10,13 +10,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DreamRepository extends JpaRepository<Dream, Long> {
-    
-    @Query("SELECT d FROM Dream d WHERE d.user.id = :userId ORDER BY d.createdAt DESC")
-    Page<Dream> findByUserId(@Param("userId") Long userId, Pageable pageable);
-    
-    @Query("SELECT d FROM Dream d " +
-           "LEFT JOIN FETCH d.scenes " +
-           "LEFT JOIN FETCH d.analysis " +
-           "WHERE d.id = :id")
-    Dream findByIdWithDetails(@Param("id") Long id);
+
+        @Query("SELECT d FROM Dream d WHERE d.user.id = :userId ORDER BY d.createdAt DESC")
+        Page<Dream> findByUserId(@Param("userId") Long userId, Pageable pageable);
+
+        @Query(
+                        "SELECT d FROM Dream d "
+                                        + "LEFT JOIN FETCH d.scenes "
+                                        + "LEFT JOIN FETCH d.analysis "
+                                        + "WHERE d.id = :id")
+        Dream findByIdWithDetails(@Param("id") Long id);
 }

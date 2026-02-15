@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.3'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 group = 'com.dreamtoon'
@@ -34,32 +35,32 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    
+
     // Spring AI
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
-    
+
     // Database
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
-    
+
     // Querydsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    
+
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
-    
+
     // AWS S3
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.0'
-    
+
     // Swagger/OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
@@ -94,4 +95,40 @@ sourceSets {
 
 clean {
     delete file(generated)
+}
+
+// Spotless: 코드 포맷팅 자동화 (Google Java Format)
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+
+        // Google Java Format 사용
+        googleJavaFormat('1.19.2').aosp().reflowLongStrings()
+
+        // 불필요한 import 제거
+        removeUnusedImports()
+
+        // 파일 끝에 개행 추가
+        endWithNewline()
+
+        // 들여쓰기 정리
+        indentWithTabs(2)
+        indentWithSpaces(4)
+
+        // trailing whitespace 제거
+        trimTrailingWhitespace()
+
+        // 커스텀 규칙 (선택사항)
+        custom 'Lambda formatting', { content ->
+            // 람다 표현식 간격 정리
+            content.replaceAll(/\)\s*->\s*\{/, ') -> {')
+        }
+    }
+
+    // Gradle 파일도 포맷팅
+    format 'misc', {
+        target '*.gradle', '*.md', '.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }
