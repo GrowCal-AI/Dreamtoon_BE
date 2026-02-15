@@ -4,6 +4,7 @@ import com.dreamtoon.domain.analysis.entity.Analysis;
 import com.dreamtoon.domain.analysis.repository.AnalysisRepository;
 import com.dreamtoon.domain.dream.dto.CreateDreamRequest;
 import com.dreamtoon.domain.dream.dto.DreamResponse;
+import com.dreamtoon.domain.dream.dto.UpdateDreamRequest;
 import com.dreamtoon.domain.dream.entity.Dream;
 import com.dreamtoon.domain.dream.repository.DreamRepository;
 import com.dreamtoon.domain.scene.entity.Scene;
@@ -33,29 +34,34 @@ public class DreamService {
     private final UserRepository userRepository;
     private final SceneRepository sceneRepository;
     private final AnalysisRepository analysisRepository;
-    // private final DreamAiService dreamAiService; // TODO: Spring AI 서비스 추가
+    private final DreamAiService dreamAiService;
     
     @Transactional
     public DreamResponse createDream(Long userId, CreateDreamRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
-        
+
         Dream dream = Dream.builder()
                 .user(user)
+                .title(request.getTitle())
                 .rawContent(request.getContent())
                 .stylePreset(request.getStyle())
+                .inputMethod(request.getInputMethod())
                 .build();
-        
+
         dreamRepository.save(dream);
-        
-        // TODO: Spring AI를 통한 비동기 처리
-        // 1. GPT로 장면 분할
-        // 2. DALL-E로 이미지 생성
-        // 3. 감정 분석 및 DHI 점수 산출
-        
-        // 임시 데이터 생성 (나중에 AI 서비스로 대체)
-        createMockScenesAndAnalysis(dream);
-        
+
+        // AI 처리 (동기 방식 - Phase 3에서 비동기로 전환 예정)
+        // 1. GPT-4o로 장면 분할 및 감정 분석
+        // 2. DALL-E 3로 각 장면 이미지 생성
+        try {
+            dreamAiService.analyzeDream(dream);
+            log.info("Dream AI analysis completed for dream ID: {}", dream.getId());
+        } catch (Exception e) {
+            log.error("Dream AI analysis failed, using fallback data", e);
+            // fallback은 DreamAiService 내부에서 처리됨
+        }
+
         return DreamResponse.from(dream);
     }
     
@@ -76,44 +82,41 @@ public class DreamService {
     }
     
     @Transactional
-    public void deleteDream(Long userId, Long dreamId) {
+    public DreamResponse updateDream(Long userId, Long dreamId, UpdateDreamRequest request) {
         Dream dream = dreamRepository.findById(dreamId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
-        
+
         if (!dream.getUser().getId().equals(userId)) {
             throw new EntityNotFoundException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
-        
-        dreamRepository.delete(dream);
-    }
-    
-    // TODO: AI 서비스 구현 후 제거할 임시 메서드
-    private void createMockScenesAndAnalysis(Dream dream) {
-        // Mock 장면 생성
-        for (int i = 1; i <= 4; i++) {
-            Scene scene = Scene.builder()
-                    .dream(dream)
-                    .cutOrder(i)
-                    .description("장면 " + i + " 설명")
-                    .imageUrl("https://example.com/scene" + i + ".png")
-                    .dialogue("대사 " + i)
-                    .build();
-            dream.addScene(scene);
+
+        // 업데이트 가능한 필드들
+        if (request.getTitle() != null) {
+            dream.updateTitle(request.getTitle());
         }
-        
-        // Mock 분석 생성
-        Map<String, Double> emotions = new HashMap<>();
-        emotions.put("joy", 0.3);
-        emotions.put("fear", 0.1);
-        emotions.put("calm", 0.6);
-        
-        Analysis analysis = Analysis.builder()
-                .dream(dream)
-                .healthScore(75)
-                .emotions(emotions)
-                .aiInsight("편안한 꿈을 꾸셨네요! 정서적으로 안정된 상태입니다.")
-                .build();
-        
-        dream.setAnalysis(analysis);
+
+        if (request.getTags() != null) {
+            dream.updateTags(request.getTags());
+        }
+
+        if (request.getIsFavorite() != null) {
+            if (request.getIsFavorite() != dream.getIsFavorite()) {
+                dream.toggleFavorite();
+            }
+        }
+
+        return DreamResponse.from(dream);
+    }
+
+    @Transactional
+    public void deleteDream(Long userId, Long dreamId) {
+        Dream dream = dreamRepository.findById(dreamId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
+
+        if (!dream.getUser().getId().equals(userId)) {
+            throw new EntityNotFoundException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+
+        dreamRepository.delete(dream);
     }
 }

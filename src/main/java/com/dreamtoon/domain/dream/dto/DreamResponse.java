@@ -2,6 +2,7 @@ package com.dreamtoon.domain.dream.dto;
 
 import com.dreamtoon.domain.analysis.dto.AnalysisResponse;
 import com.dreamtoon.domain.dream.entity.Dream;
+import com.dreamtoon.domain.dream.entity.InputMethod;
 import com.dreamtoon.domain.dream.entity.StylePreset;
 import com.dreamtoon.domain.scene.dto.SceneResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,33 +17,57 @@ import java.util.stream.Collectors;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DreamResponse {
-    
+
     private Long dreamId;
-    private String rawContent;
+    private Long userId;
+    private String title;
+    private String content;  // rawContent를 content로 변경 (프론트엔드와 일치)
     private StylePreset stylePreset;
+    private InputMethod inputMethod;
+    private List<String> tags;
+    private Boolean isFavorite;
+    private String webtoonUrl;
+    private String videoUrl;
+    private LocalDateTime recordedAt;
+    private LocalDateTime createdAt;
     private List<SceneResponse> scenes;
     private AnalysisResponse analysis;
-    private LocalDateTime createdAt;
-    
+
     public static DreamResponse from(Dream dream) {
         return DreamResponse.builder()
                 .dreamId(dream.getId())
-                .rawContent(dream.getRawContent())
+                .userId(dream.getUser() != null ? dream.getUser().getId() : null)
+                .title(dream.getTitle())
+                .content(dream.getRawContent())
                 .stylePreset(dream.getStylePreset())
+                .inputMethod(dream.getInputMethod())
+                .tags(dream.getTags())
+                .isFavorite(dream.getIsFavorite())
+                .webtoonUrl(dream.getWebtoonUrl())
+                .videoUrl(dream.getVideoUrl())
+                .recordedAt(dream.getRecordedAt())
                 .createdAt(dream.getCreatedAt())
                 .build();
     }
-    
+
     public static DreamResponse fromWithDetails(Dream dream) {
         return DreamResponse.builder()
                 .dreamId(dream.getId())
-                .rawContent(dream.getRawContent())
+                .userId(dream.getUser() != null ? dream.getUser().getId() : null)
+                .title(dream.getTitle())
+                .content(dream.getRawContent())
                 .stylePreset(dream.getStylePreset())
+                .inputMethod(dream.getInputMethod())
+                .tags(dream.getTags())
+                .isFavorite(dream.getIsFavorite())
+                .webtoonUrl(dream.getWebtoonUrl())
+                .videoUrl(dream.getVideoUrl())
+                .recordedAt(dream.getRecordedAt())
+                .createdAt(dream.getCreatedAt())
                 .scenes(dream.getScenes().stream()
                         .map(SceneResponse::from)
                         .collect(Collectors.toList()))
                 .analysis(dream.getAnalysis() != null ? AnalysisResponse.from(dream.getAnalysis()) : null)
-                .createdAt(dream.getCreatedAt())
                 .build();
     }
 }
