@@ -51,4 +51,8 @@ src/main/generated
 logs/
 *.log
 
+### Sensitive Documentation ###
+KAKAO_LOGIN_SETUP.md
+
+### Serena ###
 .serena

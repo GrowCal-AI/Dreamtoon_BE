@@ -52,7 +52,7 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - profile_nickname
-              - account_email
+              # - account_email  # 카카오 콘솔에서 동의 항목 설정 후 주석 해제
             client-name: Kakao
         
         provider:

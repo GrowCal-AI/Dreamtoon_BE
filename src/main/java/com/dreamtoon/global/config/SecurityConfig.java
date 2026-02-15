@@ -42,8 +42,11 @@ public class SecurityConfig {
                         .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/dreams/**").permitAll()
                         
-                        // OAuth2 login
+                        // OAuth2 login (Spring Security 기본 경로)
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+                        
+                        // Auth API (토큰 갱신)
+                        .requestMatchers("/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
                         
                         // Authenticated endpoints
                         .requestMatchers("/api/v1/dreams/**").authenticated()

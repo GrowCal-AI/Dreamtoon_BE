@@ -39,8 +39,14 @@ public class OAuthAttributes {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
         
+        // 이메일이 없으면 카카오ID@kakao.com 형식으로 생성
+        String email = (String) kakaoAccount.get("email");
+        if (email == null || email.isBlank()) {
+            email = attributes.get("id") + "@kakao.com";
+        }
+        
         return OAuthAttributes.builder()
-                .email((String) kakaoAccount.get("email"))
+                .email(email)
                 .nickname((String) profile.get("nickname"))
                 .provider(SocialProvider.KAKAO)
                 .providerId(String.valueOf(attributes.get("id")))
