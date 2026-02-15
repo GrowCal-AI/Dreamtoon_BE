@@ -13,19 +13,19 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MessageResponse {
 
-        private Long messageId;
-        private MessageRole role;
-        private String content;
-        private Map<String, Object> metadata;
-        private LocalDateTime createdAt;
+    private Long messageId;
+    private MessageRole role;
+    private String content;
+    private Map<String, Object> metadata;
+    private LocalDateTime createdAt;
 
-        public static MessageResponse from(Message message) {
-                return MessageResponse.builder()
-                                .messageId(message.getId())
-                                .role(message.getRole())
-                                .content(message.getContent())
-                                .metadata(message.getMetadata())
-                                .createdAt(message.getCreatedAt())
-                                .build();
-        }
+    public static MessageResponse from(Message message) {
+        return MessageResponse.builder()
+                .messageId(message.getId())
+                .role(message.getRole())
+                .content(message.getContent())
+                .metadata(message.getMetadata())
+                .createdAt(message.getCreatedAt())
+                .build();
+    }
 }

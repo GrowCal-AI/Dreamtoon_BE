@@ -14,26 +14,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
-        private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-        public UserResponse getUser(Long userId) {
-                User user =
-                                userRepository
-                                                .findById(userId)
-                                                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+    public UserResponse getUser(Long userId) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-                return UserResponse.from(user);
-        }
+        return UserResponse.from(user);
+    }
 
-        @Transactional
-        public UserResponse updateNickname(Long userId, String nickname) {
-                User user =
-                                userRepository
-                                                .findById(userId)
-                                                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+    @Transactional
+    public UserResponse updateNickname(Long userId, String nickname) {
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-                user.updateNickname(nickname);
+        user.updateNickname(nickname);
 
-                return UserResponse.from(user);
-        }
+        return UserResponse.from(user);
+    }
 }

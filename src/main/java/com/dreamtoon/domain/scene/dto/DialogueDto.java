@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DialogueDto {
 
-        private String character;
-        private String text;
+    private String character;
+    private String text;
 }

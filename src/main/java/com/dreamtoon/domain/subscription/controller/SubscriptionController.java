@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SubscriptionController {
 
-        private final SubscriptionService subscriptionService;
+    private final SubscriptionService subscriptionService;
 
-        @Operation(summary = "사용량 조회", description = "현재 구독 티어 및 생성/저장 사용량을 조회합니다.")
-        @GetMapping("/usage")
-        public ResponseEntity<ApiResponse<UsageResponse>> getUsage(
-                        @AuthenticationPrincipal Long userId) {
-                UsageResponse response = subscriptionService.getUsage(userId);
-                return ResponseEntity.ok(ApiResponse.success(response));
-        }
+    @Operation(summary = "사용량 조회", description = "현재 구독 티어 및 생성/저장 사용량을 조회합니다.")
+    @GetMapping("/usage")
+    public ResponseEntity<ApiResponse<UsageResponse>> getUsage(
+            @AuthenticationPrincipal Long userId) {
+        UsageResponse response = subscriptionService.getUsage(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 }

@@ -14,39 +14,39 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-        @Value("${server.port:8080}")
-        private String serverPort;
+    @Value("${server.port:8080}")
+    private String serverPort;
 
-        @Bean
-        public OpenAPI openAPI() {
-                String jwt = "JWT";
-                SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
+    @Bean
+    public OpenAPI openAPI() {
+        String jwt = "JWT";
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
 
-                Components components =
-                                new Components()
-                                                .addSecuritySchemes(
-                                                                jwt,
-                                                                new SecurityScheme()
-                                                                                .name(jwt)
-                                                                                .type(SecurityScheme.Type.HTTP)
-                                                                                .scheme("bearer")
-                                                                                .bearerFormat("JWT"));
+        Components components =
+                new Components()
+                        .addSecuritySchemes(
+                                jwt,
+                                new SecurityScheme()
+                                        .name(jwt)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT"));
 
-                return new OpenAPI()
-                                .info(
-                                                new Info()
-                                                                .title("DreamToon API")
-                                                                .description("AI 기반 꿈 시각화 및 정서 상태 분석 헬스케어 플랫폼 API")
-                                                                .version("v1.0.0"))
-                                .servers(
-                                                List.of(
-                                                                new Server()
-                                                                                .url("http://localhost:" + serverPort)
-                                                                                .description("Local Server"),
-                                                                new Server()
-                                                                                .url("https://api.dreamtoon.com")
-                                                                                .description("Production Server")))
-                                .addSecurityItem(securityRequirement)
-                                .components(components);
-        }
+        return new OpenAPI()
+                .info(
+                        new Info()
+                                .title("DreamToon API")
+                                .description("AI 기반 꿈 시각화 및 정서 상태 분석 헬스케어 플랫폼 API")
+                                .version("v1.0.0"))
+                .servers(
+                        List.of(
+                                new Server()
+                                        .url("http://localhost:" + serverPort)
+                                        .description("Local Server"),
+                                new Server()
+                                        .url("https://api.dreamtoon.com")
+                                        .description("Production Server")))
+                .addSecurityItem(securityRequirement)
+                .components(components);
+    }
 }

@@ -12,57 +12,57 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(
-                name = "users",
-                uniqueConstraints = {@UniqueConstraint(columnNames = {"social_provider", "social_id"})})
+        name = "users",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"social_provider", "social_id"})})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class User {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @Column(nullable = false, unique = true)
-        private String email;
+    @Column(nullable = false, unique = true)
+    private String email;
 
-        @Column(nullable = false)
-        private String nickname;
+    @Column(nullable = false)
+    private String nickname;
 
-        @Enumerated(EnumType.STRING)
-        @Column(name = "social_provider", nullable = false)
-        private SocialProvider socialProvider;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "social_provider", nullable = false)
+    private SocialProvider socialProvider;
 
-        @Column(name = "social_id", nullable = false)
-        private String socialId;
+    @Column(name = "social_id", nullable = false)
+    private String socialId;
 
-        @Enumerated(EnumType.STRING)
-        @Column(nullable = false)
-        private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-        @CreatedDate
-        @Column(name = "created_at", nullable = false, updatable = false)
-        private LocalDateTime createdAt;
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-        @LastModifiedDate
-        @Column(name = "updated_at")
-        private LocalDateTime updatedAt;
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-        @Builder
-        public User(
-                        String email,
-                        String nickname,
-                        SocialProvider socialProvider,
-                        String socialId,
-                        Role role) {
-                this.email = email;
-                this.nickname = nickname;
-                this.socialProvider = socialProvider;
-                this.socialId = socialId;
-                this.role = role;
-        }
+    @Builder
+    public User(
+            String email,
+            String nickname,
+            SocialProvider socialProvider,
+            String socialId,
+            Role role) {
+        this.email = email;
+        this.nickname = nickname;
+        this.socialProvider = socialProvider;
+        this.socialId = socialId;
+        this.role = role;
+    }
 
-        public void updateNickname(String nickname) {
-                this.nickname = nickname;
-        }
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

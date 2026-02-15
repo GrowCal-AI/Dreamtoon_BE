@@ -24,86 +24,86 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final RequestLoggingFilter requestLoggingFilter;
-        private final JwtAuthenticationFilter jwtAuthenticationFilter;
-        private final CustomOAuth2UserService customOAuth2UserService;
-        private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final RequestLoggingFilter requestLoggingFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-                http.csrf(AbstractHttpConfigurer::disable)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .sessionManagement(
-                                                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .formLogin(AbstractHttpConfigurer::disable)
-                                .httpBasic(AbstractHttpConfigurer::disable)
-                                .authorizeHttpRequests(
-                                                auth ->
-                                                                auth
-                                                                                // Public endpoints
-                                                                                .requestMatchers("/", "/error", "/favicon.ico")
-                                                                                .permitAll()
-                                                                                .requestMatchers(
-                                                                                                "/api-docs/**",
-                                                                                                "/swagger-ui/**",
-                                                                                                "/swagger-ui.html")
-                                                                                .permitAll()
-                                                                                .requestMatchers(HttpMethod.GET, "/api/v1/dreams/**")
-                                                                                .permitAll()
-                                                                                .requestMatchers(HttpMethod.POST, "/api/v1/dreams")
-                                                                                .permitAll() // TODO: Remove after testing
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        auth ->
+                                auth
+                                        // Public endpoints
+                                        .requestMatchers("/", "/error", "/favicon.ico")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                "/api-docs/**",
+                                                "/swagger-ui/**",
+                                                "/swagger-ui.html")
+                                        .permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/api/v1/dreams/**")
+                                        .permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/api/v1/dreams")
+                                        .permitAll() // TODO: Remove after testing
 
-                                                                                // Test login endpoint (dev only)
-                                                                                .requestMatchers("/api/v1/auth/test-login")
-                                                                                .permitAll()
+                                        // Test login endpoint (dev only)
+                                        .requestMatchers("/api/v1/auth/test-login")
+                                        .permitAll()
 
-                                                                                // OAuth2 login (Spring Security 기본 경로)
-                                                                                .requestMatchers("/oauth2/**", "/login/oauth2/**")
-                                                                                .permitAll()
+                                        // OAuth2 login (Spring Security 기본 경로)
+                                        .requestMatchers("/oauth2/**", "/login/oauth2/**")
+                                        .permitAll()
 
-                                                                                // Auth API (토큰 갱신)
-                                                                                .requestMatchers(
-                                                                                                "/api/v1/auth/refresh", "/api/v1/auth/logout")
-                                                                                .permitAll()
+                                        // Auth API (토큰 갱신)
+                                        .requestMatchers(
+                                                "/api/v1/auth/refresh", "/api/v1/auth/logout")
+                                        .permitAll()
 
-                                                                                // Authenticated endpoints
-                                                                                .requestMatchers("/api/v1/dreams/**")
-                                                                                .authenticated()
-                                                                                .requestMatchers("/api/v1/users/**")
-                                                                                .authenticated()
-                                                                                .anyRequest()
-                                                                                .authenticated())
-                                .oauth2Login(
-                                                oauth2 ->
-                                                                oauth2.userInfoEndpoint(
-                                                                                                userInfo ->
-                                                                                                                userInfo.userService(
-                                                                                                                                customOAuth2UserService))
-                                                                                .successHandler(oAuth2AuthenticationSuccessHandler))
-                                .addFilterBefore(
-                                                jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                                .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);
+                                        // Authenticated endpoints
+                                        .requestMatchers("/api/v1/dreams/**")
+                                        .authenticated()
+                                        .requestMatchers("/api/v1/users/**")
+                                        .authenticated()
+                                        .anyRequest()
+                                        .authenticated())
+                .oauth2Login(
+                        oauth2 ->
+                                oauth2.userInfoEndpoint(
+                                                userInfo ->
+                                                        userInfo.userService(
+                                                                customOAuth2UserService))
+                                        .successHandler(oAuth2AuthenticationSuccessHandler))
+                .addFilterBefore(
+                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);
 
-                return http.build();
-        }
+        return http.build();
+    }
 
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(
-                                List.of(
-                                                "http://localhost:3000",
-                                                "http://localhost:3001",
-                                                "http://localhost:5173" // Vite dev server
-                                                ));
-                configuration.setAllowedMethods(
-                                List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-                configuration.setAllowedHeaders(List.of("*"));
-                configuration.setAllowCredentials(true);
-                configuration.setMaxAge(3600L);
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(
+                List.of(
+                        "http://localhost:3000",
+                        "http://localhost:3001",
+                        "http://localhost:5173" // Vite dev server
+                        ));
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                return source;
-        }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

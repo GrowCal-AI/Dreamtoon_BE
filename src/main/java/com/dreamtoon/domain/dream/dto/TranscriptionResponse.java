@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TranscriptionResponse {
 
-        /** 전사된 텍스트 */
-        private String text;
+    /** 전사된 텍스트 */
+    private String text;
 
-        /** 전사 언어 (예: "ko", "en") */
-        private String language;
+    /** 전사 언어 (예: "ko", "en") */
+    private String language;
 
-        /** 전사 소요 시간 (밀리초) */
-        private Long processingTimeMs;
+    /** 전사 소요 시간 (밀리초) */
+    private Long processingTimeMs;
 }

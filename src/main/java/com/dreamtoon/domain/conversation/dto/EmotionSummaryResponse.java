@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 public class EmotionSummaryResponse {
 
-        private EmotionType dominantEmotion;
-        private Integer dominantIntensity;
-        private String aiInterpretation;
+    private EmotionType dominantEmotion;
+    private Integer dominantIntensity;
+    private String aiInterpretation;
 }

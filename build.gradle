@@ -111,8 +111,7 @@ spotless {
         // 파일 끝에 개행 추가
         endWithNewline()
 
-        // 들여쓰기 정리
-        indentWithTabs(2)
+        // 들여쓰기 정리 (4칸 스페이스)
         indentWithSpaces(4)
 
         // trailing whitespace 제거

@@ -7,11 +7,9 @@ import java.util.Map;
 /** 대화형 AI 프롬프트 생성 */
 public class ConversationAiPrompt {
 
-        /**
-         * 감정 수집 단계 - 초기 환영 메시지 생성
-         */
-        public static String generateWelcomeMessage() {
-                return """
+    /** 감정 수집 단계 - 초기 환영 메시지 생성 */
+    public static String generateWelcomeMessage() {
+        return """
                                 당신은 드림툰의 친근하고 공감적인 AI 심리 상담사입니다.
                                 사용자가 꿈을 기록하러 왔습니다.
 
@@ -23,22 +21,20 @@ public class ConversationAiPrompt {
                                 톤: 친근하고 따뜻하며, 전문적이되 격식을 차리지 않음
                                 길이: 3문장 이내
                                 """;
-        }
+    }
 
-        /**
-         * 감정 수집 단계 - 사용자가 선택한 감정에 대한 AI 해석 생성
-         */
-        public static String generateEmotionInterpretation(
-                        Map<EmotionType, Integer> emotions, EmotionType dominantEmotion) {
-                StringBuilder emotionList = new StringBuilder();
-                emotions.forEach(
-                                (emotion, intensity) -> {
-                                        String emotionKr = getEmotionKoreanName(emotion);
-                                        emotionList.append(String.format("- %s: %d%%\n", emotionKr, intensity));
-                                });
+    /** 감정 수집 단계 - 사용자가 선택한 감정에 대한 AI 해석 생성 */
+    public static String generateEmotionInterpretation(
+            Map<EmotionType, Integer> emotions, EmotionType dominantEmotion) {
+        StringBuilder emotionList = new StringBuilder();
+        emotions.forEach(
+                (emotion, intensity) -> {
+                    String emotionKr = getEmotionKoreanName(emotion);
+                    emotionList.append(String.format("- %s: %d%%\n", emotionKr, intensity));
+                });
 
-                return String.format(
-                                """
+        return String.format(
+                """
                                 당신은 드림툰의 AI 심리 상담사입니다.
                                 사용자가 꿈에서 느낀 감정을 다음과 같이 선택했습니다:
 
@@ -53,14 +49,12 @@ public class ConversationAiPrompt {
                                 톤: 공감적이고 따뜻하며 긍정적
                                 길이: 3-4문장
                                 """,
-                                emotionList.toString(), getEmotionKoreanName(dominantEmotion));
-        }
+                emotionList.toString(), getEmotionKoreanName(dominantEmotion));
+    }
 
-        /**
-         * 상황 분석 단계 - 스트레스 평가 안내 메시지 생성
-         */
-        public static String generateStressAssessmentIntro() {
-                return """
+    /** 상황 분석 단계 - 스트레스 평가 안내 메시지 생성 */
+    public static String generateStressAssessmentIntro() {
+        return """
                                 당신은 드림툰의 AI 심리 상담사입니다.
                                 감정 분석을 마치고 이제 현실 상황 분석 단계로 넘어갑니다.
 
@@ -72,18 +66,16 @@ public class ConversationAiPrompt {
                                 톤: 격려하는 듯하면서도 전문적
                                 길이: 3-4문장
                                 """;
-        }
+    }
 
-        /**
-         * 상황 분석 단계 - 스트레스 평가 결과 해석
-         */
-        public static String generateStressRecommendation(
-                        int totalStressIndex, String topStressors, int sleepQuality) {
-                String stressLevel = totalStressIndex >= 70 ? "높음" : totalStressIndex >= 40 ? "보통" : "낮음";
-                String sleepLevel = sleepQuality >= 80 ? "양호" : sleepQuality >= 50 ? "보통" : "불량";
+    /** 상황 분석 단계 - 스트레스 평가 결과 해석 */
+    public static String generateStressRecommendation(
+            int totalStressIndex, String topStressors, int sleepQuality) {
+        String stressLevel = totalStressIndex >= 70 ? "높음" : totalStressIndex >= 40 ? "보통" : "낮음";
+        String sleepLevel = sleepQuality >= 80 ? "양호" : sleepQuality >= 50 ? "보통" : "불량";
 
-                return String.format(
-                                """
+        return String.format(
+                """
                                 당신은 드림툰의 AI 심리 상담사입니다.
                                 사용자의 스트레스 평가 결과:
                                 - 총 스트레스 지수: %d/100 (%s)
@@ -99,27 +91,22 @@ public class ConversationAiPrompt {
                                 톤: 전문적이면서도 따뜻하고 실용적
                                 길이: 3-5문장
                                 """,
-                                totalStressIndex,
-                                stressLevel,
-                                topStressors,
-                                sleepQuality,
-                                sleepLevel);
-        }
+                totalStressIndex, stressLevel, topStressors, sleepQuality, sleepLevel);
+    }
 
-        /**
-         * 일반 메시지 응답 생성 (자유 대화)
-         */
-        public static String generateGeneralResponse(String userMessage, ConversationPhase currentPhase) {
-                String phaseContext =
-                                switch (currentPhase) {
-                                        case EMOTION_COLLECTION -> "사용자가 꿈에서 느낀 감정을 파악하는 단계";
-                                        case CONTEXT_ANALYSIS -> "사용자의 현실 스트레스 상황을 분석하는 단계";
-                                        case REPORT_GENERATION -> "심리 리포트를 생성하는 단계";
-                                        case CONTENT_CREATION -> "웹툰을 생성하는 단계";
-                                };
+    /** 일반 메시지 응답 생성 (자유 대화) */
+    public static String generateGeneralResponse(
+            String userMessage, ConversationPhase currentPhase) {
+        String phaseContext =
+                switch (currentPhase) {
+                    case EMOTION_COLLECTION -> "사용자가 꿈에서 느낀 감정을 파악하는 단계";
+                    case CONTEXT_ANALYSIS -> "사용자의 현실 스트레스 상황을 분석하는 단계";
+                    case REPORT_GENERATION -> "심리 리포트를 생성하는 단계";
+                    case CONTENT_CREATION -> "웹툰을 생성하는 단계";
+                };
 
-                return String.format(
-                                """
+        return String.format(
+                """
                                 당신은 드림툰의 AI 심리 상담사입니다.
                                 현재 대화 단계: %s
 
@@ -134,18 +121,18 @@ public class ConversationAiPrompt {
                                 톤: 친근하고 공감적이며 전문적
                                 길이: 2-3문장
                                 """,
-                                phaseContext, userMessage);
-        }
+                phaseContext, userMessage);
+    }
 
-        /** 감정 타입을 한글 이름으로 변환 */
-        private static String getEmotionKoreanName(EmotionType emotion) {
-                return switch (emotion) {
-                        case JOY -> "기쁨";
-                        case ANXIETY -> "불안";
-                        case ANGER -> "분노";
-                        case SADNESS -> "슬픔";
-                        case SURPRISE -> "놀람";
-                        case PEACE -> "평온";
-                };
-        }
+    /** 감정 타입을 한글 이름으로 변환 */
+    private static String getEmotionKoreanName(EmotionType emotion) {
+        return switch (emotion) {
+            case JOY -> "기쁨";
+            case ANXIETY -> "불안";
+            case ANGER -> "분노";
+            case SADNESS -> "슬픔";
+            case SURPRISE -> "놀람";
+            case PEACE -> "평온";
+        };
+    }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateDreamRequest {
 
-        private String title;
-        private List<String> tags;
-        private Boolean isFavorite;
+    private String title;
+    private List<String> tags;
+    private Boolean isFavorite;
 }

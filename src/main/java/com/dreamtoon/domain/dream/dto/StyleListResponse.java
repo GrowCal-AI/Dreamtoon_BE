@@ -8,6 +8,6 @@ import lombok.Getter;
 @Builder
 public class StyleListResponse {
 
-        private List<StyleOptionResponse> styles;
-        private Boolean hasPremiumAccess;
+    private List<StyleOptionResponse> styles;
+    private Boolean hasPremiumAccess;
 }

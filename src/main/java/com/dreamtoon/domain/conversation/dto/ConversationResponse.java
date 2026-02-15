@@ -14,23 +14,23 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConversationResponse {
 
-        private Long conversationId;
-        private Long userId;
-        private Long dreamId;
-        private ConversationStatus status;
-        private ConversationPhase currentPhase;
-        private Map<String, Object> collectedData;
-        private LocalDateTime createdAt;
+    private Long conversationId;
+    private Long userId;
+    private Long dreamId;
+    private ConversationStatus status;
+    private ConversationPhase currentPhase;
+    private Map<String, Object> collectedData;
+    private LocalDateTime createdAt;
 
-        public static ConversationResponse from(Conversation conversation) {
-                return ConversationResponse.builder()
-                                .conversationId(conversation.getId())
-                                .userId(conversation.getUser().getId())
-                                .dreamId(conversation.getDream() != null ? conversation.getDream().getId() : null)
-                                .status(conversation.getStatus())
-                                .currentPhase(conversation.getCurrentPhase())
-                                .collectedData(conversation.getCollectedData())
-                                .createdAt(conversation.getCreatedAt())
-                                .build();
-        }
+    public static ConversationResponse from(Conversation conversation) {
+        return ConversationResponse.builder()
+                .conversationId(conversation.getId())
+                .userId(conversation.getUser().getId())
+                .dreamId(conversation.getDream() != null ? conversation.getDream().getId() : null)
+                .status(conversation.getStatus())
+                .currentPhase(conversation.getCurrentPhase())
+                .collectedData(conversation.getCollectedData())
+                .createdAt(conversation.getCreatedAt())
+                .build();
+    }
 }

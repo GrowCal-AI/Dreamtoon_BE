@@ -11,21 +11,21 @@ import lombok.Getter;
 @Builder
 public class DreamStatusResponse {
 
-        private Long dreamId;
-        private ProcessingStatus processingStatus;
-        private String errorMessage;
-        private Integer sceneCount;
-        private Boolean hasAnalysis;
-        private LocalDateTime createdAt;
+    private Long dreamId;
+    private ProcessingStatus processingStatus;
+    private String errorMessage;
+    private Integer sceneCount;
+    private Boolean hasAnalysis;
+    private LocalDateTime createdAt;
 
-        public static DreamStatusResponse from(Dream dream) {
-                return DreamStatusResponse.builder()
-                                .dreamId(dream.getId())
-                                .processingStatus(dream.getProcessingStatus())
-                                .errorMessage(dream.getErrorMessage())
-                                .sceneCount(dream.getScenes() != null ? dream.getScenes().size() : 0)
-                                .hasAnalysis(dream.getAnalysis() != null)
-                                .createdAt(dream.getCreatedAt())
-                                .build();
-        }
+    public static DreamStatusResponse from(Dream dream) {
+        return DreamStatusResponse.builder()
+                .dreamId(dream.getId())
+                .processingStatus(dream.getProcessingStatus())
+                .errorMessage(dream.getErrorMessage())
+                .sceneCount(dream.getScenes() != null ? dream.getScenes().size() : 0)
+                .hasAnalysis(dream.getAnalysis() != null)
+                .createdAt(dream.getCreatedAt())
+                .build();
+    }
 }

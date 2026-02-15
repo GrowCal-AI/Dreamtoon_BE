@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SceneRepository extends JpaRepository<Scene, Long> {
 
-        List<Scene> findByDreamIdOrderByCutOrderAsc(Long dreamId);
+    List<Scene> findByDreamIdOrderByCutOrderAsc(Long dreamId);
 }

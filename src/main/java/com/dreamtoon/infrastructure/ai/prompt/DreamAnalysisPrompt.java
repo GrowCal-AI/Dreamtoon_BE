@@ -2,9 +2,7 @@ package com.dreamtoon.infrastructure.ai.prompt;
 
 import com.dreamtoon.domain.dream.entity.StylePreset;
 
-/**
- * GPT-4o를 위한 꿈 분석 프롬프트 템플릿
- */
+/** GPT-4o를 위한 꿈 분석 프롬프트 템플릿 */
 public class DreamAnalysisPrompt {
 
     /**
@@ -15,7 +13,8 @@ public class DreamAnalysisPrompt {
      * @return GPT-4o에 전달할 프롬프트
      */
     public static String createSceneAnalysisPrompt(String dreamContent, StylePreset style) {
-        return String.format("""
+        return String.format(
+                """
             당신은 전문 웹툰 작가이자 심리 분석가입니다. 사용자의 꿈을 분석하여 웹툰 형식으로 재구성해주세요.
 
             **꿈 내용:**
@@ -70,7 +69,8 @@ public class DreamAnalysisPrompt {
             }
 
             **중요:** 반드시 유효한 JSON 형식으로만 응답하세요. 다른 텍스트는 포함하지 마세요.
-            """, dreamContent, style.getDescription());
+            """,
+                dreamContent, style.getDescription());
     }
 
     /**
@@ -81,10 +81,12 @@ public class DreamAnalysisPrompt {
      * @param style 웹툰 스타일
      * @return DALL-E 3에 전달할 프롬프트
      */
-    public static String createImagePrompt(String sceneDescription, String[] backgroundKeywords, StylePreset style) {
+    public static String createImagePrompt(
+            String sceneDescription, String[] backgroundKeywords, StylePreset style) {
         String keywordsStr = String.join(", ", backgroundKeywords);
 
-        return String.format("""
+        return String.format(
+                """
             Create a webtoon panel in %s style.
 
             Scene: %s
@@ -100,10 +102,6 @@ public class DreamAnalysisPrompt {
 
             Make it visually engaging and emotionally impactful.
             """,
-            style.getDescription(),
-            sceneDescription,
-            keywordsStr,
-            style.getPromptTemplate()
-        );
+                style.getDescription(), sceneDescription, keywordsStr, style.getPromptTemplate());
     }
 }

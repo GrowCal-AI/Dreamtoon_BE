@@ -16,21 +16,21 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-        private final UserService userService;
+    private final UserService userService;
 
-        @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
-        @GetMapping("/me")
-        public ResponseEntity<ApiResponse<UserResponse>> getMyInfo(
-                        @AuthenticationPrincipal Long userId) {
-                UserResponse response = userService.getUser(userId);
-                return ResponseEntity.ok(ApiResponse.success(response));
-        }
+    @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserResponse>> getMyInfo(
+            @AuthenticationPrincipal Long userId) {
+        UserResponse response = userService.getUser(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
-        @Operation(summary = "닉네임 변경", description = "사용자의 닉네임을 변경합니다.")
-        @PatchMapping("/me/nickname")
-        public ResponseEntity<ApiResponse<UserResponse>> updateNickname(
-                        @AuthenticationPrincipal Long userId, @RequestParam String nickname) {
-                UserResponse response = userService.updateNickname(userId, nickname);
-                return ResponseEntity.ok(ApiResponse.success("닉네임이 변경되었습니다.", response));
-        }
+    @Operation(summary = "닉네임 변경", description = "사용자의 닉네임을 변경합니다.")
+    @PatchMapping("/me/nickname")
+    public ResponseEntity<ApiResponse<UserResponse>> updateNickname(
+            @AuthenticationPrincipal Long userId, @RequestParam String nickname) {
+        UserResponse response = userService.updateNickname(userId, nickname);
+        return ResponseEntity.ok(ApiResponse.success("닉네임이 변경되었습니다.", response));
+    }
 }

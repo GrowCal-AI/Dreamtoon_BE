@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SocialProvider {
-        GOOGLE("구글"),
-        KAKAO("카카오");
+    GOOGLE("구글"),
+    KAKAO("카카오");
 
-        private final String description;
+    private final String description;
 }

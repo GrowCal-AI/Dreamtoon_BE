@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum InputMethod {
-        TEXT("텍스트 입력"),
-        VOICE("음성 입력");
+    TEXT("텍스트 입력"),
+    VOICE("음성 입력");
 
-        private final String description;
+    private final String description;
 }

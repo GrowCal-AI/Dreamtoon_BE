@@ -9,18 +9,18 @@ import lombok.Getter;
 @Builder
 public class StressAssessmentResponse {
 
-        private Integer totalStressIndex;
-        private List<String> topStressors;
-        private String sleepQualityLevel;
-        private String aiRecommendation;
+    private Integer totalStressIndex;
+    private List<String> topStressors;
+    private String sleepQualityLevel;
+    private String aiRecommendation;
 
-        public static StressAssessmentResponse from(
-                        StressAssessment assessment, String aiRecommendation) {
-                return StressAssessmentResponse.builder()
-                                .totalStressIndex(assessment.calculateTotalStressIndex())
-                                .topStressors(assessment.getTopStressors())
-                                .sleepQualityLevel(assessment.getSleepQualityLevel())
-                                .aiRecommendation(aiRecommendation)
-                                .build();
-        }
+    public static StressAssessmentResponse from(
+            StressAssessment assessment, String aiRecommendation) {
+        return StressAssessmentResponse.builder()
+                .totalStressIndex(assessment.calculateTotalStressIndex())
+                .topStressors(assessment.getTopStressors())
+                .sleepQualityLevel(assessment.getSleepQualityLevel())
+                .aiRecommendation(aiRecommendation)
+                .build();
+    }
 }

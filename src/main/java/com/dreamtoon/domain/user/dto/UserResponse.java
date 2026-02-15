@@ -11,21 +11,21 @@ import lombok.Getter;
 @Builder
 public class UserResponse {
 
-        private Long userId;
-        private String email;
-        private String nickname;
-        private SocialProvider socialProvider;
-        private Role role;
-        private LocalDateTime createdAt;
+    private Long userId;
+    private String email;
+    private String nickname;
+    private SocialProvider socialProvider;
+    private Role role;
+    private LocalDateTime createdAt;
 
-        public static UserResponse from(User user) {
-                return UserResponse.builder()
-                                .userId(user.getId())
-                                .email(user.getEmail())
-                                .nickname(user.getNickname())
-                                .socialProvider(user.getSocialProvider())
-                                .role(user.getRole())
-                                .createdAt(user.getCreatedAt())
-                                .build();
-        }
+    public static UserResponse from(User user) {
+        return UserResponse.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .socialProvider(user.getSocialProvider())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
 }

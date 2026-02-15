@@ -16,35 +16,35 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DreamAnalysisResult {
 
-        private List<SceneDto> scenes;
-        private AnalysisDto analysis;
+    private List<SceneDto> scenes;
+    private AnalysisDto analysis;
 
-        @Getter
-        @Builder
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class SceneDto {
-                private Integer sceneNumber;
-                private String description;
-                private List<String> characters;
-                private EmotionType emotion;
-                private List<String> backgroundKeywords;
-                private String narration;
-                private List<DialogueDto> dialogue;
-        }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SceneDto {
+        private Integer sceneNumber;
+        private String description;
+        private List<String> characters;
+        private EmotionType emotion;
+        private List<String> backgroundKeywords;
+        private String narration;
+        private List<DialogueDto> dialogue;
+    }
 
-        @Getter
-        @Builder
-        @NoArgsConstructor
-        @AllArgsConstructor
-        public static class AnalysisDto {
-                private Map<EmotionType, Double> emotions;
-                private Integer tensionLevel;
-                private Integer controlLevel;
-                private Boolean isNightmare;
-                private List<String> repeatingSymbols;
-                private List<String> relationshipPatterns;
-                private Boolean hasResolution;
-                private String aiInsight;
-        }
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AnalysisDto {
+        private Map<EmotionType, Double> emotions;
+        private Integer tensionLevel;
+        private Integer controlLevel;
+        private Boolean isNightmare;
+        private List<String> repeatingSymbols;
+        private List<String> relationshipPatterns;
+        private Boolean hasResolution;
+        private String aiInsight;
+    }
 }

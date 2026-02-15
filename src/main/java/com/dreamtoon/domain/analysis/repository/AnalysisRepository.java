@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
-        Optional<Analysis> findByDreamId(Long dreamId);
+    Optional<Analysis> findByDreamId(Long dreamId);
 }

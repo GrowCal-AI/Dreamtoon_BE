@@ -16,70 +16,70 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 /** 대화 메시지 */
 @Entity
 @Table(
-                name = "messages",
-                indexes = {@Index(name = "idx_messages_conversation_id", columnList = "conversation_id")})
+        name = "messages",
+        indexes = {@Index(name = "idx_messages_conversation_id", columnList = "conversation_id")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Message {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "conversation_id", nullable = false)
-        private Conversation conversation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conversation_id", nullable = false)
+    private Conversation conversation;
 
-        @Enumerated(EnumType.STRING)
-        @Column(nullable = false)
-        private MessageRole role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MessageRole role;
 
-        @Column(nullable = false, columnDefinition = "TEXT")
-        private String content;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String content;
 
-        @Type(JsonType.class)
-        @Column(columnDefinition = "jsonb")
-        private Map<String, Object> metadata = new HashMap<>();
+    @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> metadata = new HashMap<>();
 
-        @CreatedDate
-        @Column(name = "created_at", nullable = false, updatable = false)
-        private LocalDateTime createdAt;
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-        @Builder
-        public Message(
-                        Conversation conversation,
-                        MessageRole role,
-                        String content,
-                        Map<String, Object> metadata) {
-                this.conversation = conversation;
-                this.role = role;
-                this.content = content;
-                this.metadata = metadata != null ? metadata : new HashMap<>();
+    @Builder
+    public Message(
+            Conversation conversation,
+            MessageRole role,
+            String content,
+            Map<String, Object> metadata) {
+        this.conversation = conversation;
+        this.role = role;
+        this.content = content;
+        this.metadata = metadata != null ? metadata : new HashMap<>();
+    }
+
+    // === 비즈니스 메서드 ===
+
+    /** 메타데이터 추가 */
+    public void addMetadata(String key, Object value) {
+        if (this.metadata == null) {
+            this.metadata = new HashMap<>();
         }
+        this.metadata.put(key, value);
+    }
 
-        // === 비즈니스 메서드 ===
+    /** 사용자 메시지인지 확인 */
+    public boolean isUserMessage() {
+        return this.role == MessageRole.USER;
+    }
 
-        /** 메타데이터 추가 */
-        public void addMetadata(String key, Object value) {
-                if (this.metadata == null) {
-                        this.metadata = new HashMap<>();
-                }
-                this.metadata.put(key, value);
-        }
+    /** AI 메시지인지 확인 */
+    public boolean isAssistantMessage() {
+        return this.role == MessageRole.ASSISTANT;
+    }
 
-        /** 사용자 메시지인지 확인 */
-        public boolean isUserMessage() {
-                return this.role == MessageRole.USER;
-        }
-
-        /** AI 메시지인지 확인 */
-        public boolean isAssistantMessage() {
-                return this.role == MessageRole.ASSISTANT;
-        }
-
-        /** 시스템 메시지인지 확인 */
-        public boolean isSystemMessage() {
-                return this.role == MessageRole.SYSTEM;
-        }
+    /** 시스템 메시지인지 확인 */
+    public boolean isSystemMessage() {
+        return this.role == MessageRole.SYSTEM;
+    }
 }

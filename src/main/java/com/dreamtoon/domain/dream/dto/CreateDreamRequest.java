@@ -23,30 +23,30 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateDreamRequest {
 
-        /** 꿈 제목 */
-        @NotBlank(message = "제목을 입력해주세요.")
-        private String title;
+    /** 꿈 제목 */
+    @NotBlank(message = "제목을 입력해주세요.")
+    private String title;
 
-        /** 꿈 내용 */
-        @NotBlank(message = "꿈 내용을 입력해주세요.")
-        private String content;
+    /** 꿈 내용 */
+    @NotBlank(message = "꿈 내용을 입력해주세요.")
+    private String content;
 
-        /** 웹툰 스타일 (필수) */
-        @NotNull(message = "스타일을 선택해주세요.")
-        private StylePreset style;
+    /** 웹툰 스타일 (필수) */
+    @NotNull(message = "스타일을 선택해주세요.")
+    private StylePreset style;
 
-        /** 등장인물 목록 (선택) */
-        private List<String> characters;
+    /** 등장인물 목록 (선택) */
+    private List<String> characters;
 
-        /** 장소 목록 (선택) */
-        private List<String> location;
+    /** 장소 목록 (선택) */
+    private List<String> location;
 
-        /** 주요 감정 (선택) */
-        private EmotionType mainEmotion;
+    /** 주요 감정 (선택) */
+    private EmotionType mainEmotion;
 
-        /** 마지막 장면 설명 (선택) */
-        private String lastScene;
+    /** 마지막 장면 설명 (선택) */
+    private String lastScene;
 
-        /** 입력 방식 (기본값: TEXT) */
-        @Builder.Default private InputMethod inputMethod = InputMethod.TEXT;
+    /** 입력 방식 (기본값: TEXT) */
+    @Builder.Default private InputMethod inputMethod = InputMethod.TEXT;
 }

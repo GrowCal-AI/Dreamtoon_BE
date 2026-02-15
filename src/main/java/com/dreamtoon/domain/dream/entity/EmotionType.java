@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum EmotionType {
-        JOY("기쁨", "joy"),
-        ANXIETY("불안", "anxiety"),
-        ANGER("분노", "anger"),
-        SADNESS("슬픔", "sadness"),
-        SURPRISE("놀라움", "surprise"),
-        PEACE("평온", "peace");
+    JOY("기쁨", "joy"),
+    ANXIETY("불안", "anxiety"),
+    ANGER("분노", "anger"),
+    SADNESS("슬픔", "sadness"),
+    SURPRISE("놀라움", "surprise"),
+    PEACE("평온", "peace");
 
-        private final String description;
-        private final String code;
+    private final String description;
+    private final String code;
 }

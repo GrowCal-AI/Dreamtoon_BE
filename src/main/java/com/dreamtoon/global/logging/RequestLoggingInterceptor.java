@@ -13,35 +13,35 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class RequestLoggingInterceptor implements HandlerInterceptor {
 
-        @Override
-        public boolean preHandle(
-                        HttpServletRequest request, HttpServletResponse response, Object handler) {
-                if (handler instanceof HandlerMethod handlerMethod) {
-                        String controllerName = handlerMethod.getBeanType().getSimpleName();
-                        String methodName = handlerMethod.getMethod().getName();
+    @Override
+    public boolean preHandle(
+            HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (handler instanceof HandlerMethod handlerMethod) {
+            String controllerName = handlerMethod.getBeanType().getSimpleName();
+            String methodName = handlerMethod.getMethod().getName();
 
-                        String requestId = MDC.get("requestId");
-                        log.info("[{}] Controller: {}.{}()", requestId, controllerName, methodName);
-                }
-
-                return true;
+            String requestId = MDC.get("requestId");
+            log.info("[{}] Controller: {}.{}()", requestId, controllerName, methodName);
         }
 
-        @Override
-        public void afterCompletion(
-                        HttpServletRequest request,
-                        HttpServletResponse response,
-                        Object handler,
-                        Exception ex) {
-                String requestId = MDC.get("requestId");
-                int status = response.getStatus();
+        return true;
+    }
 
-                if (ex != null) {
-                        log.error("[{}] Request failed with exception: {}", requestId, ex.getMessage());
-                } else if (status >= 400) {
-                        log.warn("[{}] Request completed with error status: {}", requestId, status);
-                } else {
-                        log.debug("[{}] Request completed successfully with status: {}", requestId, status);
-                }
+    @Override
+    public void afterCompletion(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler,
+            Exception ex) {
+        String requestId = MDC.get("requestId");
+        int status = response.getStatus();
+
+        if (ex != null) {
+            log.error("[{}] Request failed with exception: {}", requestId, ex.getMessage());
+        } else if (status >= 400) {
+            log.warn("[{}] Request completed with error status: {}", requestId, status);
+        } else {
+            log.debug("[{}] Request completed successfully with status: {}", requestId, status);
         }
+    }
 }
