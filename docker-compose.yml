@@ -47,6 +47,15 @@ services:
         condition: service_healthy
     networks:
       - dreamtoon-network
+    # Docker Watch: 코드 변경 시 자동 재빌드
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: ./build.gradle
+          target: /app/build.gradle
 
 volumes:
   postgres_data:
