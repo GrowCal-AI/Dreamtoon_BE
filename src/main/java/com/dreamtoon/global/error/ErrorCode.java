@@ -32,7 +32,21 @@ public enum ErrorCode {
         // Storage
         FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "파일 업로드에 실패했습니다."),
         FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S002", "파일 삭제에 실패했습니다."),
-        INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "S003", "유효하지 않은 파일 형식입니다.");
+        INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "S003", "유효하지 않은 파일 형식입니다."),
+
+        // Subscription
+        GENERATION_LIMIT_EXCEEDED(
+                        HttpStatus.FORBIDDEN, "SUB001", "무료 회원은 월 3회까지 생성 가능합니다. 프리미엄으로 업그레이드하세요."),
+        SAVE_LIMIT_EXCEEDED(
+                        HttpStatus.FORBIDDEN,
+                        "SUB002",
+                        "무료 회원은 최대 3개까지 저장 가능합니다. 기존 꿈을 삭제하거나 프리미엄으로 업그레이드하세요."),
+        PREMIUM_STYLE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB003", "프리미엄 스타일은 유료 회원만 사용 가능합니다."),
+
+        // Conversation
+        CONVERSATION_NOT_FOUND(HttpStatus.NOT_FOUND, "CONV001", "대화를 찾을 수 없습니다."),
+        CONVERSATION_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "CONV002", "이미 완료된 대화입니다."),
+        INVALID_CONVERSATION_PHASE(HttpStatus.BAD_REQUEST, "CONV003", "현재 대화 단계에서는 수행할 수 없는 작업입니다.");
 
         private final HttpStatus status;
         private final String code;

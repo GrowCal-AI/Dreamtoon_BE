@@ -3,6 +3,7 @@ package com.dreamtoon.domain.dream.controller;
 import com.dreamtoon.domain.dream.dto.CreateDreamRequest;
 import com.dreamtoon.domain.dream.dto.DreamResponse;
 import com.dreamtoon.domain.dream.dto.DreamStatusResponse;
+import com.dreamtoon.domain.dream.dto.StyleListResponse;
 import com.dreamtoon.domain.dream.dto.TranscriptionResponse;
 import com.dreamtoon.domain.dream.dto.UpdateDreamRequest;
 import com.dreamtoon.domain.dream.service.DreamService;
@@ -91,5 +92,15 @@ public class DreamController {
                 TranscriptionResponse response = voiceTranscriptionService.transcribeAudio(audioFile);
 
                 return ResponseEntity.ok(ApiResponse.success("음성 전사가 완료되었습니다.", response));
+        }
+
+        @Operation(
+                        summary = "스타일 목록 조회",
+                        description = "사용 가능한 웹툰 스타일 목록을 조회합니다. 구독 티어에 따라 접근 가능한 스타일이 표시됩니다.")
+        @GetMapping("/styles")
+        public ResponseEntity<ApiResponse<StyleListResponse>> getAvailableStyles(
+                        @AuthenticationPrincipal Long userId) {
+                StyleListResponse response = dreamService.getAvailableStyles(userId);
+                return ResponseEntity.ok(ApiResponse.success(response));
         }
 }
