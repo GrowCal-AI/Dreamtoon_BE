@@ -29,6 +29,7 @@ public class ConversationService {
         private final MessageRepository messageRepository;
         private final StressAssessmentRepository stressAssessmentRepository;
         private final UserRepository userRepository;
+        private final ConversationAiService conversationAiService;
 
         /**
          * 새 대화 시작
@@ -53,14 +54,13 @@ public class ConversationService {
                                                         Conversation conversation = Conversation.builder().user(user).build();
                                                         conversationRepository.save(conversation);
 
-                                                        // 환영 메시지 생성
+                                                        // 환영 메시지 생성 (GPT-4o)
+                                                        String welcomeContent = conversationAiService.generateWelcomeMessage();
                                                         Message welcomeMessage =
                                                                         Message.builder()
                                                                                         .conversation(conversation)
                                                                                         .role(MessageRole.ASSISTANT)
-                                                                                        .content(
-                                                                                                        "안녕하세요! 오늘 꿈에서 어떤 감정을 느끼셨나요? 아래에서 가장 가까운 감정을"
-                                                                                                                        + " 선택해주세요.")
+                                                                                        .content(welcomeContent)
                                                                                         .build();
                                                         messageRepository.save(welcomeMessage);
 
@@ -131,13 +131,15 @@ public class ConversationService {
                                                 .build();
                 messageRepository.save(userMessage);
 
-                // TODO: AI 응답 생성 로직 (Phase 2에서 구현)
-                // 현재는 단순 확인 메시지 반환
+                // AI 응답 생성 (GPT-4o)
+                String aiResponse =
+                                conversationAiService.generateGeneralResponse(
+                                                request.getContent(), conversation.getCurrentPhase());
                 Message assistantMessage =
                                 Message.builder()
                                                 .conversation(conversation)
                                                 .role(MessageRole.ASSISTANT)
-                                                .content("메시지를 받았습니다. AI 응답 생성 기능은 곧 구현될 예정입니다.")
+                                                .content(aiResponse)
                                                 .build();
                 messageRepository.save(assistantMessage);
 
@@ -182,8 +184,9 @@ public class ConversationService {
                 conversation.advanceToNextPhase();
                 conversationRepository.save(conversation);
 
-                // AI 해석 생성 (간단한 규칙 기반, Phase 3에서 GPT로 개선)
-                String interpretation = generateSimpleInterpretation(dominantEmotion, dominantIntensity);
+                // AI 감정 해석 생성 (GPT-4o)
+                String interpretation =
+                                conversationAiService.generateEmotionInterpretation(emotions, dominantEmotion);
 
                 log.info(
                                 "Emotions selected for conversation ID: {}, dominant: {}",
@@ -234,8 +237,12 @@ public class ConversationService {
                 conversation.advanceToNextPhase();
                 conversationRepository.save(conversation);
 
-                // AI 권장사항 생성 (간단한 규칙 기반, Phase 3에서 GPT로 개선)
-                String recommendation = generateSimpleRecommendation(assessment);
+                // AI 스트레스 권장사항 생성 (GPT-4o)
+                String recommendation =
+                                conversationAiService.generateStressRecommendation(
+                                                assessment.calculateTotalStressIndex(),
+                                                assessment.getTopStressors(),
+                                                assessment.getSleepQuality());
 
                 log.info(
                                 "Stress assessment submitted for conversation ID: {}, total index: {}",
@@ -267,33 +274,4 @@ public class ConversationService {
                 log.info("Deleted conversation ID: {} for user ID: {}", conversationId, userId);
         }
 
-        // === 유틸리티 메서드 ===
-
-        /** 간단한 감정 해석 생성 (Phase 3에서 GPT로 교체) */
-        private String generateSimpleInterpretation(EmotionType emotion, Integer intensity) {
-                String intensityLevel = intensity >= 70 ? "강하게" : intensity >= 40 ? "보통으로" : "약하게";
-
-                return switch (emotion) {
-                        case JOY -> intensityLevel + " 기쁨을 느끼셨군요. 긍정적인 꿈이었네요!";
-                        case ANXIETY -> intensityLevel + " 불안감을 느끼셨네요. 현실의 걱정이 반영된 것 같습니다.";
-                        case ANGER -> intensityLevel + " 분노를 느끼셨군요. 해결되지 않은 갈등이 있으신가요?";
-                        case SADNESS -> intensityLevel + " 슬픔을 느끼셨네요. 마음이 힘드셨던 것 같습니다.";
-                        case SURPRISE -> intensityLevel + " 놀라움을 느끼셨군요. 예상치 못한 일이 있었나요?";
-                        case PEACE -> intensityLevel + " 평온함을 느끼셨네요. 마음이 안정되어 있으신 것 같습니다.";
-                };
-        }
-
-        /** 간단한 권장사항 생성 (Phase 3에서 GPT로 교체) */
-        private String generateSimpleRecommendation(StressAssessment assessment) {
-                List<String> topStressors = assessment.getTopStressors();
-                int totalStress = assessment.calculateTotalStressIndex();
-
-                if (totalStress >= 70) {
-                        return "스트레스 수준이 높습니다. " + String.join("과 ", topStressors) + " 부분에서 휴식이 필요해 보입니다.";
-                } else if (totalStress >= 40) {
-                        return "보통 수준의 스트레스입니다. " + String.join("과 ", topStressors) + " 부분을 개선해보세요.";
-                } else {
-                        return "스트레스 수준이 낮습니다. 현재 상태를 잘 유지하고 계시네요!";
-                }
-        }
 }
