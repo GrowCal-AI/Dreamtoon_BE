@@ -36,7 +36,13 @@ public class SwaggerConfig {
                 .info(
                         new Info()
                                 .title("DreamToon API")
-                                .description("AI 기반 꿈 시각화 및 정서 상태 분석 헬스케어 플랫폼 API")
+                                .description(
+                                        "**DreamToon** — AI 기반 꿈 시각화·정서 분석 헬스케어 플랫폼의 백엔드 API입니다.\n\n"
+                                                + "**🔐 인증**: 대부분의 API는 **Authorization: Bearer {accessToken}** 헤더가 필요합니다. "
+                                                + "로그인은 OAuth2(Google/Kakao)로 진행되며, 토큰은 **Auth** 태그의 `/auth/refresh`로 갱신할 수 있습니다. "
+                                                + "개발 시에는 **Auth > [DEV] 테스트 로그인**으로 토큰 발급 후 상단 **Authorize**에 입력하세요.\n\n"
+                                                + "**📌 주요 플로우**: **Dreams** — 꿈 기록 시작 → 감정 선택 → 상세 입력 → 분석 조회(폴링) → 4컷 웹툰 생성. "
+                                                + "**Library** — 저장한 꿈 목록 조회. **Users** — 내 정보/닉네임/권한. **Conversations** — AI 에이전트 대화.")
                                 .version("v1.0.0"))
                 .servers(
                         List.of(
