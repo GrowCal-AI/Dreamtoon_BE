@@ -22,7 +22,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User oAuth2User = super.loadUser(userRequest);
+        OAuth2User oAuth2User = loadOAuth2User(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes = oAuth2User.getAttributes();
@@ -39,6 +39,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 user.getSocialId(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())),
                 attributes);
+    }
+
+    /** 테스트에서 OAuth2 인증 서버 호출을 스텁하기 위해 분리 (오버라이드 가능) */
+    protected OAuth2User loadOAuth2User(OAuth2UserRequest userRequest)
+            throws OAuth2AuthenticationException {
+        return super.loadUser(userRequest);
     }
 
     private User saveOrUpdate(OAuthAttributes attributes) {

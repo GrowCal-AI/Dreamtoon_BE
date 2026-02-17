@@ -141,7 +141,7 @@ public class SubscriptionService {
         Subscription subscription = getOrCreateSubscription(userId);
 
         if (!subscription.canAddToLibrary()) {
-            throw new BusinessException(ErrorCode.SAVE_LIMIT_EXCEEDED);
+            throw new BusinessException(ErrorCode.LIBRARY_LIMIT_EXCEEDED);
         }
 
         subscription.incrementLibraryCount();

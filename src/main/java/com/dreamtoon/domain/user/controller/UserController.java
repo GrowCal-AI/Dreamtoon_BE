@@ -1,5 +1,7 @@
 package com.dreamtoon.domain.user.controller;
 
+import com.dreamtoon.domain.subscription.dto.UsageResponse;
+import com.dreamtoon.domain.subscription.service.SubscriptionService;
 import com.dreamtoon.domain.user.dto.UserResponse;
 import com.dreamtoon.domain.user.service.UserService;
 import com.dreamtoon.global.common.dto.response.ApiResponse;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final SubscriptionService subscriptionService;
 
     @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다.")
     @GetMapping("/me")
@@ -32,5 +35,13 @@ public class UserController {
             @AuthenticationPrincipal Long userId, @RequestParam String nickname) {
         UserResponse response = userService.updateNickname(userId, nickname);
         return ResponseEntity.ok(ApiResponse.success("닉네임이 변경되었습니다.", response));
+    }
+
+    @Operation(summary = "권한 및 사용량 조회", description = "현재 사용자의 구독 등급, 사용량, 잔여 할당량 및 권한 정보를 조회합니다.")
+    @GetMapping("/me/permissions")
+    public ResponseEntity<ApiResponse<UsageResponse>> getMyPermissions(
+            @AuthenticationPrincipal Long userId) {
+        UsageResponse response = subscriptionService.getUsage(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

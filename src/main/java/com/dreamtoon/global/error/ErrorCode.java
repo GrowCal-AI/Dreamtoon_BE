@@ -37,10 +37,8 @@ public enum ErrorCode {
     // Subscription
     GENERATION_LIMIT_EXCEEDED(
             HttpStatus.FORBIDDEN, "SUB001", "무료 회원은 월 10회까지 생성 가능합니다. 프리미엄으로 업그레이드하세요."),
-    SAVE_LIMIT_EXCEEDED(
-            HttpStatus.FORBIDDEN, "SUB002", "무료 회원은 최대 50개까지 라이브러리에 저장 가능합니다. 프리미엄으로 업그레이드하세요."),
     LIBRARY_LIMIT_EXCEEDED(
-            HttpStatus.FORBIDDEN, "SUB002a", "무료 회원은 최대 50개까지 라이브러리에 저장 가능합니다. 프리미엄으로 업그레이드하세요."),
+            HttpStatus.FORBIDDEN, "SUB002", "무료 회원은 최대 50개까지 라이브러리에 저장 가능합니다. 프리미엄으로 업그레이드하세요."),
     FAVORITE_LIMIT_EXCEEDED(
             HttpStatus.FORBIDDEN, "SUB003", "무료 회원은 최대 10개까지 즐겨찾기 가능합니다. 프리미엄으로 업그레이드하세요."),
     PREMIUM_STYLE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB004", "해당 기능은 유료 회원만 사용 가능합니다."),

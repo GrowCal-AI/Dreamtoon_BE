@@ -28,11 +28,13 @@ public class AwsS3Config {
 
     @Bean
     public S3Client s3Client() {
-        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
+        AwsBasicCredentials awsCredentials =
+                AwsBasicCredentials.create(accessKeyId, secretAccessKey);
 
-        var s3ClientBuilder = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials));
+        var s3ClientBuilder =
+                S3Client.builder()
+                        .region(Region.of(region))
+                        .credentialsProvider(StaticCredentialsProvider.create(awsCredentials));
 
         // LocalStack 엔드포인트 설정 (로컬 개발용)
         if (s3Endpoint != null && !s3Endpoint.isEmpty()) {
