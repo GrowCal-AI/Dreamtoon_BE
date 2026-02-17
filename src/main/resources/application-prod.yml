@@ -63,8 +63,8 @@ server:
 # GOOGLE_CLIENT_SECRET=prod-google-client-secret
 # KAKAO_CLIENT_ID=prod-kakao-client-id
 # KAKAO_CLIENT_SECRET=prod-kakao-client-secret
-# AWS_ACCESS_KEY_ID=prod-aws-access-key
-# AWS_SECRET_ACCESS_KEY=prod-aws-secret-key
-# AWS_S3_BUCKET=dreamtoon-prod-bucket
+# GCP_PROJECT_ID=dreamtoon-prod
+# GCS_BUCKET_NAME=dreamtoon-prod-bucket
+# Cloud Run에서는 서비스 계정을 통해 GCS 인증이 자동 처리됩니다.
 # JWT_SECRET=prod-jwt-secret-key-min-256-bits
 # FRONTEND_URL=https://dreamtoon.com

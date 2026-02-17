@@ -20,4 +20,5 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 # 애플리케이션 실행
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Cloud Run은 PORT 환경변수를 자동 주입합니다
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]

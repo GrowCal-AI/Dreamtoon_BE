@@ -62,16 +62,12 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
   
-  # AWS S3 설정
+  # GCP Storage 설정
   cloud:
-    aws:
-      credentials:
-        access-key: ${AWS_ACCESS_KEY_ID}
-        secret-key: ${AWS_SECRET_ACCESS_KEY}
-      region:
-        static: ${AWS_REGION:ap-northeast-2}
-      s3:
-        bucket: ${AWS_S3_BUCKET}
+    gcp:
+      project-id: ${GCP_PROJECT_ID}
+      storage:
+        bucket: ${GCS_BUCKET_NAME}
 
 # JWT 설정
 jwt:

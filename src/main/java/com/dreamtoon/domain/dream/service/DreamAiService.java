@@ -5,7 +5,7 @@ import com.dreamtoon.domain.dream.entity.Dream;
 import com.dreamtoon.domain.dream.repository.DreamRepository;
 import com.dreamtoon.infrastructure.ai.OpenAiClient;
 import com.dreamtoon.infrastructure.ai.prompt.DreamAnalysisPrompt;
-import com.dreamtoon.infrastructure.storage.S3StorageService;
+import com.dreamtoon.infrastructure.storage.GcsStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class DreamAiService {
     private static final int WEBTOON_PANEL_COUNT = 4;
 
     private final OpenAiClient openAiClient;
-    private final S3StorageService s3StorageService;
+    private final GcsStorageService gcsStorageService;
     private final ObjectMapper objectMapper;
     private final DreamRepository dreamRepository;
 
@@ -80,7 +80,7 @@ public class DreamAiService {
     }
 
     /**
-     * 비동기 4컷 웹툰 생성 (DALL-E 4회 → S3 업로드 → Dream.webtoonImages, COMPLETED)
+     * 비동기 4컷 웹툰 생성 (DALL-E 4회 → GCS 업로드 → Dream.webtoonImages, COMPLETED)
      *
      * @param dreamId 생성할 꿈 ID
      */
@@ -110,7 +110,7 @@ public class DreamAiService {
                                 panel,
                                 WEBTOON_PANEL_COUNT);
                 String tempUrl = openAiClient.generateImage(prompt);
-                String permanentUrl = s3StorageService.uploadImageFromUrl(tempUrl, "webtoon");
+                String permanentUrl = gcsStorageService.uploadImageFromUrl(tempUrl, "webtoon");
                 imageUrls.add(permanentUrl);
             }
 
