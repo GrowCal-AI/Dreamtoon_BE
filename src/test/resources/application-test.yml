@@ -1,0 +1,44 @@
+# Test Profile Configuration
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  ai:
+    openai:
+      api-key: test-api-key
+  
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: test-kakao-id
+            client-secret: test-kakao-secret
+          google:
+            client-id: test-google-id
+            client-secret: test-google-secret
+
+jwt:
+  secret: test-jwt-secret-key-for-testing-must-be-at-least-256-bits-long-for-security
+  expiration: 3600000
+
+AWS_ACCESS_KEY_ID: test-access-key
+AWS_SECRET_ACCESS_KEY: test-secret-key
+AWS_S3_BUCKET: test-bucket
+AWS_REGION: ap-northeast-2
+
+logging:
+  level:
+    root: INFO
+    com.dreamtoon: DEBUG

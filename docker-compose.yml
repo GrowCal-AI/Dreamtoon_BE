@@ -19,6 +19,25 @@ services:
     networks:
       - dreamtoon-network
 
+  # LocalStack (로컬 AWS 서비스 에뮬레이션)
+  localstack:
+    image: localstack/localstack:latest
+    container_name: dreamtoon-localstack
+    ports:
+      - "4566:4566"  # LocalStack gateway
+      - "4510-4559:4510-4559"  # 외부 서비스 포트 범위
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./localstack-init:/etc/localstack/init/ready.d  # 초기화 스크립트
+    networks:
+      - dreamtoon-network
+
   # Spring Boot 백엔드
   backend:
     build:
@@ -38,13 +57,18 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-your-google-client-secret}
       KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-your-kakao-client-id}
       KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-your-kakao-client-secret}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-your-aws-access-key}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-your-aws-secret-key}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET:-dreamtoon-dev-bucket}
+      AWS_REGION: ${AWS_REGION:-ap-northeast-2}
+      # LocalStack S3 엔드포인트 (로컬 개발용)
+      AWS_S3_ENDPOINT: ${AWS_S3_ENDPOINT:-http://localstack:4566}
       JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-key-must-be-at-least-256-bits-long}
     depends_on:
       postgres:
         condition: service_healthy
+      localstack:
+        condition: service_started
     networks:
       - dreamtoon-network
     # Docker Watch: 코드 변경 시 자동 재빌드
