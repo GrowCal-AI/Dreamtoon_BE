@@ -6,12 +6,15 @@
 ---
 
 ## 1. 프로젝트 개요 (Overview)
-- **핵심 가치**: 휘발되는 꿈 데이터를 시각적 콘텐츠(웹툰)로 변환하고, 무의식 속 건강 지표를 도출함.
+
+- **핵심 가치**: 휘발되는 꿈 데이터를 시각적 콘텐츠(4컷 만화)로 변환하고, 무의식 속 건강 지표를 도출함.
 - **주요 타겟**: 기록의 재미를 느끼고 싶은 사용자, 심리적 불안정감을 해소하고 싶은 현대인.
 - **차별점**:
-    - LLM 기반 자동 장면 분할 및 시나리오 생성.
-    - Stable Diffusion(DALL-E) 기반 웹툰 스타일 프리셋 적용.
-    - '드림 헬스 인덱스(DHI)'를 통한 정서 상태 정량화.
+    - 단계별 인터랙티브 꿈 입력 플로우 (꿈 내용 → 감정 선택 → 상세 설명 → 장르 선택)
+    - GPT-4 기반 꿈 분석 및 감정 레이더 차트 생성
+    - DALL-E 기반 장르별 4컷 만화 자동 생성
+    - 심리상담사 페르소나 AI 챗봇을 통한 꿈 심층 상담
+    - 개인 라이브러리를 통한 꿈 아카이빙 및 패턴 분석
 
 ---
 
@@ -20,84 +23,571 @@
 | Category | Technology | Reason |
 | :--- | :--- | :--- |
 | **Backend** | **Spring Boot 3.2+** | 익숙한 생태계, 안정적인 아키텍처 및 확장성 확보 |
-| **AI Library** | **Spring AI (OpenAI)** | 파이썬 서버 분리 없이 빠른 MVP 구현 가능 |
-| **Database** | **PostgreSQL** | JSONB 지원으로 비정형 분석 데이터 및 시나리오 저장 용이 |
-| **Storage** | **AWS S3** | 생성된 웹툰 이미지 호스팅 |
-| **Frontend** | **Next.js** | 세로 스크롤 웹툰 뷰어 및 대시보드 구현 최적화 |
+| **AI Library** | **Spring AI (OpenAI)** | GPT-4, DALL-E 통합 API 호출 간소화 |
+| **Database** | **PostgreSQL** | JSONB 지원으로 감정 분석 데이터 및 채팅 내역 저장 용이 |
+| **Storage** | **AWS S3** | 생성된 4컷 만화 이미지 호스팅 |
+| **Async Processing** | **Spring @Async** | 비동기 AI API 호출로 사용자 대기 시간 최소화 |
+| **Frontend** | **Next.js** | 인터랙티브 UI 및 웹툰 뷰어 구현 최적화 |
 
 ---
 
-## 3. 핵심 아키텍처 (System Flow)
+## 3. 핵심 사용자 플로우 (User Flow)
 
+### 📱 **Phase 1: 꿈 입력 및 감정 선택**
 
+```
+[메인 화면]
+  ↓ 사용자 입력: "나 어제 썸녀와 데이트하는 꿈 꿨어"
+  
+[감정 선택 화면]
+  시스템 메시지: "안녕하세요! 어젯밤 꾸셨던 꿈은 어떠셨나요?"
+  ↓ 사용자 선택: 😊 기쁨 / 😢 불안 / 😤 분노 / 😰 슬픔 / 🤔 불편 / 😑 평온
+  
+[상세 설명 입력]
+  시스템 메시지 (감정별 매핑): "좋은 꿈을 꾸셨군요! 어떤 점이 가장 즐거우셨나요?"
+  ↓ 사용자 입력: "카페에서 데이트했는데 분위기가 너무 좋았어요"
+  ↓ (선택) 현실 상황 고민: "요즘 그 사람한테 고백할까 고민중이에요"
+```
 
-1. **Input**: 사용자가 텍스트/음성으로 꿈을 기록함.
-2. **Processing (Spring AI)**:
-   - **Text-to-Scene**: GPT-4o가 꿈을 4~8컷 시나리오로 분할.
-   - **Text-to-Analysis**: 꿈의 키워드와 감정을 추출하여 DHI 점수 산출.
-   - **Scene-to-Image**: DALL-E를 호출하여 스타일 프리셋이 적용된 이미지 생성.
-3. **Storage**: 분석 결과와 이미지 경로를 PostgreSQL(JSONB)에 저장.
-4. **Output**: 사용자에게 웹툰 뷰어와 건강 대시보드 제공.
+### 🤖 **Phase 2: AI 꿈 분석 (비동기)**
+
+```
+[백엔드 처리]
+  → GPT-4 API 호출
+  → 입력 데이터:
+     - 꿈 내용
+     - 선택한 감정
+     - 상세 설명
+     - 현실 고민 (optional)
+  
+  → 출력 데이터:
+     - 꿈 해석 텍스트
+     - 감정 레이더 차트 점수 (기쁨, 불안, 분노, 슬픔, 불편, 평온)
+     - AI 인사이트 메시지
+```
+
+### 🎨 **Phase 3: 장르 선택 및 4컷 만화 생성**
+
+```
+[장르 선택 화면]
+  사용자 선택: 로맨스 / 판타지 / 힐링 / 호러
+  
+[백엔드 처리]
+  → DALL-E API 호출 (4회)
+  → 각 컷마다 장르에 맞는 프롬프트 생성
+  → S3에 이미지 업로드
+  
+[완성 화면]
+  - 4컷 만화 표시
+  - AI 생성 제목 (예: "무의식의 숲을 지나서")
+  - 생성 날짜
+  - [라이브러리에 등록하기] 버튼
+  - [새로운 채팅] 버튼
+  - [꿈 더 대화하기] 버튼
+```
+
+### 💬 **Phase 4: 심리상담 챗봇 (선택)**
+
+```
+[꿈 더 대화하기 클릭]
+  → 심리상담사 페르소나 GPT 챗봇 시작
+  → 해당 꿈에 대한 심층 상담
+  → 채팅 내역 DB 저장
+```
+
+### 📚 **Phase 5: 라이브러리 관리**
+
+```
+[라이브러리 화면]
+  - 검색: 제목/내용으로 검색
+  - 필터링:
+    ✅ 즐겨찾기
+    ✅ 최신순 정렬
+    ✅ 장르별 필터 (로맨스/판타지/힐링/호러)
+  
+  - 각 꿈 카드:
+    - 썸네일 (4컷 중 첫 번째 이미지)
+    - 제목
+    - 날짜
+    - 장르 태그
+    - 즐겨찾기 토글
+```
 
 ---
 
-## 4. 데이터 모델링 (Entity Design)
+## 4. 시스템 아키텍처 (System Architecture)
 
-### 👤 User Entity (Member)
-- `id` (Long, PK)
-- `email` (String, Unique): 로그인 및 본인 식별용 계정
-- `nickname` (String): 서비스 내에서 사용될 이름
-- `social_provider` (Enum): GOOGLE, KAKAO 등 (OAuth2 연동 대비)
-- `social_id` (String): 소셜 서비스에서 제공하는 고유 식별값
-- `role` (Enum): ROLE_USER, ROLE_ADMIN (권한 관리)
+### 🔄 **비동기 처리 전략**
 
-created_at (DateTime): 가입일
+```
+사용자 요청 → 즉시 202 Accepted 응답
+              ↓
+         비동기 작업 시작
+              ↓
+    ┌─────────┴─────────┐
+    │                   │
+ GPT-4 분석        DALL-E 생성
+    │                   │
+    └─────────┬─────────┘
+              ↓
+         DB 저장 완료
+              ↓
+    status: COMPLETED
+```
 
-### 📊 Dream Entity
-- `id` (Long, PK)
-- `user_id` (Long, FK)
-- `raw_content` (Text): 사용자 입력 원문
-- `style_preset` (Enum): ROMANCE, FANTASY, HEALING, SD_REFRAME
-- `created_at` (DateTime)
+### 💾 **데이터 저장 전략**
 
-### 🎨 Scene Entity (Webtoon Cuts)
-- `id` (Long, PK)
-- `dream_id` (Long, FK)
-- `cut_order` (Integer): 장면 순서 (1~N)
-- `description` (String): AI가 생성한 장면 묘사
-- `image_url` (String): S3 이미지 경로
-- `dialogue` (String): 필요 시 삽입될 대사/설명
-
-### 🩺 Analysis Entity (Healthcare)
-- `id` (Long, PK)
-- `dream_id` (Long, FK)
-- `health_score` (Integer): 0~100 점수
-- `emotions` (Jsonb): {joy: 0.1, fear: 0.7, ...}
-- `ai_insight` (String): AI가 주는 일일 코칭 메시지
+- **시스템 메시지**: 하드코딩 (감정별 매핑 Map)
+- **사용자 입력**: 모두 DB 저장 (꿈 내용, 감정, 상세 설명, 현실 고민)
+- **AI 생성 데이터**: PostgreSQL JSONB 활용
+- **이미지**: S3 저장 후 URL만 DB에 저장
 
 ---
 
-## 5. 주요 API 명세 (API Specification)
+## 5. 데이터 모델링 (Entity Design)
 
-### [POST] /api/v1/dreams
-- **Description**: 꿈 기록 제출 및 AI 생성 시작.
-- **Request Body**:
-  ```json
-  {
-    "content": "어젯밤 숲속에서 거대한 고양이와 산책을 했어.",
-    "style": "HEALING"
-  }
-  ```
-- Response: `202 Accepted` (이미지 생성 시간이 길어질 수 있으므로 비동기 처리 권장)
+### 👤 **User Entity**
+```java
+- id (Long, PK)
+- email (String, Unique)
+- nickname (String)
+- social_provider (Enum): GOOGLE, KAKAO
+- social_id (String)
+- role (Enum): ROLE_USER, ROLE_ADMIN
+- created_at (DateTime)
+```
 
-### [GET] /api/v1/dreams/{id}
-- Description: 생성된 웹툰 및 분석 데이터 상세 조회.
+### 📊 **Dream Entity**
+```java
+- id (Long, PK)
+- user_id (Long, FK)
 
-- Response:
-  ```json
-  {
-    "dream_id": 1,
-    "scenes": [...],
-    "analysis": { "health_score": 85, "insight": "편안한 꿈을 꾸셨네요!" }
-  }
-  ```
+// 사용자 입력 데이터
+- dream_content (Text): 꿈 내용 원문
+- primary_emotion (Enum): 기쁨, 불안, 분노, 슬픔, 불편, 평온
+- detailed_description (Text): 상세 설명
+- real_life_context (Text, nullable): 현실 고민
+
+// AI 생성 데이터
+- title (String): AI가 생성한 제목
+- ai_analysis (Text): 꿈 해석
+- emotion_scores (Jsonb): {기쁨: 85, 불안: 20, ...}
+- ai_insight (String): AI 코칭 메시지
+
+// 웹툰 관련
+- selected_genre (Enum): 로맨스, 판타지, 힐링, 호러
+- webtoon_images (Jsonb): ["s3://url1", "s3://url2", ...]
+
+// 라이브러리 관련
+- is_favorite (Boolean): 즐겨찾기 여부
+- is_in_library (Boolean): 라이브러리 등록 여부
+
+// 처리 상태
+- processing_status (Enum): PENDING, ANALYZING, GENERATING, COMPLETED, FAILED
+
+- created_at (DateTime)
+- updated_at (DateTime)
+```
+
+### 💬 **DreamChat Entity** (꿈 더 대화하기)
+```java
+- id (Long, PK)
+- dream_id (Long, FK)
+- role (Enum): USER, ASSISTANT
+- message (Text)
+- created_at (DateTime)
+```
+
+---
+
+## 6. 주요 API 명세 (API Specification)
+
+### **[POST] /api/v1/dreams**
+꿈 내용 최초 입력
+
+**Request:**
+```json
+{
+  "dreamContent": "나 어제 썸녀와 데이트하는 꿈 꿨어"
+}
+```
+
+**Response:** `201 Created`
+```json
+{
+  "dreamId": 123,
+  "systemMessage": "안녕하세요! 어젯밤 꾸셨던 꿈은 어떠셨나요?"
+}
+```
+
+---
+
+### **[PATCH] /api/v1/dreams/{dreamId}/emotion**
+감정 선택
+
+**Request:**
+```json
+{
+  "primaryEmotion": "기쁨"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "systemMessage": "좋은 꿈을 꾸셨군요! 어떤 점이 가장 즐거우셨나요?"
+}
+```
+
+---
+
+### **[PATCH] /api/v1/dreams/{dreamId}/details**
+상세 설명 입력 및 AI 분석 시작
+
+**Request:**
+```json
+{
+  "detailedDescription": "카페에서 데이트했는데 분위기가 너무 좋았어요",
+  "realLifeContext": "요즘 그 사람한테 고백할까 고민중이에요"  // optional
+}
+```
+
+**Response:** `202 Accepted`
+```json
+{
+  "dreamId": 123,
+  "status": "ANALYZING",
+  "message": "꿈을 분석하고 있어요. 잠시만 기다려주세요!"
+}
+```
+
+---
+
+### **[GET] /api/v1/dreams/{dreamId}/analysis**
+분석 결과 조회
+
+**Response:** `200 OK`
+```json
+{
+  "dreamId": 123,
+  "status": "ANALYSIS_COMPLETED",
+  "aiAnalysis": "당신의 꿈은 현실에서의 로맨틱한 욕구를 반영하고 있습니다...",
+  "emotionScores": {
+    "기쁨": 85,
+    "불안": 20,
+    "분노": 5,
+    "슬픔": 10,
+    "불편": 15,
+    "평온": 70
+  },
+  "aiInsight": "긍정적인 감정이 지배적인 꿈이었습니다. 현실에서도 좋은 일이 있을 것 같아요!"
+}
+```
+
+---
+
+### **[POST] /api/v1/dreams/{dreamId}/webtoon**
+장르 선택 및 4컷 만화 생성 시작
+
+**Request:**
+```json
+{
+  "selectedGenre": "로맨스"
+}
+```
+
+**Response:** `202 Accepted`
+```json
+{
+  "dreamId": 123,
+  "status": "GENERATING",
+  "message": "4컷 만화를 생성하고 있어요. 조금만 기다려주세요!"
+}
+```
+
+---
+
+### **[GET] /api/v1/dreams/{dreamId}**
+전체 꿈 데이터 조회 (완성본)
+
+**Response:** `200 OK`
+```json
+{
+  "dreamId": 123,
+  "title": "무의식의 숲을 지나서",
+  "dreamContent": "나 어제 썸녀와 데이트하는 꿈 꿨어",
+  "primaryEmotion": "기쁨",
+  "detailedDescription": "카페에서...",
+  "realLifeContext": "요즘 그 사람한테...",
+  "aiAnalysis": "...",
+  "emotionScores": {...},
+  "selectedGenre": "로맨스",
+  "webtoonImages": [
+    "https://s3.amazonaws.com/.../panel1.png",
+    "https://s3.amazonaws.com/.../panel2.png",
+    "https://s3.amazonaws.com/.../panel3.png",
+    "https://s3.amazonaws.com/.../panel4.png"
+  ],
+  "status": "COMPLETED",
+  "isFavorite": false,
+  "isInLibrary": false,
+  "createdAt": "2026-02-17T18:30:00"
+}
+```
+
+---
+
+### **[POST] /api/v1/dreams/{dreamId}/library**
+라이브러리에 등록
+
+**Response:** `200 OK`
+```json
+{
+  "dreamId": 123,
+  "isInLibrary": true
+}
+```
+
+---
+
+### **[PATCH] /api/v1/dreams/{dreamId}/favorite**
+즐겨찾기 토글
+
+**Response:** `200 OK`
+```json
+{
+  "dreamId": 123,
+  "isFavorite": true
+}
+```
+
+---
+
+### **[GET] /api/v1/library**
+라이브러리 조회 (필터링)
+
+**Query Parameters:**
+- `favorite` (boolean): 즐겨찾기만 조회
+- `genre` (string): 로맨스, 판타지, 힐링, 호러
+- `sort` (string): latest (기본값)
+- `search` (string): 제목/내용 검색
+
+**Response:** `200 OK`
+```json
+{
+  "dreams": [
+    {
+      "dreamId": 123,
+      "title": "무의식의 숲을 지나서",
+      "thumbnailUrl": "https://s3.../panel1.png",
+      "genre": "로맨스",
+      "isFavorite": true,
+      "createdAt": "2026-02-17"
+    },
+    ...
+  ],
+  "totalCount": 47
+}
+```
+
+---
+
+### **[POST] /api/v1/dreams/{dreamId}/chat**
+꿈 더 대화하기 (심리상담 챗봇)
+
+**Request:**
+```json
+{
+  "message": "이 꿈이 무슨 의미인가요?"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "role": "assistant",
+  "message": "이 꿈은 당신의 내면에 있는 로맨틱한 욕구를 반영하고 있습니다. 현실에서도...",
+  "createdAt": "2026-02-17T18:35:00"
+}
+```
+
+---
+
+### **[GET] /api/v1/dreams/{dreamId}/chat**
+채팅 내역 조회
+
+**Response:** `200 OK`
+```json
+{
+  "dreamId": 123,
+  "chatHistory": [
+    {
+      "role": "user",
+      "message": "이 꿈이 무슨 의미인가요?",
+      "createdAt": "2026-02-17T18:35:00"
+    },
+    {
+      "role": "assistant",
+      "message": "이 꿈은...",
+      "createdAt": "2026-02-17T18:35:05"
+    }
+  ]
+}
+```
+
+---
+
+## 7. AI 프롬프트 전략 (Prompt Engineering)
+
+### 🧠 **꿈 분석 프롬프트 (GPT-4)**
+
+```
+당신은 전문 심리상담사입니다. 사용자의 꿈을 분석하여 심리 상태를 파악하고 조언을 제공하세요.
+
+[입력 데이터]
+- 꿈 내용: {dreamContent}
+- 주요 감정: {primaryEmotion}
+- 상세 설명: {detailedDescription}
+- 현실 고민: {realLifeContext}
+
+[출력 형식]
+{
+  "analysis": "꿈 해석 (200자 이내)",
+  "emotionScores": {
+    "기쁨": 0-100,
+    "불안": 0-100,
+    "분노": 0-100,
+    "슬픔": 0-100,
+    "불편": 0-100,
+    "평온": 0-100
+  },
+  "insight": "AI 코칭 메시지 (100자 이내)",
+  "title": "꿈 제목 (10자 이내)"
+}
+```
+
+### 🎨 **4컷 만화 생성 프롬프트 (DALL-E)**
+
+```
+[장르별 스타일 프리셋]
+- 로맨스: "romantic webtoon style, soft pastel colors, dreamy atmosphere"
+- 판타지: "fantasy webtoon style, vibrant colors, magical elements"
+- 힐링: "healing webtoon style, warm colors, peaceful mood"
+- 호러: "horror webtoon style, dark colors, eerie atmosphere"
+
+[프롬프트 구조]
+"Webtoon style illustration, {genre_preset}, {scene_description}, Korean manhwa art style, clean lines, professional digital art"
+```
+
+### 💬 **심리상담 챗봇 시스템 프롬프트**
+
+```
+당신은 따뜻하고 공감적인 심리상담사입니다.
+사용자의 꿈에 대해 깊이 있는 대화를 나누며, 심리적 안정을 제공하세요.
+
+[꿈 컨텍스트]
+- 꿈 내용: {dreamContent}
+- 분석 결과: {aiAnalysis}
+
+[대화 규칙]
+1. 공감적이고 따뜻한 톤 유지
+2. 전문적이지만 친근한 언어 사용
+3. 사용자의 감정을 존중하고 인정
+4. 필요시 실질적인 조언 제공
+```
+
+---
+
+## 8. 성능 최적화 전략
+
+### ⚡ **비동기 처리**
+- AI API 호출은 모두 `@Async`로 처리
+- 사용자는 즉시 응답 받고, 백그라운드에서 처리
+- 폴링 또는 WebSocket으로 진행 상태 업데이트
+
+### 💰 **비용 최적화**
+- 시스템 메시지는 하드코딩 (API 호출 불필요)
+- 감정별 후속 질문도 Map으로 관리
+- GPT API는 실제 분석/생성에만 사용
+
+### 🗄️ **캐싱 전략**
+- S3 이미지는 CloudFront CDN 사용
+- 자주 조회되는 꿈은 Redis 캐싱 고려
+
+---
+
+## 9. 개발 우선순위 (MVP Roadmap)
+
+### ✅ **Phase 1: 핵심 플로우 구현**
+1. 꿈 입력 → 감정 선택 → 상세 설명 API
+2. GPT-4 꿈 분석 비동기 처리
+3. DALL-E 4컷 만화 생성
+4. 완성 화면 조회 API
+
+### ✅ **Phase 2: 라이브러리 기능**
+1. 라이브러리 등록/조회
+2. 즐겨찾기 기능
+3. 장르별 필터링
+4. 검색 기능
+
+### ✅ **Phase 3: 심리상담 챗봇**
+1. 꿈 더 대화하기 API
+2. 채팅 내역 저장/조회
+3. 심리상담사 페르소나 프롬프트 최적화
+
+### 🔜 **Phase 4: 대시보드 & 분석**
+1. 주간/월간 꿈 통계
+2. 감정 패턴 분석
+3. AI 코칭 리포트
+
+---
+
+## 10. 주요 기술적 고려사항
+
+### 🔐 **보안**
+- OAuth2 소셜 로그인 (Google, Kakao)
+- JWT 토큰 기반 인증
+- 개인 꿈 데이터 암호화 저장
+
+### 📊 **모니터링**
+- AI API 호출 성공률 추적
+- 평균 생성 시간 모니터링
+- 에러율 및 재시도 로직
+
+### 🧪 **테스트 전략**
+- AI API 모킹으로 단위 테스트
+- 비동기 처리 통합 테스트
+- E2E 테스트 (전체 플로우)
+
+---
+
+## 11. 감정별 시스템 메시지 매핑
+
+```java
+public static final Map<String, String> EMOTION_MESSAGES = Map.of(
+    "기쁨", "좋은 꿈을 꾸셨군요! 어떤 점이 가장 즐거우셨나요?",
+    "불안", "불안한 꿈이셨군요. 어떤 부분이 가장 불안하셨나요?",
+    "분노", "화가 나는 꿈이셨군요. 무엇이 가장 화나셨나요?",
+    "슬픔", "슬픈 꿈이셨군요. 어떤 점이 가장 슬프셨나요?",
+    "불편", "불편한 꿈이셨군요. 어떤 부분이 불편하셨나요?",
+    "평온", "평온한 꿈이셨군요. 어떤 느낌이 드셨나요?"
+);
+```
+
+---
+
+## 12. 예상 비용 산정 (사용자 1명 기준)
+
+| 항목 | 비용 | 비고 |
+|------|------|------|
+| GPT-4 꿈 분석 | ~$0.01 | 약 1,000 토큰 |
+| DALL-E 4컷 생성 | ~$0.08 | $0.02 × 4장 |
+| 심리상담 챗봇 (10턴) | ~$0.02 | 선택적 기능 |
+| **총 비용** | **~$0.11** | 꿈 1개당 |
+
+→ 월 1,000명 사용 시: **약 $110**
+
+---
+
+**Last Updated**: 2026-02-17
+**Version**: 2.0 (새로운 플로우 반영)
