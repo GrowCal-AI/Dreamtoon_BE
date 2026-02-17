@@ -1,13 +1,11 @@
 package com.dreamtoon.domain.dream.controller;
 
-import com.dreamtoon.domain.dream.dto.CreateDreamRequest;
-import com.dreamtoon.domain.dream.dto.DreamResponse;
-import com.dreamtoon.domain.dream.dto.DreamStatusResponse;
-import com.dreamtoon.domain.dream.dto.StyleListResponse;
-import com.dreamtoon.domain.dream.dto.TranscriptionResponse;
-import com.dreamtoon.domain.dream.dto.UpdateDreamRequest;
+import com.dreamtoon.domain.dream.dto.*;
 import com.dreamtoon.domain.dream.service.DreamService;
-import com.dreamtoon.domain.dream.service.VoiceTranscriptionService;
+import com.dreamtoon.domain.dreamchat.dto.ChatHistoryResponse;
+import com.dreamtoon.domain.dreamchat.dto.ChatMessageResponse;
+import com.dreamtoon.domain.dreamchat.dto.SendChatRequest;
+import com.dreamtoon.domain.dreamchat.service.DreamChatService;
 import com.dreamtoon.global.common.dto.request.PageRequest;
 import com.dreamtoon.global.common.dto.response.ApiResponse;
 import com.dreamtoon.global.common.dto.response.PageResponse;
@@ -19,58 +17,78 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-@Tag(name = "Dreams", description = "꿈 기록 및 웹툰 생성 API")
+@Tag(name = "Dreams", description = "꿈 기록 및 4컷 웹툰 생성 API (Blueprint v2.0)")
 @RestController
 @RequestMapping("/api/v1/dreams")
 @RequiredArgsConstructor
 public class DreamController {
 
     private final DreamService dreamService;
-    private final VoiceTranscriptionService voiceTranscriptionService;
+    private final DreamChatService dreamChatService;
 
-    @Operation(summary = "꿈 기록 생성", description = "사용자의 꿈을 기록하고 AI 웹툰 생성을 시작합니다.")
+    @Operation(summary = "꿈 기록 시작", description = "꿈 내용을 입력하고 Dream을 생성합니다.")
     @PostMapping
-    public ResponseEntity<ApiResponse<DreamResponse>> createDream(
-            @AuthenticationPrincipal Long userId, @Valid @RequestBody CreateDreamRequest request) {
-        DreamResponse response = dreamService.createDream(userId, request);
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(ApiResponse.success("꿈 기록이 생성되었습니다. AI 웹툰 생성이 진행 중입니다.", response));
+    public ResponseEntity<ApiResponse<InitiateDreamResponse>> initiateDream(
+            @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody InitiateDreamRequest request) {
+        InitiateDreamResponse response = dreamService.initiateDream(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
     }
 
-    @Operation(summary = "꿈 처리 상태 조회", description = "꿈의 AI 처리 상태를 조회합니다.")
-    @GetMapping("/{dreamId}/status")
-    public ResponseEntity<ApiResponse<DreamStatusResponse>> getDreamStatus(
-            @PathVariable Long dreamId) {
-        DreamStatusResponse response = dreamService.getDreamStatus(dreamId);
+    @Operation(summary = "감정 선택", description = "꿈에서 느낀 주요 감정을 선택합니다.")
+    @PatchMapping("/{dreamId}/emotion")
+    public ResponseEntity<ApiResponse<EmotionSelectResponse>> selectEmotion(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long dreamId,
+            @Valid @RequestBody EmotionSelectRequest request) {
+        EmotionSelectResponse response = dreamService.selectEmotion(userId, dreamId, request);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @Operation(summary = "꿈 상세 조회", description = "생성된 웹툰 및 분석 데이터를 조회합니다.")
+    @Operation(summary = "상세 설명 입력", description = "상세 설명을 저장하고 비동기로 AI 분석을 시작합니다.")
+    @PatchMapping("/{dreamId}/details")
+    public ResponseEntity<ApiResponse<DreamDetailsResponse>> addDetails(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long dreamId,
+            @Valid @RequestBody DreamDetailsRequest request) {
+        DreamDetailsResponse response = dreamService.addDetails(userId, dreamId, request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "분석 결과 조회", description = "AI 꿈 분석 결과를 조회합니다. (폴링 가능)")
+    @GetMapping("/{dreamId}/analysis")
+    public ResponseEntity<ApiResponse<DreamAnalysisResponse>> getAnalysis(
+            @AuthenticationPrincipal Long userId, @PathVariable Long dreamId) {
+        DreamAnalysisResponse response = dreamService.getAnalysis(userId, dreamId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "4컷 만화 생성", description = "장르를 선택하고 비동기로 웹툰 이미지 생성을 시작합니다.")
+    @PostMapping("/{dreamId}/webtoon")
+    public ResponseEntity<ApiResponse<WebtoonGenerateResponse>> generateWebtoon(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long dreamId,
+            @Valid @RequestBody WebtoonGenerateRequest request) {
+        WebtoonGenerateResponse response = dreamService.generateWebtoon(userId, dreamId, request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "꿈 상세 조회", description = "꿈 전체 정보(분석, 웹툰 이미지 포함)를 조회합니다.")
     @GetMapping("/{dreamId}")
-    public ResponseEntity<ApiResponse<DreamResponse>> getDream(@PathVariable Long dreamId) {
-        DreamResponse response = dreamService.getDream(dreamId);
+    public ResponseEntity<ApiResponse<DreamResponse>> getDream(
+            @AuthenticationPrincipal Long userId, @PathVariable Long dreamId) {
+        DreamResponse response = dreamService.getDream(userId, dreamId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @Operation(summary = "내 꿈 목록 조회", description = "로그인한 사용자의 꿈 목록을 조회합니다.")
+    @Operation(summary = "내 꿈 목록 조회", description = "로그인한 사용자의 꿈 목록을 페이징 조회합니다.")
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<DreamResponse>>> getUserDreams(
             @AuthenticationPrincipal Long userId, @ModelAttribute PageRequest pageRequest) {
         PageResponse<DreamResponse> response =
                 dreamService.getUserDreams(userId, pageRequest.toPageable());
         return ResponseEntity.ok(ApiResponse.success(response));
-    }
-
-    @Operation(summary = "꿈 업데이트", description = "꿈의 제목, 태그, 즐겨찾기 상태를 업데이트합니다.")
-    @PatchMapping("/{dreamId}")
-    public ResponseEntity<ApiResponse<DreamResponse>> updateDream(
-            @AuthenticationPrincipal Long userId,
-            @PathVariable Long dreamId,
-            @Valid @RequestBody UpdateDreamRequest request) {
-        DreamResponse response = dreamService.updateDream(userId, dreamId, request);
-        return ResponseEntity.ok(ApiResponse.success("꿈 기록이 업데이트되었습니다.", response));
     }
 
     @Operation(summary = "꿈 삭제", description = "꿈 기록을 삭제합니다.")
@@ -81,26 +99,37 @@ public class DreamController {
         return ResponseEntity.ok(ApiResponse.success("꿈 기록이 삭제되었습니다."));
     }
 
-    @Operation(summary = "음성 전사", description = "음성 파일을 텍스트로 변환합니다 (Whisper AI)")
-    @PostMapping("/transcribe")
-    public ResponseEntity<ApiResponse<TranscriptionResponse>> transcribeVoice(
-            @RequestParam("audio") MultipartFile audioFile) {
-        // 파일 검증
-        voiceTranscriptionService.validateAudioFile(audioFile);
-
-        // Whisper로 전사
-        TranscriptionResponse response = voiceTranscriptionService.transcribeAudio(audioFile);
-
-        return ResponseEntity.ok(ApiResponse.success("음성 전사가 완료되었습니다.", response));
+    @Operation(summary = "라이브러리에 추가", description = "꿈을 라이브러리에 저장합니다.")
+    @PostMapping("/{dreamId}/library")
+    public ResponseEntity<ApiResponse<AddToLibraryResponse>> addToLibrary(
+            @AuthenticationPrincipal Long userId, @PathVariable Long dreamId) {
+        AddToLibraryResponse response = dreamService.addToLibrary(userId, dreamId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @Operation(
-            summary = "스타일 목록 조회",
-            description = "사용 가능한 웹툰 스타일 목록을 조회합니다. 구독 티어에 따라 접근 가능한 스타일이 표시됩니다.")
-    @GetMapping("/styles")
-    public ResponseEntity<ApiResponse<StyleListResponse>> getAvailableStyles(
-            @AuthenticationPrincipal Long userId) {
-        StyleListResponse response = dreamService.getAvailableStyles(userId);
+    @Operation(summary = "즐겨찾기 토글", description = "꿈의 즐겨찾기 상태를 토글합니다.")
+    @PatchMapping("/{dreamId}/favorite")
+    public ResponseEntity<ApiResponse<ToggleFavoriteResponse>> toggleFavorite(
+            @AuthenticationPrincipal Long userId, @PathVariable Long dreamId) {
+        ToggleFavoriteResponse response = dreamService.toggleFavorite(userId, dreamId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "꿈 더 대화하기", description = "심리상담사 챗봇과 꿈에 대해 대화합니다.")
+    @PostMapping("/{dreamId}/chat")
+    public ResponseEntity<ApiResponse<ChatMessageResponse>> sendChatMessage(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable Long dreamId,
+            @Valid @RequestBody SendChatRequest request) {
+        ChatMessageResponse response = dreamChatService.sendMessage(userId, dreamId, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "채팅 내역 조회", description = "해당 꿈의 심리상담 채팅 내역을 조회합니다.")
+    @GetMapping("/{dreamId}/chat")
+    public ResponseEntity<ApiResponse<ChatHistoryResponse>> getChatHistory(
+            @AuthenticationPrincipal Long userId, @PathVariable Long dreamId) {
+        ChatHistoryResponse response = dreamChatService.getChatHistory(userId, dreamId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

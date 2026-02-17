@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.image.ImageClient;
@@ -42,6 +43,27 @@ public class OpenAiClient {
         } catch (Exception e) {
             log.error("Error calling GPT-4o API", e);
             throw new RuntimeException("GPT-4o API 호출 실패: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 시스템 프롬프트 + 사용자 메시지로 채팅 (심리상담 챗봇 등)
+     *
+     * @param systemPrompt 시스템(페르소나) 프롬프트
+     * @param userMessage 사용자 메시지
+     * @return AI 응답 텍스트
+     */
+    public String chatWithSystem(String systemPrompt, String userMessage) {
+        try {
+            Prompt prompt =
+                    new Prompt(
+                            java.util.List.of(
+                                    new SystemMessage(systemPrompt), new UserMessage(userMessage)));
+            ChatResponse response = chatClient.call(prompt);
+            return response.getResult().getOutput().getContent();
+        } catch (Exception e) {
+            log.error("Error calling GPT-4o chat API", e);
+            throw new RuntimeException("GPT-4o 채팅 API 호출 실패: " + e.getMessage(), e);
         }
     }
 

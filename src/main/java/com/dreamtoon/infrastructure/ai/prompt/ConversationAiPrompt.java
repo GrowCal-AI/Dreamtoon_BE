@@ -131,7 +131,7 @@ public class ConversationAiPrompt {
             case ANXIETY -> "불안";
             case ANGER -> "분노";
             case SADNESS -> "슬픔";
-            case SURPRISE -> "놀람";
+            case DISCOMFORT -> "불편";
             case PEACE -> "평온";
         };
     }

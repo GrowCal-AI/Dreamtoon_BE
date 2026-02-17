@@ -2,6 +2,7 @@ package com.dreamtoon.domain.subscription.entity;
 
 import com.dreamtoon.domain.user.entity.User;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,8 +37,14 @@ public class Subscription {
     @Column(name = "generation_count", nullable = false)
     private Integer generationCount = 0;
 
-    @Column(name = "saved_dreams_count", nullable = false)
-    private Integer savedDreamsCount = 0;
+    @Column(name = "library_count", nullable = false)
+    private Integer libraryCount = 0;
+
+    @Column(name = "favorite_count", nullable = false)
+    private Integer favoriteCount = 0;
+
+    @Column(name = "quota_reset_date")
+    private LocalDate quotaResetDate;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -49,7 +56,9 @@ public class Subscription {
         this.tier = tier != null ? tier : SubscriptionTier.FREE;
         this.isActive = true;
         this.generationCount = 0;
-        this.savedDreamsCount = 0;
+        this.libraryCount = 0;
+        this.favoriteCount = 0;
+        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1); // 다음 달 1일
     }
 
     // === 비즈니스 메서드 ===
@@ -59,21 +68,34 @@ public class Subscription {
         this.generationCount++;
     }
 
-    /** 저장된 꿈 개수 증가 */
-    public void incrementSavedCount() {
-        this.savedDreamsCount++;
+    /** 라이브러리 저장 개수 증가 */
+    public void incrementLibraryCount() {
+        this.libraryCount++;
     }
 
-    /** 저장된 꿈 개수 감소 */
-    public void decrementSavedCount() {
-        if (this.savedDreamsCount > 0) {
-            this.savedDreamsCount--;
+    /** 라이브러리 저장 개수 감소 */
+    public void decrementLibraryCount() {
+        if (this.libraryCount > 0) {
+            this.libraryCount--;
+        }
+    }
+
+    /** 즐겨찾기 개수 증가 */
+    public void incrementFavoriteCount() {
+        this.favoriteCount++;
+    }
+
+    /** 즐겨찾기 개수 감소 */
+    public void decrementFavoriteCount() {
+        if (this.favoriteCount > 0) {
+            this.favoriteCount--;
         }
     }
 
     /** 월별 생성 횟수 초기화 (매월 1일 실행) */
     public void resetMonthlyGenerationCount() {
         this.generationCount = 0;
+        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
     }
 
     /** 프리미엄으로 업그레이드 */
@@ -107,19 +129,30 @@ public class Subscription {
         return generationCount < tier.getMaxGenerations();
     }
 
-    /** 저장 가능 여부 확인 */
-    public boolean canSave() {
+    /** 라이브러리 추가 가능 여부 확인 */
+    public boolean canAddToLibrary() {
         if (!isActive) {
             return false;
         }
-        if (tier.isUnlimitedSaves()) {
+        if (tier.isUnlimitedLibrary()) {
             return true;
         }
-        return savedDreamsCount < tier.getMaxSavedDreams();
+        return libraryCount < tier.getMaxLibraryItems();
     }
 
-    /** 프리미엄 스타일 사용 가능 여부 */
-    public boolean canUsePremiumStyles() {
-        return isActive && tier.isPremiumStylesAllowed();
+    /** 즐겨찾기 추가 가능 여부 확인 */
+    public boolean canFavorite() {
+        if (!isActive) {
+            return false;
+        }
+        if (tier.isUnlimitedFavorites()) {
+            return true;
+        }
+        return favoriteCount < tier.getMaxFavorites();
+    }
+
+    /** 프리미엄 기능 사용 가능 여부 */
+    public boolean canUsePremiumFeatures() {
+        return isActive && tier.isPremiumFeaturesAllowed();
     }
 }

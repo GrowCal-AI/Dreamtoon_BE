@@ -18,36 +18,36 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-        private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-        @Override
-        public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-                OAuth2User oAuth2User = super.loadUser(userRequest);
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2User oAuth2User = super.loadUser(userRequest);
 
-                String registrationId = userRequest.getClientRegistration().getRegistrationId();
-                Map<String, Object> attributes = oAuth2User.getAttributes();
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        Map<String, Object> attributes = oAuth2User.getAttributes();
 
-                OAuthAttributes oAuthAttributes = OAuthAttributes.of(registrationId, attributes);
+        OAuthAttributes oAuthAttributes = OAuthAttributes.of(registrationId, attributes);
 
-                User user = saveOrUpdate(oAuthAttributes);
+        User user = saveOrUpdate(oAuthAttributes);
 
-                return new CustomOAuth2User(
-                                user.getId(),
-                                user.getEmail(),
-                                user.getNickname(),
-                                user.getSocialProvider().name(),
-                                user.getSocialId(),
-                                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())),
-                                attributes);
-        }
+        return new CustomOAuth2User(
+                user.getId(),
+                user.getEmail(),
+                user.getNickname(),
+                user.getSocialProvider().name(),
+                user.getSocialId(),
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())),
+                attributes);
+    }
 
-        private User saveOrUpdate(OAuthAttributes attributes) {
-                User user =
-                                userRepository
-                                                .findBySocialProviderAndSocialId(
-                                                                attributes.getProvider(), attributes.getProviderId())
-                                                .orElseGet(() -> attributes.toEntity());
+    private User saveOrUpdate(OAuthAttributes attributes) {
+        User user =
+                userRepository
+                        .findBySocialProviderAndSocialId(
+                                attributes.getProvider(), attributes.getProviderId())
+                        .orElseGet(() -> attributes.toEntity());
 
-                return userRepository.save(user);
-        }
+        return userRepository.save(user);
+    }
 }

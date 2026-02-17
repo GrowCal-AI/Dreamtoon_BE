@@ -1,14 +1,11 @@
 package com.dreamtoon.domain.dream.service;
 
-import com.dreamtoon.domain.analysis.repository.AnalysisRepository;
-import com.dreamtoon.domain.dream.dto.CreateDreamRequest;
-import com.dreamtoon.domain.dream.dto.DreamResponse;
-import com.dreamtoon.domain.dream.dto.DreamStatusResponse;
-import com.dreamtoon.domain.dream.dto.UpdateDreamRequest;
+import com.dreamtoon.domain.dream.constants.EmotionMessages;
+import com.dreamtoon.domain.dream.dto.*;
 import com.dreamtoon.domain.dream.entity.Dream;
-import com.dreamtoon.domain.dream.entity.StylePreset;
+import com.dreamtoon.domain.dream.entity.Genre;
+import com.dreamtoon.domain.dream.entity.ProcessingStatus;
 import com.dreamtoon.domain.dream.repository.DreamRepository;
-import com.dreamtoon.domain.scene.repository.SceneRepository;
 import com.dreamtoon.domain.subscription.service.SubscriptionService;
 import com.dreamtoon.domain.user.entity.User;
 import com.dreamtoon.domain.user.repository.UserRepository;
@@ -16,8 +13,6 @@ import com.dreamtoon.global.common.dto.response.PageResponse;
 import com.dreamtoon.global.error.BusinessException;
 import com.dreamtoon.global.error.EntityNotFoundException;
 import com.dreamtoon.global.error.ErrorCode;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,38 +20,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** 꿈 기록 및 웹툰 생성 서비스 (Blueprint v2.0) */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class DreamService {
 
+    private static final String INITIATE_MESSAGE = "꿈 내용을 입력해 주셔서 감사합니다. 이 꿈에서 느낀 감정을 선택해 주세요.";
+    private static final String DETAILS_MESSAGE = "상세 설명이 저장되었습니다. AI가 꿈을 분석하고 있습니다.";
+    private static final String WEBTOON_MESSAGE = "4컷 만화 생성을 시작했습니다. 완료될 때까지 잠시 기다려 주세요.";
+
     private final DreamRepository dreamRepository;
     private final UserRepository userRepository;
-    private final SceneRepository sceneRepository;
-    private final AnalysisRepository analysisRepository;
     private final DreamAiService dreamAiService;
     private final SubscriptionService subscriptionService;
 
-    // 프리미엄 전용 스타일
-    private static final List<StylePreset> PREMIUM_STYLES =
-            Arrays.asList(
-                    StylePreset.DARK_FANTASY,
-                    StylePreset.FANTASY,
-                    StylePreset.HORROR,
-                    StylePreset.SD_REFRAME);
-
     @Transactional
-    public DreamResponse createDream(Long userId, CreateDreamRequest request) {
-        // 1. 구독 제한 확인 - 생성 가능 여부
+    public InitiateDreamResponse initiateDream(Long userId, InitiateDreamRequest request) {
         if (!subscriptionService.canGenerate(userId)) {
             throw new BusinessException(ErrorCode.GENERATION_LIMIT_EXCEEDED);
-        }
-
-        // 2. 프리미엄 스타일 접근 권한 확인
-        if (PREMIUM_STYLES.contains(request.getStyle())
-                && !subscriptionService.canUsePremiumStyles(userId)) {
-            throw new BusinessException(ErrorCode.PREMIUM_STYLE_NOT_ALLOWED);
         }
 
         User user =
@@ -64,139 +47,177 @@ public class DreamService {
                         .findById(userId)
                         .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        Dream dream =
-                Dream.builder()
-                        .user(user)
-                        .title(request.getTitle())
-                        .rawContent(request.getContent())
-                        .stylePreset(request.getStyle())
-                        .inputMethod(request.getInputMethod())
-                        .build();
-
+        Dream dream = Dream.builder().user(user).dreamContent(request.getDreamContent()).build();
         dreamRepository.save(dream);
-
-        // 3. 생성 횟수 증가 (생성 성공 후)
         subscriptionService.incrementGenerationCount(userId);
 
-        // 4. 비동기로 AI 처리 시작 (즉시 응답 반환)
-        dreamAiService.analyzeDreamAsync(dream.getId());
-        log.info("Dream created with ID: {}, async processing started", dream.getId());
-
-        return DreamResponse.from(dream);
+        log.info("Dream initiated, ID: {}", dream.getId());
+        return InitiateDreamResponse.builder()
+                .dreamId(dream.getId())
+                .systemMessage(INITIATE_MESSAGE)
+                .build();
     }
 
-    public DreamStatusResponse getDreamStatus(Long dreamId) {
-        Dream dream =
-                dreamRepository
-                        .findById(dreamId)
-                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
-
-        return DreamStatusResponse.from(dream);
-    }
-
-    public DreamResponse getDream(Long dreamId) {
-        Dream dream = dreamRepository.findByIdWithDetails(dreamId);
-        if (dream == null) {
-            throw new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND);
+    @Transactional
+    public EmotionSelectResponse selectEmotion(
+            Long userId, Long dreamId, EmotionSelectRequest request) {
+        Dream dream = findDreamByUser(dreamId, userId);
+        if (dream.getProcessingStatus() != ProcessingStatus.PENDING) {
+            throw new BusinessException(ErrorCode.DREAM_INVALID_STATE);
         }
 
-        return DreamResponse.fromWithDetails(dream);
+        dream.selectEmotion(request.getPrimaryEmotion());
+        dreamRepository.save(dream);
+
+        String message = EmotionMessages.getMessage(request.getPrimaryEmotion());
+        return EmotionSelectResponse.builder().systemMessage(message).build();
+    }
+
+    @Transactional
+    public DreamDetailsResponse addDetails(Long userId, Long dreamId, DreamDetailsRequest request) {
+        Dream dream = findDreamByUser(dreamId, userId);
+        if (dream.getProcessingStatus() != ProcessingStatus.PENDING) {
+            throw new BusinessException(ErrorCode.DREAM_INVALID_STATE);
+        }
+
+        dream.addDetails(request.getDetailedDescription(), request.getRealLifeContext());
+        dreamRepository.save(dream);
+
+        dreamAiService.analyzeDreamAsync(dreamId);
+
+        return DreamDetailsResponse.builder()
+                .dreamId(dreamId)
+                .status(ProcessingStatus.ANALYZING)
+                .message(DETAILS_MESSAGE)
+                .build();
+    }
+
+    public DreamAnalysisResponse getAnalysis(Long userId, Long dreamId) {
+        Dream dream = findDreamByUser(dreamId, userId);
+        ProcessingStatus status = dream.getProcessingStatus();
+
+        if (status != ProcessingStatus.ANALYSIS_COMPLETED && status != ProcessingStatus.COMPLETED) {
+            return DreamAnalysisResponse.builder().dreamId(dreamId).status(status).build();
+        }
+
+        return DreamAnalysisResponse.builder()
+                .dreamId(dreamId)
+                .status(status)
+                .title(dream.getTitle())
+                .aiAnalysis(dream.getAiAnalysis())
+                .emotionScores(dream.getEmotionScores())
+                .aiInsight(dream.getAiInsight())
+                .build();
+    }
+
+    @Transactional
+    public WebtoonGenerateResponse generateWebtoon(
+            Long userId, Long dreamId, WebtoonGenerateRequest request) {
+        Dream dream = findDreamByUser(dreamId, userId);
+        if (dream.getProcessingStatus() != ProcessingStatus.ANALYSIS_COMPLETED) {
+            throw new BusinessException(ErrorCode.DREAM_INVALID_STATE);
+        }
+
+        dream.selectGenre(request.getSelectedGenre());
+        dreamRepository.save(dream);
+
+        dreamAiService.generateWebtoonAsync(dreamId);
+
+        return WebtoonGenerateResponse.builder()
+                .dreamId(dreamId)
+                .status(ProcessingStatus.GENERATING)
+                .message(WEBTOON_MESSAGE)
+                .build();
+    }
+
+    public DreamResponse getDream(Long userId, Long dreamId) {
+        Dream dream = findDreamByUser(dreamId, userId);
+        return DreamResponse.from(dream);
     }
 
     public PageResponse<DreamResponse> getUserDreams(Long userId, Pageable pageable) {
         Page<Dream> dreams = dreamRepository.findByUserId(userId, pageable);
-        Page<DreamResponse> dreamResponses = dreams.map(DreamResponse::from);
-
-        return PageResponse.of(dreamResponses);
-    }
-
-    @Transactional
-    public DreamResponse updateDream(Long userId, Long dreamId, UpdateDreamRequest request) {
-        Dream dream =
-                dreamRepository
-                        .findById(dreamId)
-                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
-
-        if (!dream.getUser().getId().equals(userId)) {
-            throw new EntityNotFoundException(ErrorCode.HANDLE_ACCESS_DENIED);
-        }
-
-        // 업데이트 가능한 필드들
-        if (request.getTitle() != null) {
-            dream.updateTitle(request.getTitle());
-        }
-
-        if (request.getTags() != null) {
-            dream.updateTags(request.getTags());
-        }
-
-        if (request.getIsFavorite() != null) {
-            if (request.getIsFavorite() != dream.getIsFavorite()) {
-                // 즐겨찾기 추가 시 저장 제한 확인
-                if (request.getIsFavorite() && !subscriptionService.canSave(userId)) {
-                    throw new BusinessException(ErrorCode.SAVE_LIMIT_EXCEEDED);
-                }
-
-                dream.toggleFavorite();
-
-                // 즐겨찾기 상태에 따라 저장 카운트 조정
-                if (dream.getIsFavorite()) {
-                    subscriptionService.incrementSavedCount(userId);
-                    log.info("Dream ID: {} added to favorites", dreamId);
-                } else {
-                    subscriptionService.decrementSavedCount(userId);
-                    log.info("Dream ID: {} removed from favorites", dreamId);
-                }
-            }
-        }
-
-        return DreamResponse.from(dream);
+        return PageResponse.of(dreams.map(DreamResponse::from));
     }
 
     @Transactional
     public void deleteDream(Long userId, Long dreamId) {
-        Dream dream =
-                dreamRepository
-                        .findById(dreamId)
-                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
-
-        if (!dream.getUser().getId().equals(userId)) {
-            throw new EntityNotFoundException(ErrorCode.HANDLE_ACCESS_DENIED);
-        }
-
-        // 즐겨찾기된 꿈이면 저장 카운트 감소
-        if (dream.getIsFavorite()) {
-            subscriptionService.decrementSavedCount(userId);
-            log.info("Decremented saved count due to dream deletion, ID: {}", dreamId);
-        }
-
+        Dream dream = findDreamByUser(dreamId, userId);
         dreamRepository.delete(dream);
         log.info("Dream deleted, ID: {}", dreamId);
     }
 
-    /**
-     * 사용 가능한 스타일 목록 조회 (구독 티어에 따라 필터링)
-     *
-     * @param userId 사용자 ID
-     * @return 스타일 목록 응답
-     */
-    public com.dreamtoon.domain.dream.dto.StyleListResponse getAvailableStyles(Long userId) {
-        boolean hasPremiumAccess = subscriptionService.canUsePremiumStyles(userId);
+    // === 라이브러리 ===
 
-        List<com.dreamtoon.domain.dream.dto.StyleOptionResponse> styles =
-                Arrays.stream(StylePreset.values())
-                        .map(
-                                preset -> {
-                                    boolean isPremium = PREMIUM_STYLES.contains(preset);
-                                    boolean isAccessible = !isPremium || hasPremiumAccess;
-                                    return com.dreamtoon.domain.dream.dto.StyleOptionResponse.of(
-                                            preset, isPremium, isAccessible);
-                                })
-                        .toList();
+    @Transactional
+    public AddToLibraryResponse addToLibrary(Long userId, Long dreamId) {
+        if (!subscriptionService.canAddToLibrary(userId)) {
+            throw new BusinessException(ErrorCode.LIBRARY_LIMIT_EXCEEDED);
+        }
+        Dream dream = findDreamByUser(dreamId, userId);
+        dream.addToLibrary();
+        dreamRepository.save(dream);
+        subscriptionService.incrementSavedCount(userId);
+        return AddToLibraryResponse.builder().dreamId(dreamId).isInLibrary(true).build();
+    }
 
-        return com.dreamtoon.domain.dream.dto.StyleListResponse.builder()
-                .styles(styles)
-                .hasPremiumAccess(hasPremiumAccess)
+    @Transactional
+    public ToggleFavoriteResponse toggleFavorite(Long userId, Long dreamId) {
+        Dream dream = findDreamByUser(dreamId, userId);
+        boolean willBeFavorite = !dream.getIsFavorite();
+        if (willBeFavorite && !subscriptionService.canFavorite(userId)) {
+            throw new BusinessException(ErrorCode.FAVORITE_LIMIT_EXCEEDED);
+        }
+        dream.toggleFavorite();
+        dreamRepository.save(dream);
+        if (willBeFavorite) {
+            subscriptionService.incrementFavoriteCount(userId);
+        } else {
+            subscriptionService.decrementFavoriteCount(userId);
+        }
+        return ToggleFavoriteResponse.builder()
+                .dreamId(dreamId)
+                .isFavorite(dream.getIsFavorite())
                 .build();
+    }
+
+    public LibraryResponse getLibrary(
+            Long userId,
+            Boolean favorite,
+            Genre genre,
+            String search,
+            String sort,
+            Pageable pageable) {
+        Page<Dream> dreams =
+                dreamRepository.findLibraryDreams(
+                        userId, favorite, genre, search, sort != null ? sort : "latest", pageable);
+        var items =
+                dreams.getContent().stream()
+                        .map(
+                                d ->
+                                        LibraryItemResponse.builder()
+                                                .dreamId(d.getId())
+                                                .title(d.getTitle())
+                                                .thumbnailUrl(
+                                                        d.getWebtoonImages() != null
+                                                                        && !d.getWebtoonImages()
+                                                                                .isEmpty()
+                                                                ? d.getWebtoonImages().get(0)
+                                                                : null)
+                                                .genre(d.getSelectedGenre())
+                                                .isFavorite(d.getIsFavorite())
+                                                .createdAt(d.getCreatedAt())
+                                                .build())
+                        .toList();
+        return LibraryResponse.builder()
+                .dreams(items)
+                .totalCount(dreams.getTotalElements())
+                .build();
+    }
+
+    private Dream findDreamByUser(Long dreamId, Long userId) {
+        return dreamRepository
+                .findByIdAndUserId(dreamId, userId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.DREAM_NOT_FOUND));
     }
 }

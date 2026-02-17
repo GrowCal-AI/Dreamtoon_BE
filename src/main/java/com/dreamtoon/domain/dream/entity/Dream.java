@@ -1,19 +1,20 @@
 package com.dreamtoon.domain.dream.entity;
 
-import com.dreamtoon.domain.analysis.entity.Analysis;
-import com.dreamtoon.domain.scene.entity.Scene;
 import com.dreamtoon.domain.user.entity.User;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -31,19 +32,54 @@ public class Dream {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private String title;
+    // === 사용자 입력 데이터 ===
 
-    @Column(name = "raw_content", nullable = false, columnDefinition = "TEXT")
-    private String rawContent;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "style_preset", nullable = false)
-    private StylePreset stylePreset;
+    @Column(name = "dream_content", nullable = false, columnDefinition = "TEXT")
+    private String dreamContent;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "input_method", nullable = false)
-    private InputMethod inputMethod = InputMethod.TEXT;
+    @Column(name = "primary_emotion")
+    private EmotionType primaryEmotion;
+
+    @Column(name = "detailed_description", columnDefinition = "TEXT")
+    private String detailedDescription;
+
+    @Column(name = "real_life_context", columnDefinition = "TEXT")
+    private String realLifeContext;
+
+    // === AI 생성 데이터 ===
+
+    @Column private String title;
+
+    @Column(name = "ai_analysis", columnDefinition = "TEXT")
+    private String aiAnalysis;
+
+    @Type(JsonType.class)
+    @Column(name = "emotion_scores", columnDefinition = "jsonb")
+    private Map<String, Integer> emotionScores = new HashMap<>();
+
+    @Column(name = "ai_insight", columnDefinition = "TEXT")
+    private String aiInsight;
+
+    // === 웹툰 관련 ===
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "selected_genre")
+    private Genre selectedGenre;
+
+    @Type(JsonType.class)
+    @Column(name = "webtoon_images", columnDefinition = "jsonb")
+    private List<String> webtoonImages = new ArrayList<>();
+
+    // === 라이브러리 관련 ===
+
+    @Column(name = "is_favorite", nullable = false)
+    private Boolean isFavorite = false;
+
+    @Column(name = "is_in_library", nullable = false)
+    private Boolean isInLibrary = false;
+
+    // === 처리 상태 ===
 
     @Enumerated(EnumType.STRING)
     @Column(name = "processing_status", nullable = false)
@@ -52,109 +88,93 @@ public class Dream {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private List<String> tags = new ArrayList<>();
-
-    @Column(name = "is_favorite", nullable = false)
-    private Boolean isFavorite = false;
-
-    @Column(name = "webtoon_url")
-    private String webtoonUrl;
-
-    @Column(name = "video_url")
-    private String videoUrl;
-
-    @Column(name = "recorded_at")
-    private LocalDateTime recordedAt;
-
-    @OneToMany(mappedBy = "dream", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("cutOrder ASC")
-    private List<Scene> scenes = new ArrayList<>();
-
-    @OneToOne(
-            mappedBy = "dream",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
-    private Analysis analysis;
+    // === 타임스탬프 ===
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @Builder
-    public Dream(
-            User user,
-            String title,
-            String rawContent,
-            StylePreset stylePreset,
-            InputMethod inputMethod,
-            List<String> tags,
-            Boolean isFavorite,
-            String webtoonUrl,
-            String videoUrl,
-            LocalDateTime recordedAt) {
+    public Dream(User user, String dreamContent) {
         this.user = user;
-        this.title = title;
-        this.rawContent = rawContent;
-        this.stylePreset = stylePreset;
-        this.inputMethod = inputMethod != null ? inputMethod : InputMethod.TEXT;
+        this.dreamContent = dreamContent;
         this.processingStatus = ProcessingStatus.PENDING;
-        this.tags = tags != null ? tags : new ArrayList<>();
-        this.isFavorite = isFavorite != null ? isFavorite : false;
-        this.webtoonUrl = webtoonUrl;
-        this.videoUrl = videoUrl;
-        this.recordedAt = recordedAt != null ? recordedAt : LocalDateTime.now();
+        this.isFavorite = false;
+        this.isInLibrary = false;
+        this.emotionScores = new HashMap<>();
+        this.webtoonImages = new ArrayList<>();
     }
 
-    public void addScene(Scene scene) {
-        this.scenes.add(scene);
-        scene.setDream(this);
+    // === 단계별 비즈니스 메서드 ===
+
+    /** Step 2: 감정 선택 */
+    public void selectEmotion(EmotionType emotion) {
+        this.primaryEmotion = emotion;
     }
 
-    public void setAnalysis(Analysis analysis) {
-        this.analysis = analysis;
-        analysis.setDream(this);
+    /** Step 3: 상세 설명 추가 */
+    public void addDetails(String detailedDescription, String realLifeContext) {
+        this.detailedDescription = detailedDescription;
+        this.realLifeContext = realLifeContext;
     }
 
-    // 업데이트 메서드들
-    public void updateTitle(String title) {
+    /** AI 분석 시작 */
+    public void startAnalyzing() {
+        this.processingStatus = ProcessingStatus.ANALYZING;
+    }
+
+    /** AI 분석 완료 */
+    public void completeAnalysis(
+            String title, String aiAnalysis, Map<String, Integer> emotionScores, String aiInsight) {
         this.title = title;
+        this.aiAnalysis = aiAnalysis;
+        this.emotionScores = emotionScores;
+        this.aiInsight = aiInsight;
+        this.processingStatus = ProcessingStatus.ANALYSIS_COMPLETED;
+        this.errorMessage = null;
     }
 
-    public void updateContent(String rawContent) {
-        this.rawContent = rawContent;
+    /** Step 5: 장르 선택 */
+    public void selectGenre(Genre genre) {
+        this.selectedGenre = genre;
     }
 
-    public void updateTags(List<String> tags) {
-        this.tags = tags;
+    /** 웹툰 생성 시작 */
+    public void startGenerating() {
+        this.processingStatus = ProcessingStatus.GENERATING;
     }
 
-    public void toggleFavorite() {
-        this.isFavorite = !this.isFavorite;
-    }
-
-    public void setWebtoonUrl(String webtoonUrl) {
-        this.webtoonUrl = webtoonUrl;
-    }
-
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }
-
-    // 상태 관리 메서드들
-    public void startProcessing() {
-        this.processingStatus = ProcessingStatus.PROCESSING;
-    }
-
-    public void completeProcessing() {
+    /** 웹툰 생성 완료 */
+    public void completeGeneration(List<String> webtoonImages) {
+        this.webtoonImages = webtoonImages;
         this.processingStatus = ProcessingStatus.COMPLETED;
         this.errorMessage = null;
     }
 
+    /** 처리 실패 */
     public void failProcessing(String errorMessage) {
         this.processingStatus = ProcessingStatus.FAILED;
         this.errorMessage = errorMessage;
+    }
+
+    // === 라이브러리 메서드 ===
+
+    /** 라이브러리에 추가 */
+    public void addToLibrary() {
+        this.isInLibrary = true;
+    }
+
+    /** 라이브러리에서 제거 */
+    public void removeFromLibrary() {
+        this.isInLibrary = false;
+    }
+
+    /** 즐겨찾기 토글 */
+    public void toggleFavorite() {
+        this.isFavorite = !this.isFavorite;
     }
 }

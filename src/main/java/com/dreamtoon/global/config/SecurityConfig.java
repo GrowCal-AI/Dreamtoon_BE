@@ -8,7 +8,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -48,10 +47,6 @@ public class SecurityConfig {
                                                 "/swagger-ui/**",
                                                 "/swagger-ui.html")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/v1/dreams/**")
-                                        .permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/v1/dreams")
-                                        .permitAll() // TODO: Remove after testing
 
                                         // Test login endpoint (dev only)
                                         .requestMatchers("/api/v1/auth/test-login")

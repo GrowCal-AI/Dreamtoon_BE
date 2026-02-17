@@ -1,17 +1,17 @@
-package com.dreamtoon.domain.scene.dto;
+package com.dreamtoon.domain.dream.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/** 장면 대사 DTO */
+/** 꿈 기록 시작 응답 */
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DialogueDto {
+public class InitiateDreamResponse {
 
-    private String character;
-    private String text;
+    private Long dreamId;
+    private String systemMessage;
 }

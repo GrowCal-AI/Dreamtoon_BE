@@ -23,7 +23,7 @@ public enum ErrorCode {
     // Dream
     DREAM_NOT_FOUND(HttpStatus.NOT_FOUND, "D001", "꿈 기록을 찾을 수 없습니다."),
     DREAM_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "D002", "꿈 생성에 실패했습니다."),
-    INVALID_STYLE_PRESET(HttpStatus.BAD_REQUEST, "D003", "유효하지 않은 스타일 프리셋입니다."),
+    DREAM_INVALID_STATE(HttpStatus.BAD_REQUEST, "D003", "현재 단계에서 수행할 수 없는 작업입니다."),
 
     // AI
     AI_API_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "A001", "AI API 호출에 실패했습니다."),
@@ -36,12 +36,15 @@ public enum ErrorCode {
 
     // Subscription
     GENERATION_LIMIT_EXCEEDED(
-            HttpStatus.FORBIDDEN, "SUB001", "무료 회원은 월 3회까지 생성 가능합니다. 프리미엄으로 업그레이드하세요."),
+            HttpStatus.FORBIDDEN, "SUB001", "무료 회원은 월 10회까지 생성 가능합니다. 프리미엄으로 업그레이드하세요."),
     SAVE_LIMIT_EXCEEDED(
-            HttpStatus.FORBIDDEN,
-            "SUB002",
-            "무료 회원은 최대 3개까지 저장 가능합니다. 기존 꿈을 삭제하거나 프리미엄으로 업그레이드하세요."),
-    PREMIUM_STYLE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB003", "프리미엄 스타일은 유료 회원만 사용 가능합니다."),
+            HttpStatus.FORBIDDEN, "SUB002", "무료 회원은 최대 50개까지 라이브러리에 저장 가능합니다. 프리미엄으로 업그레이드하세요."),
+    LIBRARY_LIMIT_EXCEEDED(
+            HttpStatus.FORBIDDEN, "SUB002a", "무료 회원은 최대 50개까지 라이브러리에 저장 가능합니다. 프리미엄으로 업그레이드하세요."),
+    FAVORITE_LIMIT_EXCEEDED(
+            HttpStatus.FORBIDDEN, "SUB003", "무료 회원은 최대 10개까지 즐겨찾기 가능합니다. 프리미엄으로 업그레이드하세요."),
+    PREMIUM_STYLE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB004", "해당 기능은 유료 회원만 사용 가능합니다."),
+    PREMIUM_FEATURES_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB005", "해당 기능은 유료 회원만 사용 가능합니다."),
 
     // Conversation
     CONVERSATION_NOT_FOUND(HttpStatus.NOT_FOUND, "CONV001", "대화를 찾을 수 없습니다."),

@@ -18,37 +18,37 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-        private static final String AUTHORIZATION_HEADER = "Authorization";
-        private static final String BEARER_PREFIX = "Bearer ";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
 
-        private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
-        @Override
-        protected void doFilterInternal(
-                        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-                        throws ServletException, IOException {
-                try {
-                        String token = resolveToken(request);
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        try {
+            String token = resolveToken(request);
 
-                        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-                                Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                                SecurityContextHolder.getContext().setAuthentication(authentication);
-                                log.debug("Security Context에 인증 정보 저장, userId: {}", authentication.getPrincipal());
-                        }
-                } catch (Exception e) {
-                        log.error("Security Context에 인증 정보를 저장할 수 없습니다.", e);
-                }
-
-                filterChain.doFilter(request, response);
+            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("Security Context에 인증 정보 저장, userId: {}", authentication.getPrincipal());
+            }
+        } catch (Exception e) {
+            log.error("Security Context에 인증 정보를 저장할 수 없습니다.", e);
         }
 
-        private String resolveToken(HttpServletRequest request) {
-                String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        filterChain.doFilter(request, response);
+    }
 
-                if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-                        return bearerToken.substring(BEARER_PREFIX.length());
-                }
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
-                return null;
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(BEARER_PREFIX.length());
         }
+
+        return null;
+    }
 }

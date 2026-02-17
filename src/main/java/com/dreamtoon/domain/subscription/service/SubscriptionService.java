@@ -87,18 +87,25 @@ public class SubscriptionService {
      */
     public boolean canSave(Long userId) {
         Subscription subscription = getOrCreateSubscription(userId);
-        return subscription.canSave();
+        return subscription.canAddToLibrary();
     }
 
-    /**
-     * 프리미엄 스타일 사용 가능 여부 확인
-     *
-     * @param userId 사용자 ID
-     * @return 프리미엄 스타일 사용 가능 여부
-     */
+    /** 라이브러리 추가 가능 여부 */
+    public boolean canAddToLibrary(Long userId) {
+        Subscription subscription = getOrCreateSubscription(userId);
+        return subscription.canAddToLibrary();
+    }
+
+    /** 즐겨찾기 추가 가능 여부 */
+    public boolean canFavorite(Long userId) {
+        Subscription subscription = getOrCreateSubscription(userId);
+        return subscription.canFavorite();
+    }
+
+    /** 프리미엄 기능 사용 가능 여부 */
     public boolean canUsePremiumStyles(Long userId) {
         Subscription subscription = getOrCreateSubscription(userId);
-        return subscription.canUsePremiumStyles();
+        return subscription.canUsePremiumFeatures();
     }
 
     /**
@@ -124,7 +131,7 @@ public class SubscriptionService {
     }
 
     /**
-     * 저장된 꿈 개수 증가 (저장 제한 체크 포함)
+     * 라이브러리 저장 개수 증가 (저장 제한 체크 포함)
      *
      * @param userId 사용자 ID
      * @throws BusinessException 저장 제한 초과 시
@@ -133,32 +140,60 @@ public class SubscriptionService {
     public void incrementSavedCount(Long userId) {
         Subscription subscription = getOrCreateSubscription(userId);
 
-        if (!subscription.canSave()) {
+        if (!subscription.canAddToLibrary()) {
             throw new BusinessException(ErrorCode.SAVE_LIMIT_EXCEEDED);
         }
 
-        subscription.incrementSavedCount();
+        subscription.incrementLibraryCount();
         subscriptionRepository.save(subscription);
         log.info(
-                "Incremented saved dreams count for user ID: {}, new count: {}",
+                "Incremented library count for user ID: {}, new count: {}",
                 userId,
-                subscription.getSavedDreamsCount());
+                subscription.getLibraryCount());
     }
 
     /**
-     * 저장된 꿈 개수 감소
+     * 라이브러리 저장 개수 감소
      *
      * @param userId 사용자 ID
      */
     @Transactional
     public void decrementSavedCount(Long userId) {
         Subscription subscription = getOrCreateSubscription(userId);
-        subscription.decrementSavedCount();
+        subscription.decrementLibraryCount();
         subscriptionRepository.save(subscription);
         log.info(
-                "Decremented saved dreams count for user ID: {}, new count: {}",
+                "Decremented library count for user ID: {}, new count: {}",
                 userId,
-                subscription.getSavedDreamsCount());
+                subscription.getLibraryCount());
+    }
+
+    /**
+     * 즐겨찾기 개수 증가 (제한 체크 포함)
+     *
+     * @param userId 사용자 ID
+     * @throws BusinessException 즐겨찾기 제한 초과 시
+     */
+    @Transactional
+    public void incrementFavoriteCount(Long userId) {
+        Subscription subscription = getOrCreateSubscription(userId);
+        if (!subscription.canFavorite()) {
+            throw new BusinessException(ErrorCode.FAVORITE_LIMIT_EXCEEDED);
+        }
+        subscription.incrementFavoriteCount();
+        subscriptionRepository.save(subscription);
+    }
+
+    /**
+     * 즐겨찾기 개수 감소
+     *
+     * @param userId 사용자 ID
+     */
+    @Transactional
+    public void decrementFavoriteCount(Long userId) {
+        Subscription subscription = getOrCreateSubscription(userId);
+        subscription.decrementFavoriteCount();
+        subscriptionRepository.save(subscription);
     }
 
     /**

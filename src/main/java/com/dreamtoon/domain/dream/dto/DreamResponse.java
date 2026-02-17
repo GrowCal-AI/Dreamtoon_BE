@@ -1,15 +1,12 @@
 package com.dreamtoon.domain.dream.dto;
 
-import com.dreamtoon.domain.analysis.dto.AnalysisResponse;
 import com.dreamtoon.domain.dream.entity.Dream;
-import com.dreamtoon.domain.dream.entity.InputMethod;
+import com.dreamtoon.domain.dream.entity.Genre;
 import com.dreamtoon.domain.dream.entity.ProcessingStatus;
-import com.dreamtoon.domain.dream.entity.StylePreset;
-import com.dreamtoon.domain.scene.dto.SceneResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,63 +18,43 @@ public class DreamResponse {
     private Long dreamId;
     private Long userId;
     private String title;
-    private String content; // rawContent를 content로 변경 (프론트엔드와 일치)
-    private StylePreset stylePreset;
-    private InputMethod inputMethod;
-    private List<String> tags;
+    private String dreamContent;
+    private String primaryEmotion;
+    private String detailedDescription;
+    private String realLifeContext;
+    private String aiAnalysis;
+    private Map<String, Integer> emotionScores;
+    private String aiInsight;
+    private Genre selectedGenre;
+    private List<String> webtoonImages;
     private Boolean isFavorite;
+    private Boolean isInLibrary;
     private ProcessingStatus processingStatus;
     private String errorMessage;
-    private String webtoonUrl;
-    private String videoUrl;
-    private LocalDateTime recordedAt;
     private LocalDateTime createdAt;
-    private List<SceneResponse> scenes;
-    private AnalysisResponse analysis;
+    private LocalDateTime updatedAt;
 
     public static DreamResponse from(Dream dream) {
         return DreamResponse.builder()
                 .dreamId(dream.getId())
                 .userId(dream.getUser() != null ? dream.getUser().getId() : null)
                 .title(dream.getTitle())
-                .content(dream.getRawContent())
-                .stylePreset(dream.getStylePreset())
-                .inputMethod(dream.getInputMethod())
-                .tags(dream.getTags())
+                .dreamContent(dream.getDreamContent())
+                .primaryEmotion(
+                        dream.getPrimaryEmotion() != null ? dream.getPrimaryEmotion().name() : null)
+                .detailedDescription(dream.getDetailedDescription())
+                .realLifeContext(dream.getRealLifeContext())
+                .aiAnalysis(dream.getAiAnalysis())
+                .emotionScores(dream.getEmotionScores())
+                .aiInsight(dream.getAiInsight())
+                .selectedGenre(dream.getSelectedGenre())
+                .webtoonImages(dream.getWebtoonImages())
                 .isFavorite(dream.getIsFavorite())
+                .isInLibrary(dream.getIsInLibrary())
                 .processingStatus(dream.getProcessingStatus())
                 .errorMessage(dream.getErrorMessage())
-                .webtoonUrl(dream.getWebtoonUrl())
-                .videoUrl(dream.getVideoUrl())
-                .recordedAt(dream.getRecordedAt())
                 .createdAt(dream.getCreatedAt())
-                .build();
-    }
-
-    public static DreamResponse fromWithDetails(Dream dream) {
-        return DreamResponse.builder()
-                .dreamId(dream.getId())
-                .userId(dream.getUser() != null ? dream.getUser().getId() : null)
-                .title(dream.getTitle())
-                .content(dream.getRawContent())
-                .stylePreset(dream.getStylePreset())
-                .inputMethod(dream.getInputMethod())
-                .tags(dream.getTags())
-                .isFavorite(dream.getIsFavorite())
-                .processingStatus(dream.getProcessingStatus())
-                .errorMessage(dream.getErrorMessage())
-                .webtoonUrl(dream.getWebtoonUrl())
-                .videoUrl(dream.getVideoUrl())
-                .recordedAt(dream.getRecordedAt())
-                .createdAt(dream.getCreatedAt())
-                .scenes(
-                        dream.getScenes().stream()
-                                .map(SceneResponse::from)
-                                .collect(Collectors.toList()))
-                .analysis(
-                        dream.getAnalysis() != null
-                                ? AnalysisResponse.from(dream.getAnalysis())
-                                : null)
+                .updatedAt(dream.getUpdatedAt())
                 .build();
     }
 }

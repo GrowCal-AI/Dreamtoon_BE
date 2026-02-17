@@ -2,6 +2,7 @@ package com.dreamtoon.domain.subscription.dto;
 
 import com.dreamtoon.domain.subscription.entity.Subscription;
 import com.dreamtoon.domain.subscription.entity.SubscriptionTier;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,11 +14,15 @@ public class UsageResponse {
     private Boolean isActive;
     private Integer generationCount;
     private Integer maxGenerations; // -1은 무제한
-    private Integer savedDreamsCount;
-    private Integer maxSavedDreams; // -1은 무제한
+    private Integer libraryCount;
+    private Integer maxLibrary; // -1은 무제한
+    private Integer favoriteCount;
+    private Integer maxFavorites; // -1은 무제한
+    private LocalDate quotaResetDate;
     private Boolean canGenerate;
-    private Boolean canSave;
-    private Boolean canUsePremiumStyles;
+    private Boolean canAddToLibrary;
+    private Boolean canFavorite;
+    private Boolean canUsePremiumFeatures;
 
     public static UsageResponse from(Subscription subscription) {
         return UsageResponse.builder()
@@ -25,11 +30,15 @@ public class UsageResponse {
                 .isActive(subscription.getIsActive())
                 .generationCount(subscription.getGenerationCount())
                 .maxGenerations(subscription.getTier().getMaxGenerations())
-                .savedDreamsCount(subscription.getSavedDreamsCount())
-                .maxSavedDreams(subscription.getTier().getMaxSavedDreams())
+                .libraryCount(subscription.getLibraryCount())
+                .maxLibrary(subscription.getTier().getMaxLibraryItems())
+                .favoriteCount(subscription.getFavoriteCount())
+                .maxFavorites(subscription.getTier().getMaxFavorites())
+                .quotaResetDate(subscription.getQuotaResetDate())
                 .canGenerate(subscription.canGenerate())
-                .canSave(subscription.canSave())
-                .canUsePremiumStyles(subscription.canUsePremiumStyles())
+                .canAddToLibrary(subscription.canAddToLibrary())
+                .canFavorite(subscription.canFavorite())
+                .canUsePremiumFeatures(subscription.canUsePremiumFeatures())
                 .build();
     }
 }

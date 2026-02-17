@@ -5,12 +5,18 @@ public enum ProcessingStatus {
     /** 대기 중 - Dream이 생성되었지만 AI 처리가 시작되지 않음 */
     PENDING,
 
-    /** 처리 중 - AI 분석 및 이미지 생성이 진행 중 */
-    PROCESSING,
+    /** 분석 중 - GPT-4o 꿈 분석이 진행 중 */
+    ANALYZING,
+
+    /** 분석 완료 - 꿈 분석 완료, 장르 선택 대기 중 */
+    ANALYSIS_COMPLETED,
+
+    /** 생성 중 - DALL-E 4컷 만화 이미지 생성 진행 중 */
+    GENERATING,
 
     /** 완료 - 모든 처리가 성공적으로 완료됨 */
     COMPLETED,
 
-    /** 실패 - AI 처리 중 오류 발생 (fallback 데이터 사용) */
+    /** 실패 - AI 처리 중 오류 발생 */
     FAILED
 }

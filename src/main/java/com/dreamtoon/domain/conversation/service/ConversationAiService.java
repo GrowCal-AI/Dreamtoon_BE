@@ -129,7 +129,7 @@ public class ConversationAiService {
                     case ANXIETY -> intensityLevel + " 불안감을 느끼셨네요. 현실의 걱정이 반영된 것 같습니다.";
                     case ANGER -> intensityLevel + " 분노를 느끼셨군요. 해결되지 않은 갈등이 있으신가요?";
                     case SADNESS -> intensityLevel + " 슬픔을 느끼셨네요. 마음이 힘드셨던 것 같습니다.";
-                    case SURPRISE -> intensityLevel + " 놀라움을 느끼셨군요. 예상치 못한 일이 있었나요?";
+                    case DISCOMFORT -> intensityLevel + " 불편함을 느끼셨군요. 어떤 부분이 불편하셨나요?";
                     case PEACE -> intensityLevel + " 평온함을 느끼셨네요. 마음이 안정되어 있으신 것 같습니다.";
                 };
 

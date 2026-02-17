@@ -44,6 +44,10 @@ out/
 .env.local
 .env.*.local
 
+### Local config (secrets / local overrides - do not commit) ###
+**/application-local.yml
+**/application-local.yaml
+
 ### Querydsl ###
 src/main/generated
 
