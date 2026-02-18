@@ -1,6 +1,10 @@
 package com.dreamtoon.domain.user.controller;
 
 import com.dreamtoon.domain.user.dto.TokenResponse;
+import com.dreamtoon.domain.user.entity.Role;
+import com.dreamtoon.domain.user.entity.SocialProvider;
+import com.dreamtoon.domain.user.entity.User;
+import com.dreamtoon.domain.user.repository.UserRepository;
 import com.dreamtoon.global.common.dto.response.ApiResponse;
 import com.dreamtoon.infrastructure.security.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     @Operation(
             summary = "카카오 소셜 로그인",
@@ -55,9 +60,25 @@ public class AuthController {
             @Parameter(description = "테스트할 사용자 ID (기본값 1)") @RequestParam(defaultValue = "1")
                     Long userId) {
 
+        // DB에 테스트 사용자가 없으면 자동 생성
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseGet(
+                                () ->
+                                        userRepository.save(
+                                                User.builder()
+                                                        .email("test@dreamtoon.com")
+                                                        .nickname("테스트유저")
+                                                        .socialProvider(SocialProvider.KAKAO)
+                                                        .socialId("test-" + userId)
+                                                        .role(Role.ROLE_USER)
+                                                        .build()));
+
         String accessToken =
-                jwtTokenProvider.createAccessToken(userId, "test@dreamtoon.com", "ROLE_USER");
-        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+                jwtTokenProvider.createAccessToken(
+                        user.getId(), user.getEmail(), "ROLE_USER");
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
         TestTokenResponse response = new TestTokenResponse(accessToken, refreshToken);
 

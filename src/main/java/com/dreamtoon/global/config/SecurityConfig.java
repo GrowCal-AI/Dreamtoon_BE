@@ -28,6 +28,9 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
+    @org.springframework.beans.factory.annotation.Value("${FRONTEND_URL:http://localhost:5173}")
+    private String frontendUrl;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -65,6 +68,14 @@ public class SecurityConfig {
                                         .requestMatchers("/api/v1/dreams/**")
                                         .authenticated()
                                         .requestMatchers("/api/v1/users/**")
+                                        .authenticated()
+                                        .requestMatchers("/api/v1/analytics/**")
+                                        .authenticated()
+                                        .requestMatchers("/api/v1/voice/**")
+                                        .authenticated()
+                                        .requestMatchers("/api/v1/library/**")
+                                        .authenticated()
+                                        .requestMatchers("/api/v1/subscriptions/**")
                                         .authenticated()
                                         .anyRequest()
                                         .authenticated())

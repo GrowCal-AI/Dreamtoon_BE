@@ -42,12 +42,7 @@ public enum ErrorCode {
     FAVORITE_LIMIT_EXCEEDED(
             HttpStatus.FORBIDDEN, "SUB003", "무료 회원은 최대 10개까지 즐겨찾기 가능합니다. 프리미엄으로 업그레이드하세요."),
     PREMIUM_STYLE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB004", "해당 기능은 유료 회원만 사용 가능합니다."),
-    PREMIUM_FEATURES_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB005", "해당 기능은 유료 회원만 사용 가능합니다."),
-
-    // Conversation
-    CONVERSATION_NOT_FOUND(HttpStatus.NOT_FOUND, "CONV001", "대화를 찾을 수 없습니다."),
-    CONVERSATION_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "CONV002", "이미 완료된 대화입니다."),
-    INVALID_CONVERSATION_PHASE(HttpStatus.BAD_REQUEST, "CONV003", "현재 대화 단계에서는 수행할 수 없는 작업입니다.");
+    PREMIUM_FEATURES_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB005", "해당 기능은 유료 회원만 사용 가능합니다.");
 
     private final HttpStatus status;
     private final String code;

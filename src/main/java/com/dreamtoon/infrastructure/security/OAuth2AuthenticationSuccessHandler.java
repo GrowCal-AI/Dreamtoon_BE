@@ -18,8 +18,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Value("${app.oauth2.redirect-uri:http://localhost:3000/oauth2/redirect}")
-    private String redirectUri;
+    @Value("${FRONTEND_URL:http://localhost:5173}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -120,6 +120,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             </body>
             </html>
             """
-                                .formatted(accessToken, refreshToken, redirectUri));
+                                .formatted(
+                                        accessToken,
+                                        refreshToken,
+                                        frontendUrl + "/oauth/callback"));
     }
 }

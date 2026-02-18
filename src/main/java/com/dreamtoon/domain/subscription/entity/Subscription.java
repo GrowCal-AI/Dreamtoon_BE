@@ -37,12 +37,6 @@ public class Subscription {
     @Column(name = "generation_count", nullable = false)
     private Integer generationCount = 0;
 
-    @Column(name = "library_count", nullable = false)
-    private Integer libraryCount = 0;
-
-    @Column(name = "favorite_count", nullable = false)
-    private Integer favoriteCount = 0;
-
     @Column(name = "quota_reset_date")
     private LocalDate quotaResetDate;
 
@@ -56,9 +50,7 @@ public class Subscription {
         this.tier = tier != null ? tier : SubscriptionTier.FREE;
         this.isActive = true;
         this.generationCount = 0;
-        this.libraryCount = 0;
-        this.favoriteCount = 0;
-        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1); // 다음 달 1일
+        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
     }
 
     // === 비즈니스 메서드 ===
@@ -66,30 +58,6 @@ public class Subscription {
     /** 생성 횟수 증가 */
     public void incrementGenerationCount() {
         this.generationCount++;
-    }
-
-    /** 라이브러리 저장 개수 증가 */
-    public void incrementLibraryCount() {
-        this.libraryCount++;
-    }
-
-    /** 라이브러리 저장 개수 감소 */
-    public void decrementLibraryCount() {
-        if (this.libraryCount > 0) {
-            this.libraryCount--;
-        }
-    }
-
-    /** 즐겨찾기 개수 증가 */
-    public void incrementFavoriteCount() {
-        this.favoriteCount++;
-    }
-
-    /** 즐겨찾기 개수 감소 */
-    public void decrementFavoriteCount() {
-        if (this.favoriteCount > 0) {
-            this.favoriteCount--;
-        }
     }
 
     /** 월별 생성 횟수 초기화 (매월 1일 실행) */
@@ -120,35 +88,23 @@ public class Subscription {
 
     /** 생성 가능 여부 확인 */
     public boolean canGenerate() {
-        if (!isActive) {
-            return false;
-        }
-        if (tier.isUnlimitedGenerations()) {
-            return true;
-        }
+        if (!isActive) return false;
+        if (tier.isUnlimitedGenerations()) return true;
         return generationCount < tier.getMaxGenerations();
     }
 
-    /** 라이브러리 추가 가능 여부 확인 */
-    public boolean canAddToLibrary() {
-        if (!isActive) {
-            return false;
-        }
-        if (tier.isUnlimitedLibrary()) {
-            return true;
-        }
-        return libraryCount < tier.getMaxLibraryItems();
+    /** 라이브러리 추가 가능 여부 (현재 라이브러리 수를 외부에서 전달) */
+    public boolean canAddToLibrary(long currentLibraryCount) {
+        if (!isActive) return false;
+        if (tier.isUnlimitedLibrary()) return true;
+        return currentLibraryCount < tier.getMaxLibraryItems();
     }
 
-    /** 즐겨찾기 추가 가능 여부 확인 */
-    public boolean canFavorite() {
-        if (!isActive) {
-            return false;
-        }
-        if (tier.isUnlimitedFavorites()) {
-            return true;
-        }
-        return favoriteCount < tier.getMaxFavorites();
+    /** 즐겨찾기 추가 가능 여부 (현재 즐겨찾기 수를 외부에서 전달) */
+    public boolean canFavorite(long currentFavoriteCount) {
+        if (!isActive) return false;
+        if (tier.isUnlimitedFavorites()) return true;
+        return currentFavoriteCount < tier.getMaxFavorites();
     }
 
     /** 프리미엄 기능 사용 가능 여부 */
