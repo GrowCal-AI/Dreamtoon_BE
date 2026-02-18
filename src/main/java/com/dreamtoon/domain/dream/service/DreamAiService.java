@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /** AI 기반 꿈 분석 및 4컷 웹툰 생성 서비스 (Blueprint v3.0) */
 @Slf4j
@@ -36,24 +36,31 @@ public class DreamAiService {
     private final GcsStorageService gcsStorageService;
     private final ObjectMapper objectMapper;
     private final DreamRepository dreamRepository;
+    private final TransactionTemplate transactionTemplate;
 
     /** 비동기 꿈 분석 (GPT-4o → Dream 필드 저장, ANALYSIS_COMPLETED) */
     @Async("dreamProcessingExecutor")
-    @Transactional
     public void analyzeDreamAsync(Long dreamId) {
+        // DB 커넥션을 짧게 사용: 로드 + 상태 업데이트만
         Dream dream =
-                dreamRepository
-                        .findById(dreamId)
-                        .orElseThrow(
-                                () ->
-                                        new com.dreamtoon.global.error.EntityNotFoundException(
-                                                com.dreamtoon.global.error.ErrorCode
-                                                        .DREAM_NOT_FOUND));
+                transactionTemplate.execute(
+                        status -> {
+                            Dream d =
+                                    dreamRepository
+                                            .findById(dreamId)
+                                            .orElseThrow(
+                                                    () ->
+                                                            new com.dreamtoon.global.error
+                                                                    .EntityNotFoundException(
+                                                                    com.dreamtoon.global.error
+                                                                            .ErrorCode
+                                                                            .DREAM_NOT_FOUND));
+                            d.startAnalyzing();
+                            return dreamRepository.save(d);
+                        });
 
         try {
             log.info("[ASYNC] Starting dream analysis for dream ID: {}", dreamId);
-            dream.startAnalyzing();
-            dreamRepository.save(dream);
 
             String prompt =
                     DreamAnalysisPrompt.createDreamAnalysisPrompt(
@@ -67,20 +74,29 @@ public class DreamAiService {
             gptResponse = gptResponse.replaceAll("```json\\n|```", "");
             AiAnalysisResult result = objectMapper.readValue(gptResponse, AiAnalysisResult.class);
 
-            dream.completeAnalysis(
-                    result.getTitle(),
-                    result.getAnalysis(),
-                    result.getEmotionScores() != null
-                            ? result.getEmotionScores()
-                            : new java.util.HashMap<>(),
-                    result.getInsight());
-            dreamRepository.save(dream);
+            // DB 커넥션을 짧게 사용: 분석 결과 저장만
+            final Dream analyzedDream = dream;
+            transactionTemplate.executeWithoutResult(
+                    status -> {
+                        analyzedDream.completeAnalysis(
+                                result.getTitle(),
+                                result.getAnalysis(),
+                                result.getEmotionScores() != null
+                                        ? result.getEmotionScores()
+                                        : new java.util.HashMap<>(),
+                                result.getInsight());
+                        dreamRepository.save(analyzedDream);
+                    });
 
             log.info("[ASYNC] Dream analysis completed for dream ID: {}", dreamId);
         } catch (Exception e) {
             log.error("[ASYNC] Dream analysis failed for dream ID: {}", dreamId, e);
-            dream.failProcessing(e.getMessage());
-            dreamRepository.save(dream);
+            final Dream failedDream = dream;
+            transactionTemplate.executeWithoutResult(
+                    status -> {
+                        failedDream.failProcessing(e.getMessage());
+                        dreamRepository.save(failedDream);
+                    });
         }
     }
 
@@ -89,21 +105,27 @@ public class DreamAiService {
      * 연결성 보장) 2단계: 각 장면 묘사를 DALL-E에 병렬로 전달하여 이미지 생성 (실패 시 1회 재시도)
      */
     @Async("dreamProcessingExecutor")
-    @Transactional
     public void generateWebtoonAsync(Long dreamId) {
+        // DB 커넥션을 짧게 사용: 로드 + 상태 업데이트만
         Dream dream =
-                dreamRepository
-                        .findById(dreamId)
-                        .orElseThrow(
-                                () ->
-                                        new com.dreamtoon.global.error.EntityNotFoundException(
-                                                com.dreamtoon.global.error.ErrorCode
-                                                        .DREAM_NOT_FOUND));
+                transactionTemplate.execute(
+                        status -> {
+                            Dream d =
+                                    dreamRepository
+                                            .findById(dreamId)
+                                            .orElseThrow(
+                                                    () ->
+                                                            new com.dreamtoon.global.error
+                                                                    .EntityNotFoundException(
+                                                                    com.dreamtoon.global.error
+                                                                            .ErrorCode
+                                                                            .DREAM_NOT_FOUND));
+                            d.startGenerating();
+                            return dreamRepository.save(d);
+                        });
 
         try {
             log.info("[ASYNC] Starting webtoon generation for dream ID: {}", dreamId);
-            dream.startGenerating();
-            dreamRepository.save(dream);
 
             // ── 1단계: GPT로 4컷 스토리보드 생성 (기승전결 연결) ──
             log.info(
@@ -193,9 +215,14 @@ public class DreamAiService {
                 throw new RuntimeException("모든 패널 생성 실패");
             }
 
-            // 최소 1개 성공이면 저장 (4개 모두 성공이 이상적)
-            dream.completeGeneration(successUrls);
-            dreamRepository.save(dream);
+            // DB 커넥션을 짧게 사용: 완료 결과 저장만
+            final Dream completedDream = dream;
+            final List<String> finalUrls = successUrls;
+            transactionTemplate.executeWithoutResult(
+                    status -> {
+                        completedDream.completeGeneration(finalUrls);
+                        dreamRepository.save(completedDream);
+                    });
 
             log.info(
                     "[ASYNC] Webtoon generation completed for dream ID: {} ({}/{} panels)",
@@ -204,8 +231,12 @@ public class DreamAiService {
                     WEBTOON_PANEL_COUNT);
         } catch (Exception e) {
             log.error("[ASYNC] Webtoon generation failed for dream ID: {}", dreamId, e);
-            dream.failProcessing(e.getMessage());
-            dreamRepository.save(dream);
+            final Dream failedDream = dream;
+            transactionTemplate.executeWithoutResult(
+                    status -> {
+                        failedDream.failProcessing(e.getMessage());
+                        dreamRepository.save(failedDream);
+                    });
         }
     }
 
