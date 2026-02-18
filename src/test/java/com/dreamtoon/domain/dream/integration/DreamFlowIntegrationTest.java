@@ -215,7 +215,7 @@ public class DreamFlowIntegrationTest {
 
         // 분석 완료(ANALYSIS_COMPLETED) 전에 웹툰 생성 시도 → DREAM_INVALID_STATE(400)
         WebtoonGenerateRequest webtoonRequest =
-                WebtoonGenerateRequest.builder().selectedGenre(Genre.FANTASY).build();
+                WebtoonGenerateRequest.builder().selectedGenre(Genre.DARK_FANTASY).build();
 
         mockMvc.perform(
                         post("/api/v1/dreams/" + dreamId + "/webtoon")
