@@ -46,8 +46,8 @@ public class SwaggerConfig {
                                             + " 테스트 로그인**으로 토큰 발급 후 상단 **Authorize**에 입력하세요.\n\n"
                                             + "**📌 주요 플로우**: **Dreams** — 꿈 기록 시작 → 감정 선택 → 상세 입력"
                                             + " → 분석 조회(폴링) → 4컷 웹툰 생성. **Library** — 저장한 꿈 목록 조회."
-                                            + " **Users** — 내 정보/닉네임/권한."
-                                            + " **Subscriptions** — 구독/사용량 관리.")
+                                            + " **Users** — 내 정보/닉네임/권한. **Subscriptions** — 구독/사용량"
+                                            + " 관리.")
                                 .version("v1.0.0"))
                 .servers(
                         List.of(

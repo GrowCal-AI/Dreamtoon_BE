@@ -31,17 +31,17 @@ class OAuth2AuthenticationSuccessHandlerTest {
 
     private static final String MOCK_ACCESS_TOKEN = "mock-access-token";
     private static final String MOCK_REFRESH_TOKEN = "mock-refresh-token";
-    private static final String REDIRECT_URI = "http://localhost:3000/oauth2/redirect";
+    private static final String FRONTEND_URL = "http://localhost:5173";
 
     @BeforeEach
     void setUp() {
         successHandler = new OAuth2AuthenticationSuccessHandler(jwtTokenProvider);
-        ReflectionTestUtils.setField(successHandler, "redirectUri", REDIRECT_URI);
+        ReflectionTestUtils.setField(successHandler, "frontendUrl", FRONTEND_URL);
     }
 
     @Test
-    @DisplayName("로그인 성공 시 Access/Refresh 토큰 발급 후 HTML에 토큰·리다이렉트 URL 포함")
-    void onAuthenticationSuccess_issuesTokensAndWritesHtml() throws Exception {
+    @DisplayName("로그인 성공 시 Access Token을 쿼리 파라미터로 포함하여 리다이렉트")
+    void onAuthenticationSuccess_issuesTokensAndRedirects() throws Exception {
         when(jwtTokenProvider.createAccessToken(1L, "user@example.com", "ROLE_USER"))
                 .thenReturn(MOCK_ACCESS_TOKEN);
         when(jwtTokenProvider.createRefreshToken(1L)).thenReturn(MOCK_REFRESH_TOKEN);
@@ -63,15 +63,20 @@ class OAuth2AuthenticationSuccessHandlerTest {
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
+        // Verify Tokens Created
         verify(jwtTokenProvider).createAccessToken(1L, "user@example.com", "ROLE_USER");
         verify(jwtTokenProvider).createRefreshToken(1L);
 
-        String content = response.getContentAsString();
-        assertThat(content).contains(MOCK_ACCESS_TOKEN);
-        assertThat(content).contains(MOCK_REFRESH_TOKEN);
-        assertThat(content).contains(REDIRECT_URI);
-        assertThat(content).contains("oauth2-login-success");
-        assertThat(response.getContentType()).isEqualTo("text/html;charset=UTF-8");
+        // Verify Redirect
+        String redirectedUrl = response.getRedirectedUrl();
+        assertThat(redirectedUrl).isNotNull();
+        assertThat(redirectedUrl).startsWith(FRONTEND_URL + "/oauth/callback");
+        assertThat(redirectedUrl).contains("accessToken=" + MOCK_ACCESS_TOKEN);
+
+        // Verify Cookie
+        assertThat(response.getCookie("refreshToken")).isNotNull();
+        assertThat(response.getCookie("refreshToken").getValue()).isEqualTo(MOCK_REFRESH_TOKEN);
+        assertThat(response.getCookie("refreshToken").isHttpOnly()).isTrue();
     }
 
     @Test

@@ -200,6 +200,19 @@
 
 ---
 
+### 📈 **AnalysisStats (Dashboard Cache)**
+대시보드 로딩 속도를 위해 매번 계산하지 않고 일별/주별 통계를 요약 저장 (선택 사항)
+```java
+- id (Long)
+- user_id (Long)
+- date (Date)
+- average_stress_level (Integer)
+- dominant_emotion (Enum)
+- sleep_score (Integer)
+```
+
+---
+
 ## 6. 주요 API 명세 (API Specification)
 
 ### **[POST] /api/v1/dreams**
@@ -437,6 +450,49 @@
 
 ---
 
+### **[GET] /api/v1/analysis/dashboard**
+꿈 분석 대시보드 (종합 건강 상태)
+
+**Query Parameters:**
+- `period`: 7d (기본값), 30d
+
+**Response:** `200 OK`
+```json
+{
+  "stressIndex": 75,
+  "stressLevel": "HIGH", // LOW, MEDIUM, HIGH
+  "sleepQualityScore": 60,
+  "sleepQualityMessage": "수면의 질 개선이 필요해요.",
+  "emotionBalance": {
+    "기쁨": 30,
+    "평온": 20,
+    "불안": 60,
+    "슬픔": 40,
+    "분노": 10
+  },
+  "weeklyDreamFlow": [
+    { "date": "2026-02-12", "hasDream": true, "primaryEmotion": "불안" },
+    { "date": "2026-02-13", "hasDream": true, "primaryEmotion": "평온" },
+    { "date": "2026-02-14", "hasDream": false, "primaryEmotion": null }
+  ],
+  "aiCoachMessage": "최근 불안과 관련된 꿈이 잦습니다. 잠들기 전 명상을 추천드려요."
+}
+```
+
+**Response (데이터 없음 - 첫 사용자):** `200 OK`
+```json
+{
+  "hasEnoughData": false,
+  "message": "아직 분석할 꿈 데이터가 없어요. 첫 번째 꿈을 기록해보세요!",
+  "stressIndex": 0,
+  "sleepQualityScore": 0,
+  "emotionBalance": null,
+  "weeklyDreamFlow": []
+}
+```
+
+---
+
 ## 7. AI 프롬프트 전략 (Prompt Engineering)
 
 ### 🧠 **꿈 분석 프롬프트 (GPT-4)**
@@ -535,10 +591,15 @@
 2. 채팅 내역 저장/조회
 3. 심리상담사 페르소나 프롬프트 최적화
 
-### 🔜 **Phase 4: 대시보드 & 분석**
-1. 주간/월간 꿈 통계
-2. 감정 패턴 분석
-3. AI 코칭 리포트
+
+### ✅ **Phase 4: 대시보드 & 분석 (Dream Health Analysis)**
+1. **Stress Index & Sleep Quality**
+   - 개별 꿈의 부정적 감정(불안, 공포, 분노) 점수를 가중 평균하여 산출
+   - 수면 만족도 입력 필드 추가 고려
+2. **Emotion Balance (Radar Chart)**
+   - 기간 내 모든 꿈의 감정 점수 합산 및 정규화
+3. **Weekly Dream Flow**
+   - 캘린더 형태의 감정 흐름 시각화
 
 ---
 
@@ -546,6 +607,10 @@
 
 ### 🔐 **보안**
 - OAuth2 소셜 로그인 (Google, Kakao)
+  - **Hybrid Authentication Flow**:
+    - **Access Token**: 리다이렉트 URL 쿼리 파라미터로 전달 (`?accessToken=...`) - 즉시 사용
+    - **Refresh Token**: `HttpOnly; Secure; SameSite=None` 쿠키로 설정 - 보안 강화
+    - **Frontend**: URL에서 Access Token 추출, Refresh Token은 쿠키로 자동 전송 (API 호출 시)
 - JWT 토큰 기반 인증
 - 개인 꿈 데이터 암호화 저장
 

@@ -1,6 +1,8 @@
 package com.dreamtoon.domain.dream.repository;
 
 import com.dreamtoon.domain.dream.entity.Dream;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +16,14 @@ public interface DreamRepository extends JpaRepository<Dream, Long>, DreamReposi
 
     @Query("SELECT d FROM Dream d WHERE d.user.id = :userId ORDER BY d.createdAt DESC")
     Page<Dream> findByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(
+            "SELECT d FROM Dream d WHERE d.user.id = :userId AND d.createdAt BETWEEN :startDate AND"
+                    + " :endDate ORDER BY d.createdAt DESC")
+    List<Dream> findByUserIdAndCreatedAtBetween(
+            @Param("userId") Long userId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT d FROM Dream d WHERE d.id = :id AND d.user.id = :userId")
     Optional<Dream> findByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);

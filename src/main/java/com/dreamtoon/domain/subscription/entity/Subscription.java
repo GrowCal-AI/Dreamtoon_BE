@@ -44,12 +44,20 @@ public class Subscription {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "library_count", nullable = false)
+    private Integer libraryCount = 0;
+
+    @Column(name = "favorite_count", nullable = false)
+    private Integer favoriteCount = 0;
+
     @Builder
     public Subscription(User user, SubscriptionTier tier) {
         this.user = user;
         this.tier = tier != null ? tier : SubscriptionTier.FREE;
         this.isActive = true;
         this.generationCount = 0;
+        this.libraryCount = 0;
+        this.favoriteCount = 0;
         this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
     }
 

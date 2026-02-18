@@ -134,8 +134,8 @@ public class DreamFlowIntegrationTest {
         // Step 4: 꿈 조회 (비동기 처리 결과와 무관하게 dreamId 확인)
         mockMvc.perform(get("/api/v1/dreams/" + dreamId).header("Authorization", bearerToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.dreamId").value(dreamId))
-                .andExpect(jsonPath("$.data.dreamContent").exists());
+                .andExpect(jsonPath("$.data.id").value(String.valueOf(dreamId)))
+                .andExpect(jsonPath("$.data.content").exists());
 
         System.out.println("✅ Step 4: 꿈 조회 완료");
         System.out.println("\n🎉 핵심 플로우 테스트 성공!");
@@ -215,7 +215,7 @@ public class DreamFlowIntegrationTest {
 
         // 분석 완료(ANALYSIS_COMPLETED) 전에 웹툰 생성 시도 → DREAM_INVALID_STATE(400)
         WebtoonGenerateRequest webtoonRequest =
-                WebtoonGenerateRequest.builder().selectedGenre(Genre.FANTASY).build();
+                WebtoonGenerateRequest.builder().selectedGenre(Genre.DARK_FANTASY).build();
 
         mockMvc.perform(
                         post("/api/v1/dreams/" + dreamId + "/webtoon")
