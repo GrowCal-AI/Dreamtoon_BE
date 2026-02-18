@@ -20,12 +20,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * OAuth2AuthenticationSuccessHandler 단위 테스트
  *
- * <p>OAuth2 로그인 성공 시 JWT 발급 및 HTML 리다이렉트 응답을 검증합니다.
+ * <p>
+ * OAuth2 로그인 성공 시 JWT 발급 및 HTML 리다이렉트 응답을 검증합니다.
  */
 @ExtendWith(MockitoExtension.class)
 class OAuth2AuthenticationSuccessHandlerTest {
 
-    @Mock private JwtTokenProvider jwtTokenProvider;
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
 
     private OAuth2AuthenticationSuccessHandler successHandler;
 
@@ -40,21 +42,20 @@ class OAuth2AuthenticationSuccessHandlerTest {
     }
 
     @Test
-    @DisplayName("로그인 성공 시 Access/Refresh 토큰 발급 후 HTML에 토큰·리다이렉트 URL 포함")
-    void onAuthenticationSuccess_issuesTokensAndWritesHtml() throws Exception {
+    @DisplayName("로그인 성공 시 Access Token을 쿼리 파라미터로 포함하여 리다이렉트")
+    void onAuthenticationSuccess_issuesTokensAndRedirects() throws Exception {
         when(jwtTokenProvider.createAccessToken(1L, "user@example.com", "ROLE_USER"))
                 .thenReturn(MOCK_ACCESS_TOKEN);
         when(jwtTokenProvider.createRefreshToken(1L)).thenReturn(MOCK_REFRESH_TOKEN);
 
-        CustomOAuth2User customUser =
-                new CustomOAuth2User(
-                        1L,
-                        "user@example.com",
-                        "테스트유저",
-                        "KAKAO",
-                        "kakao-123",
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
-                        Collections.emptyMap());
+        CustomOAuth2User customUser = new CustomOAuth2User(
+                1L,
+                "user@example.com",
+                "테스트유저",
+                "KAKAO",
+                "kakao-123",
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                Collections.emptyMap());
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(customUser);
 
@@ -63,15 +64,20 @@ class OAuth2AuthenticationSuccessHandlerTest {
 
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
+        // Verify Tokens Created
         verify(jwtTokenProvider).createAccessToken(1L, "user@example.com", "ROLE_USER");
         verify(jwtTokenProvider).createRefreshToken(1L);
 
-        String content = response.getContentAsString();
-        assertThat(content).contains(MOCK_ACCESS_TOKEN);
-        assertThat(content).contains(MOCK_REFRESH_TOKEN);
-        assertThat(content).contains(FRONTEND_URL + "/oauth/callback");
-        assertThat(content).contains("oauth2-login-success");
-        assertThat(response.getContentType()).isEqualTo("text/html;charset=UTF-8");
+        // Verify Redirect
+        String redirectedUrl = response.getRedirectedUrl();
+        assertThat(redirectedUrl).isNotNull();
+        assertThat(redirectedUrl).startsWith(FRONTEND_URL + "/oauth/callback");
+        assertThat(redirectedUrl).contains("accessToken=" + MOCK_ACCESS_TOKEN);
+
+        // Verify Cookie
+        assertThat(response.getCookie("refreshToken")).isNotNull();
+        assertThat(response.getCookie("refreshToken").getValue()).isEqualTo(MOCK_REFRESH_TOKEN);
+        assertThat(response.getCookie("refreshToken").isHttpOnly()).isTrue();
     }
 
     @Test
