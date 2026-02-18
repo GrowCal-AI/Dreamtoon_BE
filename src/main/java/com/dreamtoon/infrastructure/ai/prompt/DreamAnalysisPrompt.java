@@ -8,9 +8,7 @@ public final class DreamAnalysisPrompt {
 
     private DreamAnalysisPrompt() {}
 
-    /**
-     * 꿈 분석용 GPT 프롬프트 생성 (JSON 응답: title, analysis, emotionScores 6종, insight)
-     */
+    /** 꿈 분석용 GPT 프롬프트 생성 (JSON 응답: title, analysis, emotionScores 6종, insight) */
     public static String createDreamAnalysisPrompt(
             String dreamContent,
             EmotionType primaryEmotion,
@@ -54,9 +52,8 @@ public final class DreamAnalysisPrompt {
     }
 
     /**
-     * 4컷 만화 스토리보드를 GPT로 생성하기 위한 프롬프트.
-     * 꿈 내용을 기승전결 4컷으로 나누어 각 컷의 시각적 장면 묘사를 영어로 생성.
-     * Character DNA를 별도 필드로 분리하여 모든 패널에 일관된 캐릭터 적용.
+     * 4컷 만화 스토리보드를 GPT로 생성하기 위한 프롬프트. 꿈 내용을 기승전결 4컷으로 나누어 각 컷의 시각적 장면 묘사를 영어로 생성. Character DNA를 별도
+     * 필드로 분리하여 모든 패널에 일관된 캐릭터 적용.
      *
      * @param dreamContent 꿈 내용
      * @param genre 선택 장르 (스타일 힌트용)
@@ -101,14 +98,12 @@ public final class DreamAnalysisPrompt {
                   ]
                 }
                 """,
-                dreamContent != null ? dreamContent : "Unknown dream",
-                style);
+                dreamContent != null ? dreamContent : "Unknown dream", style);
     }
 
     /**
-     * GPT가 생성한 개별 장면 묘사를 이미지 생성 프롬프트로 변환.
-     * Character DNA를 명시적으로 포함하여 캐릭터 일관성 향상.
-     * DALL-E 3 및 FLUX 모두 호환.
+     * GPT가 생성한 개별 장면 묘사를 이미지 생성 프롬프트로 변환. Character DNA를 명시적으로 포함하여 캐릭터 일관성 향상. DALL-E 3 및 FLUX 모두
+     * 호환.
      *
      * @param sceneDescription GPT가 생성한 현재 컷 장면 묘사 (영어)
      * @param characterDNA 주인공 외모 묘사 (영어, 모든 패널 동일)

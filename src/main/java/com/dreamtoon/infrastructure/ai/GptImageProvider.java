@@ -11,8 +11,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * GPT-Image-1 이미지 생성 프로바이더 (OpenAI API 직접 호출).
- * Spring AI 0.8.1이 gpt-image-1을 지원하지 않으므로 직접 REST 호출.
+ * GPT-Image-1 이미지 생성 프로바이더 (OpenAI API 직접 호출). Spring AI 0.8.1이 gpt-image-1을 지원하지 않으므로 직접 REST 호출.
  * 같은 OPENAI_API_KEY로 동작하며, DALL-E 3보다 빠르고 프롬프트 충실도가 높음.
  */
 @Slf4j
@@ -28,10 +27,7 @@ public class GptImageProvider implements ImageGenerationProvider {
     public GptImageProvider(String apiKey, String quality) {
         this.apiKey = apiKey;
         this.quality = quality != null ? quality : "medium";
-        this.httpClient =
-                HttpClient.newBuilder()
-                        .connectTimeout(Duration.ofSeconds(10))
-                        .build();
+        this.httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
         this.objectMapper = new ObjectMapper();
     }
 
@@ -42,11 +38,16 @@ public class GptImageProvider implements ImageGenerationProvider {
 
             Map<String, Object> body =
                     Map.of(
-                            "model", "gpt-image-1",
-                            "prompt", prompt,
-                            "n", 1,
-                            "size", "1024x1536",
-                            "quality", quality);
+                            "model",
+                            "gpt-image-1",
+                            "prompt",
+                            prompt,
+                            "n",
+                            1,
+                            "size",
+                            "1024x1536",
+                            "quality",
+                            quality);
 
             String jsonBody = objectMapper.writeValueAsString(body);
 
@@ -67,8 +68,7 @@ public class GptImageProvider implements ImageGenerationProvider {
                         "[GPT-Image-1] API error: status={}, body={}",
                         response.statusCode(),
                         response.body());
-                throw new RuntimeException(
-                        "GPT-Image-1 API 오류: " + response.statusCode());
+                throw new RuntimeException("GPT-Image-1 API 오류: " + response.statusCode());
             }
 
             JsonNode root = objectMapper.readTree(response.body());

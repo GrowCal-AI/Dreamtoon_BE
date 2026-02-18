@@ -8,8 +8,8 @@ import org.springframework.ai.image.ImageResponse;
 import org.springframework.ai.openai.OpenAiImageOptions;
 
 /**
- * DALL-E 3 이미지 생성 프로바이더 (기존 Spring AI ImageClient 래핑).
- * application.yml의 image.provider=dalle 일 때 활성화.
+ * DALL-E 3 이미지 생성 프로바이더 (기존 Spring AI ImageClient 래핑). application.yml의 image.provider=dalle 일 때
+ * 활성화.
  */
 @Slf4j
 @RequiredArgsConstructor

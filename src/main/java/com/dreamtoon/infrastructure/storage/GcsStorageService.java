@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,10 @@ public class GcsStorageService {
             return uploadImage(imageData, gcsKey, contentType);
 
         } catch (Exception e) {
-            log.error("Failed to upload image to GCS: {}", imageUrl.substring(0, Math.min(100, imageUrl.length())), e);
+            log.error(
+                    "Failed to upload image to GCS: {}",
+                    imageUrl.substring(0, Math.min(100, imageUrl.length())),
+                    e);
             throw new RuntimeException("GCS 이미지 업로드 실패: " + e.getMessage(), e);
         }
     }

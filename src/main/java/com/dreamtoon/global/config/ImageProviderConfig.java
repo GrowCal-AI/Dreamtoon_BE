@@ -10,12 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 이미지 생성 프로바이더 설정.
- * image.provider 프로퍼티에 따라 활성 프로바이더 결정.
+ * 이미지 생성 프로바이더 설정. image.provider 프로퍼티에 따라 활성 프로바이더 결정.
  *
  * <ul>
- *   <li>dalle: DALL-E 3 (Spring AI ImageClient)</li>
- *   <li>gpt-image: GPT-Image-1 (OpenAI API 직접 호출, 같은 API 키)</li>
+ *   <li>dalle: DALL-E 3 (Spring AI ImageClient)
+ *   <li>gpt-image: GPT-Image-1 (OpenAI API 직접 호출, 같은 API 키)
  * </ul>
  */
 @Slf4j

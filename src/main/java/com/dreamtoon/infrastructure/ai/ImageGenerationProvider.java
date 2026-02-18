@@ -1,9 +1,6 @@
 package com.dreamtoon.infrastructure.ai;
 
-/**
- * 이미지 생성 프로바이더 인터페이스.
- * DALL-E, FLUX 등 다양한 이미지 생성 백엔드를 추상화.
- */
+/** 이미지 생성 프로바이더 인터페이스. DALL-E, FLUX 등 다양한 이미지 생성 백엔드를 추상화. */
 public interface ImageGenerationProvider {
 
     /**
