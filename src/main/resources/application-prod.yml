@@ -30,6 +30,11 @@ spring:
       allowed-headers: "*"
       allow-credentials: true
 
+# OAuth2 로그인 성공 후 프론트엔드 리다이렉트 URI
+app:
+  oauth2:
+    redirect-uri: ${FRONTEND_URL}/oauth2/redirect
+
 # 운영 환경 로깅
 logging:
   level:
@@ -49,6 +54,7 @@ logging:
 server:
   port: ${PORT:8080}
   shutdown: graceful
+  forward-headers-strategy: native
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
