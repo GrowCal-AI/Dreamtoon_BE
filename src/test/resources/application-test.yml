@@ -32,6 +32,12 @@ spring:
             client-id: test-google-id
             client-secret: test-google-secret
 
+  cloud:
+    gcp:
+      project-id: test-project
+      storage:
+        bucket: test-bucket
+
 jwt:
   secret: test-jwt-secret-key-for-testing-must-be-at-least-256-bits-long-for-security
   expiration: 3600000
