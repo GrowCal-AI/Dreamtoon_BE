@@ -76,8 +76,7 @@ public class AuthController {
                                                         .build()));
 
         String accessToken =
-                jwtTokenProvider.createAccessToken(
-                        user.getId(), user.getEmail(), "ROLE_USER");
+                jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), "ROLE_USER");
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
         TestTokenResponse response = new TestTokenResponse(accessToken, refreshToken);

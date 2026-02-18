@@ -11,11 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 /**
- * 로컬(local) 프로필용 Storage 빈.
- * ADC(Application Default Credentials)가 있으면 실제 GCS에 연결하고,
- * 없으면 no-op 프록시로 fallback합니다.
+ * 로컬(local) 프로필용 Storage 빈. ADC(Application Default Credentials)가 있으면 실제 GCS에 연결하고, 없으면 no-op 프록시로
+ * fallback합니다.
  *
- * ADC 설정: gcloud auth application-default login
+ * <p>ADC 설정: gcloud auth application-default login
  */
 @Slf4j
 @Configuration
@@ -29,17 +28,18 @@ public class LocalGcsConfig {
     public Storage storage() {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-            Storage realStorage = StorageOptions.newBuilder()
-                    .setProjectId(projectId)
-                    .setCredentials(credentials)
-                    .build()
-                    .getService();
+            Storage realStorage =
+                    StorageOptions.newBuilder()
+                            .setProjectId(projectId)
+                            .setCredentials(credentials)
+                            .build()
+                            .getService();
             log.info("Using REAL GCS Storage for local profile (ADC found).");
             return realStorage;
         } catch (Exception e) {
             log.warn(
-                    "No GCP credentials found. Using no-op Storage proxy. "
-                            + "Run 'gcloud auth application-default login' to enable real GCS uploads.");
+                    "No GCP credentials found. Using no-op Storage proxy. Run 'gcloud auth"
+                            + " application-default login' to enable real GCS uploads.");
             return (Storage)
                     Proxy.newProxyInstance(
                             Storage.class.getClassLoader(),

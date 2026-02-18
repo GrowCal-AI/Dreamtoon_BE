@@ -116,15 +116,13 @@ public class DreamAiService {
                                                     panelNum,
                                                     WEBTOON_PANEL_COUNT);
                                     String tempUrl = openAiClient.generateImage(prompt);
-                                    return gcsStorageService.uploadImageFromUrl(
-                                            tempUrl, "webtoon");
+                                    return gcsStorageService.uploadImageFromUrl(tempUrl, "webtoon");
                                 });
                 futures.add(future);
             }
 
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            List<String> imageUrls =
-                    futures.stream().map(CompletableFuture::join).toList();
+            List<String> imageUrls = futures.stream().map(CompletableFuture::join).toList();
 
             dream.completeGeneration(imageUrls);
             dreamRepository.save(dream);
