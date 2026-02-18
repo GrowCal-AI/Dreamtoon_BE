@@ -18,7 +18,15 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "dreams")
+@Table(
+        name = "dreams",
+        indexes = {
+            @Index(name = "idx_dream_user", columnList = "user_id"),
+            @Index(name = "idx_dream_user_library", columnList = "user_id, is_in_library"),
+            @Index(name = "idx_dream_user_favorite", columnList = "user_id, is_favorite"),
+            @Index(name = "idx_dream_status", columnList = "processing_status"),
+            @Index(name = "idx_dream_created", columnList = "created_at")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
@@ -88,6 +96,12 @@ public class Dream {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
+    // === FE 호환 필드 ===
+
+    @Type(JsonType.class)
+    @Column(name = "tags", columnDefinition = "jsonb")
+    private List<String> tags = new ArrayList<>();
+
     // === 타임스탬프 ===
 
     @CreatedDate
@@ -99,9 +113,19 @@ public class Dream {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Dream(User user, String dreamContent) {
+    public Dream(
+            User user,
+            String dreamContent,
+            EmotionType primaryEmotion,
+            Genre selectedGenre,
+            String title,
+            List<String> tags) {
         this.user = user;
         this.dreamContent = dreamContent;
+        this.primaryEmotion = primaryEmotion;
+        this.selectedGenre = selectedGenre;
+        this.title = title;
+        this.tags = tags != null ? tags : new ArrayList<>();
         this.processingStatus = ProcessingStatus.PENDING;
         this.isFavorite = false;
         this.isInLibrary = false;

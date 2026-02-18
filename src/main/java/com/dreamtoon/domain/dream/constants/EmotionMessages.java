@@ -14,7 +14,7 @@ public final class EmotionMessages {
         MESSAGES.put(EmotionType.ANXIETY, "불안한 꿈이셨군요. 어떤 부분이 가장 불안하셨나요?");
         MESSAGES.put(EmotionType.ANGER, "화가 나는 꿈이셨군요. 무엇이 가장 화나셨나요?");
         MESSAGES.put(EmotionType.SADNESS, "슬픈 꿈이셨군요. 어떤 점이 가장 슬프셨나요?");
-        MESSAGES.put(EmotionType.DISCOMFORT, "불편한 꿈이셨군요. 어떤 부분이 불편하셨나요?");
+        MESSAGES.put(EmotionType.SURPRISE, "놀라운 꿈이셨군요. 어떤 부분이 가장 인상적이셨나요?");
         MESSAGES.put(EmotionType.PEACE, "평온한 꿈이셨군요. 어떤 느낌이 드셨나요?");
     }
 

@@ -36,6 +36,35 @@ public class DreamService {
     private final DreamAiService dreamAiService;
     private final SubscriptionService subscriptionService;
 
+    /** FE 통합 꿈 생성 (감정 → 내용 → 스타일 한번에) */
+    @Transactional
+    public DreamResponse createDreamFull(Long userId, CreateDreamFullRequest request) {
+        if (!subscriptionService.canGenerate(userId)) {
+            throw new BusinessException(ErrorCode.GENERATION_LIMIT_EXCEEDED);
+        }
+
+        User user =
+                userRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        Dream dream =
+                Dream.builder()
+                        .user(user)
+                        .dreamContent(request.getContent())
+                        .primaryEmotion(request.getMainEmotion())
+                        .selectedGenre(request.getStyle())
+                        .title(request.getTitle())
+                        .build();
+        dreamRepository.save(dream);
+        subscriptionService.incrementGenerationCount(userId);
+
+        dreamAiService.analyzeDreamAsync(dream.getId());
+
+        log.info("Dream created (full), ID: {}", dream.getId());
+        return DreamResponse.from(dream);
+    }
+
     @Transactional
     public InitiateDreamResponse initiateDream(Long userId, InitiateDreamRequest request) {
         if (!subscriptionService.canGenerate(userId)) {
@@ -157,7 +186,6 @@ public class DreamService {
         Dream dream = findDreamByUser(dreamId, userId);
         dream.addToLibrary();
         dreamRepository.save(dream);
-        subscriptionService.incrementSavedCount(userId);
         return AddToLibraryResponse.builder().dreamId(dreamId).isInLibrary(true).build();
     }
 
@@ -170,11 +198,6 @@ public class DreamService {
         }
         dream.toggleFavorite();
         dreamRepository.save(dream);
-        if (willBeFavorite) {
-            subscriptionService.incrementFavoriteCount(userId);
-        } else {
-            subscriptionService.decrementFavoriteCount(userId);
-        }
         return ToggleFavoriteResponse.builder()
                 .dreamId(dreamId)
                 .isFavorite(dream.getIsFavorite())

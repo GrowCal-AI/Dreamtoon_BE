@@ -9,6 +9,7 @@ import com.dreamtoon.infrastructure.storage.GcsStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -101,18 +102,29 @@ public class DreamAiService {
             dream.startGenerating();
             dreamRepository.save(dream);
 
-            List<String> imageUrls = new ArrayList<>();
+            // 4컷 이미지를 병렬로 동시 생성 (순차 대비 ~4배 빠름)
+            List<CompletableFuture<String>> futures = new ArrayList<>();
             for (int panel = 1; panel <= WEBTOON_PANEL_COUNT; panel++) {
-                String prompt =
-                        DreamAnalysisPrompt.createWebtoonPanelPrompt(
-                                dream.getDreamContent(),
-                                dream.getSelectedGenre(),
-                                panel,
-                                WEBTOON_PANEL_COUNT);
-                String tempUrl = openAiClient.generateImage(prompt);
-                String permanentUrl = gcsStorageService.uploadImageFromUrl(tempUrl, "webtoon");
-                imageUrls.add(permanentUrl);
+                final int panelNum = panel;
+                CompletableFuture<String> future =
+                        CompletableFuture.supplyAsync(
+                                () -> {
+                                    String prompt =
+                                            DreamAnalysisPrompt.createWebtoonPanelPrompt(
+                                                    dream.getDreamContent(),
+                                                    dream.getSelectedGenre(),
+                                                    panelNum,
+                                                    WEBTOON_PANEL_COUNT);
+                                    String tempUrl = openAiClient.generateImage(prompt);
+                                    return gcsStorageService.uploadImageFromUrl(
+                                            tempUrl, "webtoon");
+                                });
+                futures.add(future);
             }
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            List<String> imageUrls =
+                    futures.stream().map(CompletableFuture::join).toList();
 
             dream.completeGeneration(imageUrls);
             dreamRepository.save(dream);

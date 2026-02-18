@@ -34,6 +34,19 @@ public class DreamController {
     private final DreamChatService dreamChatService;
 
     @Operation(
+            summary = "통합 꿈 생성 (FE용)",
+            description =
+                    "**[FE 전용]** 감정, 꿈 내용, 스타일을 한번에 전송합니다."
+                            + " 비동기 AI 분석이 시작되며 processingStatus로 진행 상태를 확인하세요.")
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<DreamResponse>> createDreamFull(
+            @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody CreateDreamFullRequest request) {
+        DreamResponse response = dreamService.createDreamFull(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
+    }
+
+    @Operation(
             summary = "1. 꿈 기록 시작",
             description =
                     "**[화면: 메인] 꿈 기록 시작**\n\n"
@@ -52,7 +65,7 @@ public class DreamController {
             description =
                     "**[화면: 감정 선택]**\n\n"
                             + "꿈 기록 시작 후, 사용자가 6가지 감정 칩 중 하나를 선택했을 때 호출합니다. 요청 body에 감정 종류(`JOY`,"
-                            + " `ANXIETY`, `ANGER`, `SADNESS`, `DISCOMFORT`, `CALM`)를 보내주세요.")
+                            + " `ANXIETY`, `ANGER`, `SADNESS`, `SURPRISE`, `PEACE`)를 보내주세요.")
     @PatchMapping("/{dreamId}/emotion")
     public ResponseEntity<ApiResponse<EmotionSelectResponse>> selectEmotion(
             @AuthenticationPrincipal Long userId,

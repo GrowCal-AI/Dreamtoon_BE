@@ -13,31 +13,32 @@ public class UsageResponse {
     private SubscriptionTier tier;
     private Boolean isActive;
     private Integer generationCount;
-    private Integer maxGenerations; // -1은 무제한
-    private Integer libraryCount;
-    private Integer maxLibrary; // -1은 무제한
-    private Integer favoriteCount;
-    private Integer maxFavorites; // -1은 무제한
+    private Integer maxGenerations;
+    private Long libraryCount;
+    private Integer maxLibrary;
+    private Long favoriteCount;
+    private Integer maxFavorites;
     private LocalDate quotaResetDate;
     private Boolean canGenerate;
     private Boolean canAddToLibrary;
     private Boolean canFavorite;
     private Boolean canUsePremiumFeatures;
 
-    public static UsageResponse from(Subscription subscription) {
+    public static UsageResponse from(
+            Subscription subscription, long libraryCount, long favoriteCount) {
         return UsageResponse.builder()
                 .tier(subscription.getTier())
                 .isActive(subscription.getIsActive())
                 .generationCount(subscription.getGenerationCount())
                 .maxGenerations(subscription.getTier().getMaxGenerations())
-                .libraryCount(subscription.getLibraryCount())
+                .libraryCount(libraryCount)
                 .maxLibrary(subscription.getTier().getMaxLibraryItems())
-                .favoriteCount(subscription.getFavoriteCount())
+                .favoriteCount(favoriteCount)
                 .maxFavorites(subscription.getTier().getMaxFavorites())
                 .quotaResetDate(subscription.getQuotaResetDate())
                 .canGenerate(subscription.canGenerate())
-                .canAddToLibrary(subscription.canAddToLibrary())
-                .canFavorite(subscription.canFavorite())
+                .canAddToLibrary(subscription.canAddToLibrary(libraryCount))
+                .canFavorite(subscription.canFavorite(favoriteCount))
                 .canUsePremiumFeatures(subscription.canUsePremiumFeatures())
                 .build();
     }

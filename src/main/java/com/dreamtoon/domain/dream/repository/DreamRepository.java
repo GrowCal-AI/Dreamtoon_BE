@@ -19,12 +19,10 @@ public interface DreamRepository extends JpaRepository<Dream, Long>, DreamReposi
 
     @Query("SELECT d FROM Dream d WHERE d.id = :id AND d.user.id = :userId")
     Optional<Dream> findByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
+                                                       
+    @Query("SELECT COUNT(d) FROM Dream d WHERE d.user.id = :userId AND d.isInLibrary = true")
+    long countLibraryByUserId(@Param("userId") Long userId);
 
-    @Query(
-            "SELECT d FROM Dream d WHERE d.user.id = :userId AND d.createdAt BETWEEN :startDate AND"
-                    + " :endDate ORDER BY d.createdAt DESC")
-    List<Dream> findByUserIdAndCreatedAtBetween(
-            @Param("userId") Long userId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate);
+    @Query("SELECT COUNT(d) FROM Dream d WHERE d.user.id = :userId AND d.isFavorite = true")
+    long countFavoritesByUserId(@Param("userId") Long userId);
 }

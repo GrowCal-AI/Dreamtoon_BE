@@ -1,36 +1,57 @@
 package com.dreamtoon.infrastructure.storage;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import java.lang.reflect.Proxy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 /**
- * 로컬(local) 프로필에서 GCP credential 없이 기동하기 위해 No-op Storage 빈 제공. GCS 업로드/삭제 등 실제 스토리지 호출은 동작하지 않으며,
- * 실제 GCS 사용 시에는 GOOGLE_APPLICATION_CREDENTIALS 설정 후 application-local.yml 에서
- * spring.cloud.gcp.storage.enabled: true 로 변경하세요.
+ * 로컬(local) 프로필용 Storage 빈.
+ * ADC(Application Default Credentials)가 있으면 실제 GCS에 연결하고,
+ * 없으면 no-op 프록시로 fallback합니다.
+ *
+ * ADC 설정: gcloud auth application-default login
  */
 @Slf4j
 @Configuration
 @Profile("local")
 public class LocalGcsConfig {
 
+    @Value("${spring.cloud.gcp.project-id:}")
+    private String projectId;
+
     @Bean
     public Storage storage() {
-        log.info("Using no-op GCP Storage proxy for local profile (no credentials required).");
-        return (Storage)
-                Proxy.newProxyInstance(
-                        Storage.class.getClassLoader(),
-                        new Class<?>[] {Storage.class},
-                        (proxy, method, args) -> {
-                            return switch (method.getName()) {
-                                case "hashCode" -> System.identityHashCode(proxy);
-                                case "equals" -> proxy == args[0];
-                                case "toString" -> "NoOpStorage(local)";
-                                default -> null;
-                            };
-                        });
+        try {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            Storage realStorage = StorageOptions.newBuilder()
+                    .setProjectId(projectId)
+                    .setCredentials(credentials)
+                    .build()
+                    .getService();
+            log.info("Using REAL GCS Storage for local profile (ADC found).");
+            return realStorage;
+        } catch (Exception e) {
+            log.warn(
+                    "No GCP credentials found. Using no-op Storage proxy. "
+                            + "Run 'gcloud auth application-default login' to enable real GCS uploads.");
+            return (Storage)
+                    Proxy.newProxyInstance(
+                            Storage.class.getClassLoader(),
+                            new Class<?>[] {Storage.class},
+                            (proxy, method, args) -> {
+                                return switch (method.getName()) {
+                                    case "hashCode" -> System.identityHashCode(proxy);
+                                    case "equals" -> proxy == args[0];
+                                    case "toString" -> "NoOpStorage(local)";
+                                    default -> null;
+                                };
+                            });
+        }
     }
 }
