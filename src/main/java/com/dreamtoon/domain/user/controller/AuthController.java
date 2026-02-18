@@ -29,6 +29,21 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(
+            summary = "카카오 소셜 로그인",
+            description =
+                    "**카카오 OAuth2 로그인**을 시작합니다. 이 API를 호출하면 카카오 로그인 페이지로 리다이렉트됩니다. "
+                            + "Swagger에서는 직접 테스트할 수 없으며, **브라우저에서 직접 접속**해야 합니다.\n\n"
+                            + "로그인 URL: `{서버주소}/oauth2/authorization/kakao`\n\n"
+                            + "로그인 성공 시 Access Token과 Refresh Token이 발급됩니다.")
+    @GetMapping("/oauth2/kakao-info")
+    public ResponseEntity<ApiResponse<String>> kakaoLoginInfo() {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "브라우저에서 /oauth2/authorization/kakao 로 접속하세요.",
+                        "/oauth2/authorization/kakao"));
+    }
+
+    @Operation(
             summary = "[DEV] 테스트 로그인",
             description =
                     "**개발/로컬 환경 전용.** 실제 OAuth 로그인 없이 `userId`만으로 Access·Refresh 토큰을 발급받습니다."

@@ -20,8 +20,8 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 # 애플리케이션 실행
 EXPOSE 8080
+ENV SPRING_PROFILES_ACTIVE=prod
 ENTRYPOINT ["java", \
     "-Xms512m", "-Xmx1g", \
     "-jar", \
-    "-Dspring.profiles.active=prod", \
     "app.jar"]
