@@ -69,6 +69,12 @@ spring:
       storage:
         bucket: ${GCS_BUCKET_NAME}
 
+# 이미지 생성 프로바이더 설정 (dalle | gpt-image)
+image:
+  provider: ${IMAGE_PROVIDER:dalle}
+  gpt-image:
+    quality: ${GPT_IMAGE_QUALITY:medium}  # low | medium | high
+
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET}
