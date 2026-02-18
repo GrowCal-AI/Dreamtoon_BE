@@ -15,7 +15,7 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: validate  # 운영에서는 직접 마이그레이션 관리
+      ddl-auto: update  # 첫 배포: 테이블 자동 생성 (안정화 후 validate로 변경)
     show-sql: false
     properties:
       hibernate:
