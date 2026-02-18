@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,20 +30,33 @@ public class GcsStorageService {
      * 이미지 URL에서 다운로드하여 GCS에 업로드
      *
      * @param imageUrl 임시 이미지 URL (DALL-E 생성 이미지)
-     * @param prefix GCS 파일 경로 prefix (예: "scenes", "webtoons")
+     * @param prefix GCS 파일 경로 prefix (예: "webtoon/dream_5")
      * @return GCS에 저장된 영구 URL
      */
     public String uploadImageFromUrl(String imageUrl, String prefix) {
         try {
-            log.info("Downloading image from URL: {}", imageUrl);
+            byte[] imageData;
+            String contentType = "image/png";
 
-            byte[] imageData = downloadImageBytes(imageUrl);
+            if (imageUrl.startsWith("data:")) {
+                // base64 data URI 처리 (GPT-Image-1 등)
+                log.info("Decoding base64 image data for GCS upload");
+                String base64Data = imageUrl.substring(imageUrl.indexOf(",") + 1);
+                imageData = Base64.getDecoder().decode(base64Data);
+                if (imageUrl.contains("image/jpeg")) {
+                    contentType = "image/jpeg";
+                }
+            } else {
+                log.info("Downloading image from URL: {}", imageUrl);
+                imageData = downloadImageBytes(imageUrl);
+            }
 
-            String gcsKey = generateGcsKey(prefix, "png");
-            return uploadImage(imageData, gcsKey, "image/png");
+            String extension = contentType.endsWith("jpeg") ? "jpg" : "png";
+            String gcsKey = generateGcsKey(prefix, extension);
+            return uploadImage(imageData, gcsKey, contentType);
 
         } catch (Exception e) {
-            log.error("Failed to upload image from URL to GCS: {}", imageUrl, e);
+            log.error("Failed to upload image to GCS: {}", imageUrl.substring(0, Math.min(100, imageUrl.length())), e);
             throw new RuntimeException("GCS 이미지 업로드 실패: " + e.getMessage(), e);
         }
     }

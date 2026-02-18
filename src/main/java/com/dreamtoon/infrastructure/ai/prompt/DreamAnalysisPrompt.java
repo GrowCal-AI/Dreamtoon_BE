@@ -3,18 +3,13 @@ package com.dreamtoon.infrastructure.ai.prompt;
 import com.dreamtoon.domain.dream.entity.EmotionType;
 import com.dreamtoon.domain.dream.entity.Genre;
 
-/** GPT-4o 꿈 분석 및 DALL-E 4컷 만화 프롬프트 (Blueprint v2.0) */
+/** GPT-4o 꿈 분석 및 DALL-E 4컷 만화 프롬프트 (Blueprint v3.0) */
 public final class DreamAnalysisPrompt {
 
     private DreamAnalysisPrompt() {}
 
     /**
      * 꿈 분석용 GPT 프롬프트 생성 (JSON 응답: title, analysis, emotionScores 6종, insight)
-     *
-     * @param dreamContent 꿈 내용
-     * @param primaryEmotion 선택한 주요 감정
-     * @param detailedDescription 상세 설명
-     * @param realLifeContext 현실 고민 (nullable)
      */
     public static String createDreamAnalysisPrompt(
             String dreamContent,
@@ -36,6 +31,8 @@ public final class DreamAnalysisPrompt {
                 - 현실 고민: %s
 
                 [출력 형식] 반드시 아래 JSON만 출력하세요. 다른 텍스트는 포함하지 마세요.
+                각 감정 점수는 0~100 사이 정수로, 꿈에서 느낀 감정의 강도를 나타냅니다.
+                최소 2개 이상의 감정에 10 이상의 점수를 부여하세요.
                 {
                   "title": "꿈 제목 (10자 이내)",
                   "analysis": "꿈 해석 (200자 이내)",
@@ -44,7 +41,7 @@ public final class DreamAnalysisPrompt {
                     "불안": 0,
                     "분노": 0,
                     "슬픔": 0,
-                    "불편": 0,
+                    "놀람": 0,
                     "평온": 0
                   },
                   "insight": "AI 코칭 메시지 (100자 이내)"
@@ -57,26 +54,86 @@ public final class DreamAnalysisPrompt {
     }
 
     /**
-     * 4컷 만화 한 컷용 DALL-E 프롬프트 생성
+     * 4컷 만화 스토리보드를 GPT로 생성하기 위한 프롬프트.
+     * 꿈 내용을 기승전결 4컷으로 나누어 각 컷의 시각적 장면 묘사를 영어로 생성.
+     * Character DNA를 별도 필드로 분리하여 모든 패널에 일관된 캐릭터 적용.
      *
-     * @param dreamContent 꿈 내용 (전체 줄거리)
+     * @param dreamContent 꿈 내용
+     * @param genre 선택 장르 (스타일 힌트용)
+     * @return GPT 프롬프트 (JSON 객체 응답 기대: { characterDNA, scenes[] })
+     */
+    public static String createStoryboardPrompt(String dreamContent, Genre genre) {
+        String style = genre != null ? genre.getDescription() : "일반 웹툰";
+
+        return String.format(
+                """
+                You are a professional Korean webtoon storyboard artist and AI image prompt expert.
+                Read the dream below and create a 4-panel storyboard with the 기승전결 structure.
+
+                [Dream Content] %s
+                [Genre/Style] %s
+
+                ## Critical Rules
+                1. Identify the CORE theme and KEY events of the dream. ALL 4 panels must directly depict this theme.
+                2. The 4 panels must tell ONE connected story. Each panel flows into the next.
+                3. Define a CHARACTER DNA: a detailed, fixed appearance description for the protagonist.
+                   Include: gender, age range, ethnicity, hair color/style/length, eye features, clothing, and one unique visual trait.
+                   Example: "A Korean woman in her late 20s, shoulder-length straight black hair with side bangs, wearing a cream knit sweater and dark blue jeans, silver bracelet on left wrist"
+                4. Each scene description must be a VISUAL-ONLY prompt suitable for AI image generation. Describe what the camera would see.
+                5. Write ALL scene descriptions in English.
+                6. NEVER mention text, speech bubbles, letters, titles, logos, or watermarks in scene descriptions.
+                7. Start each scene description with the full Character DNA so every panel depicts the same person.
+
+                ## 4-Panel Structure
+                - Panel 1 (기/Setup): Dream begins. Introduce protagonist and setting. Establish mood.
+                - Panel 2 (승/Development): Story progresses. The core dream event begins.
+                - Panel 3 (전/Climax): Peak emotion. The most intense or dramatic moment.
+                - Panel 4 (결/Resolution): Ending. Leave a lasting impression or emotional afterglow.
+
+                [Output Format] Return ONLY this JSON object. No other text.
+                {
+                  "characterDNA": "Full character appearance description in English (one sentence, very specific)",
+                  "scenes": [
+                    "Panel 1: [Character DNA]. [Scene description with setting, action, emotion, lighting]",
+                    "Panel 2: [Character DNA]. [Scene description with setting, action, emotion, lighting]",
+                    "Panel 3: [Character DNA]. [Scene description with setting, action, emotion, lighting]",
+                    "Panel 4: [Character DNA]. [Scene description with setting, action, emotion, lighting]"
+                  ]
+                }
+                """,
+                dreamContent != null ? dreamContent : "Unknown dream",
+                style);
+    }
+
+    /**
+     * GPT가 생성한 개별 장면 묘사를 이미지 생성 프롬프트로 변환.
+     * Character DNA를 명시적으로 포함하여 캐릭터 일관성 향상.
+     * DALL-E 3 및 FLUX 모두 호환.
+     *
+     * @param sceneDescription GPT가 생성한 현재 컷 장면 묘사 (영어)
+     * @param characterDNA 주인공 외모 묘사 (영어, 모든 패널 동일)
      * @param genre 선택 장르
      * @param panelNumber 현재 컷 번호 (1~4)
      * @param totalPanels 전체 컷 수 (4)
      */
     public static String createWebtoonPanelPrompt(
-            String dreamContent, Genre genre, int panelNumber, int totalPanels) {
+            String sceneDescription,
+            String characterDNA,
+            Genre genre,
+            int panelNumber,
+            int totalPanels) {
         String style = genre != null ? genre.getPromptTemplate() : "webtoon style, clean lines";
-        String sceneHint =
-                String.format(
-                        "Panel %d of %d: a single webtoon panel that captures one key moment from"
-                                + " this story.",
-                        panelNumber, totalPanels);
 
         return String.format(
                 """
-                Webtoon style illustration, %s. %s Story summary: %s. Korean manhwa art style, clean lines, professional digital art. Single panel, no text or speech bubbles. Vertical composition suitable for webtoon.
+                %s
+
+                Character: %s
+
+                Art style: %s, Korean manhwa, professional digital coloring, cinematic composition.
+                Portrait orientation. Expressive emotions, detailed background.
+                NO text, NO speech bubbles, NO letters, NO titles, NO logos, NO watermarks. Purely visual.
                 """,
-                style, sceneHint, dreamContent != null ? dreamContent : "a dream scene");
+                sceneDescription, characterDNA, style);
     }
 }
