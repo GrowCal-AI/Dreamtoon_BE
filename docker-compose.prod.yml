@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # Cloud SQL Auth Proxy: GCE ↔ Cloud SQL 안전한 연결
+  cloud-sql-proxy:
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.0
+    command:
+      - "--address=0.0.0.0"
+      - "--port=5432"
+      - "dreamtoon-487717:asia-northeast3:dreamtoon-postgres"
+    restart: always
+    networks:
+      - dreamtoon-net
+
+  # Spring Boot 애플리케이션
+  app:
+    image: asia-northeast3-docker.pkg.dev/dreamtoon-487717/dreamtoon/dreamtoon-be:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.prod
+    depends_on:
+      - cloud-sql-proxy
+    networks:
+      - dreamtoon-net
+
+networks:
+  dreamtoon-net:
+    driver: bridge

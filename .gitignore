@@ -43,6 +43,7 @@ out/
 .env
 .env.local
 .env.*.local
+.env.prod
 
 ### Local config (secrets / local overrides - do not commit) ###
 **/application-local.yml
