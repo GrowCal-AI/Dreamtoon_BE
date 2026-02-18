@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(
         name = "Auth",
         description =
-                "**인증·토큰** 관련 API입니다. 로그인은 OAuth2(Google/Kakao)로 진행되며, "
-                        + "발급받은 **Access Token**을 다른 API 호출 시 **Authorization: Bearer {accessToken}** 헤더에 넣어 사용합니다. "
-                        + "토큰 갱신(Refresh), 로그아웃, 개발용 테스트 로그인을 제공합니다.")
+                "**인증·토큰** 관련 API입니다. 로그인은 OAuth2(Google/Kakao)로 진행되며, 발급받은 **Access Token**을 다른"
+                        + " API 호출 시 **Authorization: Bearer {accessToken}** 헤더에 넣어 사용합니다. 토큰"
+                        + " 갱신(Refresh), 로그아웃, 개발용 테스트 로그인을 제공합니다.")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -31,13 +31,14 @@ public class AuthController {
     @Operation(
             summary = "[DEV] 테스트 로그인",
             description =
-                    "**개발/로컬 환경 전용.** 실제 OAuth 로그인 없이 `userId`만으로 Access·Refresh 토큰을 발급받습니다. "
-                            + "Swagger에서 API 테스트할 때: 이 API로 토큰 발급 → 상단 'Authorize'에서 Bearer {accessToken} 입력 후 다른 API 호출. "
-                            + "프로덕션(prod)에서는 이 API가 노출되지 않습니다.")
+                    "**개발/로컬 환경 전용.** 실제 OAuth 로그인 없이 `userId`만으로 Access·Refresh 토큰을 발급받습니다."
+                            + " Swagger에서 API 테스트할 때: 이 API로 토큰 발급 → 상단 'Authorize'에서 Bearer"
+                            + " {accessToken} 입력 후 다른 API 호출. 프로덕션(prod)에서는 이 API가 노출되지 않습니다.")
     @PostMapping("/test-login")
     @org.springframework.context.annotation.Profile({"local", "dev"})
     public ResponseEntity<ApiResponse<TestTokenResponse>> testLogin(
-            @Parameter(description = "테스트할 사용자 ID (기본값 1)") @RequestParam(defaultValue = "1") Long userId) {
+            @Parameter(description = "테스트할 사용자 ID (기본값 1)") @RequestParam(defaultValue = "1")
+                    Long userId) {
 
         String accessToken =
                 jwtTokenProvider.createAccessToken(userId, "test@dreamtoon.com", "ROLE_USER");
@@ -54,10 +55,10 @@ public class AuthController {
     @Operation(
             summary = "토큰 갱신 (Refresh)",
             description =
-                    "**Access Token 만료 시** Refresh Token으로 새 Access Token을 발급받습니다. "
-                            + "Refresh Token 전달 방법: 1) **Cookie** `refreshToken` (OAuth 로그인 후 서버가 설정), "
-                            + "2) 쿠키가 없을 경우 **요청 body**에 `{ \"refreshToken\": \"...\" }` 로 보냅니다. "
-                            + "성공 시 새 accessToken과 만료 시간이 반환되며, 이후 API 호출에 새 Access Token을 사용하세요.")
+                    "**Access Token 만료 시** Refresh Token으로 새 Access Token을 발급받습니다. Refresh Token 전달"
+                            + " 방법: 1) **Cookie** `refreshToken` (OAuth 로그인 후 서버가 설정), 2) 쿠키가 없을 경우"
+                            + " **요청 body**에 `{ \"refreshToken\": \"...\" }` 로 보냅니다. 성공 시 새"
+                            + " accessToken과 만료 시간이 반환되며, 이후 API 호출에 새 Access Token을 사용하세요.")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponse>> refresh(
             HttpServletRequest request, @RequestBody(required = false) RefreshTokenRequest body) {

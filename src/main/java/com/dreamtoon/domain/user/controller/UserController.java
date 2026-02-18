@@ -54,8 +54,8 @@ public class UserController {
     @Operation(
             summary = "권한 및 사용량 조회",
             description =
-                    "현재 사용자의 **구독 티어**, **사용량**(꿈 생성/저장 횟수 등), **잔여 할당량**, **권한** 정보를 한 번에 조회합니다. "
-                            + "프리미엄/제한 안내 UI나 설정 화면에서 호출하면 됩니다. (Subscriptions의 GET /usage 와 동일한 용도)")
+                    "현재 사용자의 **구독 티어**, **사용량**(꿈 생성/저장 횟수 등), **잔여 할당량**, **권한** 정보를 한 번에 조회합니다."
+                        + " 프리미엄/제한 안내 UI나 설정 화면에서 호출하면 됩니다. (Subscriptions의 GET /usage 와 동일한 용도)")
     @GetMapping("/me/permissions")
     public ResponseEntity<ApiResponse<UsageResponse>> getMyPermissions(
             @AuthenticationPrincipal Long userId) {

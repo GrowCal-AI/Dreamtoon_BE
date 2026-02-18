@@ -60,13 +60,11 @@ public class GcsStorageService {
             log.info("Uploading image to GCS: bucket={}, key={}", bucketName, gcsKey);
 
             BlobId blobId = BlobId.of(bucketName, gcsKey);
-            BlobInfo blobInfo =
-                    BlobInfo.newBuilder(blobId).setContentType(contentType).build();
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
             storage.create(blobInfo, imageData);
 
             String gcsUrl =
-                    String.format(
-                            "https://storage.googleapis.com/%s/%s", bucketName, gcsKey);
+                    String.format("https://storage.googleapis.com/%s/%s", bucketName, gcsKey);
 
             log.info("Image uploaded successfully to GCS: {}", gcsUrl);
             return gcsUrl;
