@@ -31,12 +31,12 @@ class OAuth2AuthenticationSuccessHandlerTest {
 
     private static final String MOCK_ACCESS_TOKEN = "mock-access-token";
     private static final String MOCK_REFRESH_TOKEN = "mock-refresh-token";
-    private static final String REDIRECT_URI = "http://localhost:3000/oauth2/redirect";
+    private static final String FRONTEND_URL = "http://localhost:5173";
 
     @BeforeEach
     void setUp() {
         successHandler = new OAuth2AuthenticationSuccessHandler(jwtTokenProvider);
-        ReflectionTestUtils.setField(successHandler, "redirectUri", REDIRECT_URI);
+        ReflectionTestUtils.setField(successHandler, "frontendUrl", FRONTEND_URL);
     }
 
     @Test
@@ -69,7 +69,7 @@ class OAuth2AuthenticationSuccessHandlerTest {
         String content = response.getContentAsString();
         assertThat(content).contains(MOCK_ACCESS_TOKEN);
         assertThat(content).contains(MOCK_REFRESH_TOKEN);
-        assertThat(content).contains(REDIRECT_URI);
+        assertThat(content).contains(FRONTEND_URL + "/oauth/callback");
         assertThat(content).contains("oauth2-login-success");
         assertThat(response.getContentType()).isEqualTo("text/html;charset=UTF-8");
     }
