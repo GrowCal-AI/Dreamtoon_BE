@@ -29,7 +29,7 @@ public class GcsStorageService {
      * 이미지 URL에서 다운로드하여 GCS에 업로드
      *
      * @param imageUrl 임시 이미지 URL (DALL-E 생성 이미지)
-     * @param prefix GCS 파일 경로 prefix (예: "scenes", "webtoons")
+     * @param prefix GCS 파일 경로 prefix (예: "webtoon/dream_5")
      * @return GCS에 저장된 영구 URL
      */
     public String uploadImageFromUrl(String imageUrl, String prefix) {
