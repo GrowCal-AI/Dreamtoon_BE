@@ -20,14 +20,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * OAuth2AuthenticationSuccessHandler 단위 테스트
  *
- * <p>
- * OAuth2 로그인 성공 시 JWT 발급 및 HTML 리다이렉트 응답을 검증합니다.
+ * <p>OAuth2 로그인 성공 시 JWT 발급 및 HTML 리다이렉트 응답을 검증합니다.
  */
 @ExtendWith(MockitoExtension.class)
 class OAuth2AuthenticationSuccessHandlerTest {
 
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    @Mock private JwtTokenProvider jwtTokenProvider;
 
     private OAuth2AuthenticationSuccessHandler successHandler;
 
@@ -48,14 +46,15 @@ class OAuth2AuthenticationSuccessHandlerTest {
                 .thenReturn(MOCK_ACCESS_TOKEN);
         when(jwtTokenProvider.createRefreshToken(1L)).thenReturn(MOCK_REFRESH_TOKEN);
 
-        CustomOAuth2User customUser = new CustomOAuth2User(
-                1L,
-                "user@example.com",
-                "테스트유저",
-                "KAKAO",
-                "kakao-123",
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
-                Collections.emptyMap());
+        CustomOAuth2User customUser =
+                new CustomOAuth2User(
+                        1L,
+                        "user@example.com",
+                        "테스트유저",
+                        "KAKAO",
+                        "kakao-123",
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")),
+                        Collections.emptyMap());
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(customUser);
 

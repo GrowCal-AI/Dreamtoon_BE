@@ -607,6 +607,10 @@
 
 ### 🔐 **보안**
 - OAuth2 소셜 로그인 (Google, Kakao)
+  - **Hybrid Authentication Flow**:
+    - **Access Token**: 리다이렉트 URL 쿼리 파라미터로 전달 (`?accessToken=...`) - 즉시 사용
+    - **Refresh Token**: `HttpOnly; Secure; SameSite=None` 쿠키로 설정 - 보안 강화
+    - **Frontend**: URL에서 Access Token 추출, Refresh Token은 쿠키로 자동 전송 (API 호출 시)
 - JWT 토큰 기반 인증
 - 개인 꿈 데이터 암호화 저장
 
