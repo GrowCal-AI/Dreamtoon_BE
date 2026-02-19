@@ -125,7 +125,9 @@ public final class DreamAnalysisPrompt {
         String artStyleInstruction =
                 isPremium
                         ? style + ", high quality digital illustration, cinematic composition"
-                        : style + ", Korean manhwa, professional digital coloring, cinematic composition";
+                        : style
+                                + ", Korean manhwa, professional digital coloring, cinematic"
+                                + " composition";
 
         return String.format(
                 """
