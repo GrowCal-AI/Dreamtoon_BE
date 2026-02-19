@@ -35,22 +35,37 @@ public class Subscription {
     private Boolean isActive = true;
 
     // ── 스탠다드 이미지 쿼터 ──
-    @Column(name = "standard_generation_count", nullable = false)
+    @Column(
+            name = "standard_generation_count",
+            nullable = false,
+            columnDefinition = "integer not null default 0")
     private Integer standardGenerationCount = 0;
 
     // ── 프리미엄 이미지 쿼터 ──
-    @Column(name = "premium_generation_count", nullable = false)
+    @Column(
+            name = "premium_generation_count",
+            nullable = false,
+            columnDefinition = "integer not null default 0")
     private Integer premiumGenerationCount = 0;
 
     /** 회원가입 최초 1회 무료 프리미엄 사용 여부 (영구, 리셋 안 됨) */
-    @Column(name = "premium_trial_used", nullable = false)
+    @Column(
+            name = "premium_trial_used",
+            nullable = false,
+            columnDefinition = "boolean not null default false")
     private Boolean premiumTrialUsed = false;
 
     // ── 기타 쿼터 ──
-    @Column(name = "library_count", nullable = false)
+    @Column(
+            name = "library_count",
+            nullable = false,
+            columnDefinition = "integer not null default 0")
     private Integer libraryCount = 0;
 
-    @Column(name = "favorite_count", nullable = false)
+    @Column(
+            name = "favorite_count",
+            nullable = false,
+            columnDefinition = "integer not null default 0")
     private Integer favoriteCount = 0;
 
     @Column(name = "quota_reset_date")
@@ -66,7 +81,10 @@ public class Subscription {
     @Column(name = "subscription_end_date")
     private LocalDate subscriptionEndDate;
 
-    @Column(name = "cancel_at_period_end", nullable = false)
+    @Column(
+            name = "cancel_at_period_end",
+            nullable = false,
+            columnDefinition = "boolean not null default false")
     private Boolean cancelAtPeriodEnd = false;
 
     @CreatedDate

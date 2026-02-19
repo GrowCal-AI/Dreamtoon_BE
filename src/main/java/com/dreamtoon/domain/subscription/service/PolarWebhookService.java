@@ -1,6 +1,10 @@
 package com.dreamtoon.domain.subscription.service;
 
+import com.dreamtoon.domain.subscription.entity.PaymentEventType;
+import com.dreamtoon.domain.subscription.entity.Subscription;
 import com.dreamtoon.domain.subscription.entity.SubscriptionTier;
+import com.dreamtoon.domain.subscription.repository.SubscriptionRepository;
+import com.dreamtoon.domain.user.entity.User;
 import com.dreamtoon.domain.user.repository.UserRepository;
 import com.dreamtoon.global.config.PolarProperties;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +28,8 @@ public class PolarWebhookService {
 
     private final PolarProperties polarProperties;
     private final SubscriptionService subscriptionService;
+    private final PaymentLogService paymentLogService;
+    private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
@@ -56,8 +63,15 @@ public class PolarWebhookService {
                             + "."
                             + new String(rawBody, StandardCharsets.UTF_8);
 
-            // HMAC-SHA256 계산 (시크릿은 base64 디코딩)
-            byte[] secretBytes = Base64.getDecoder().decode(polarProperties.getWebhookSecret());
+            // HMAC-SHA256 계산 (시크릿은 base64 디코딩, prefix 제거 필요)
+            String rawSecret = polarProperties.getWebhookSecret();
+            // Polar: "polar_whs_<base64>" / Standard Webhooks: "whsec_<base64>" prefix 제거
+            if (rawSecret.startsWith("polar_whs_")) {
+                rawSecret = rawSecret.substring("polar_whs_".length());
+            } else if (rawSecret.startsWith("whsec_")) {
+                rawSecret = rawSecret.substring("whsec_".length());
+            }
+            byte[] secretBytes = Base64.getDecoder().decode(rawSecret);
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secretBytes, "HmacSHA256"));
             String computed =
@@ -105,21 +119,51 @@ public class PolarWebhookService {
         String customerEmail = data.path("customer").path("email").asText();
         String productId = data.path("product").path("id").asText();
         String currentPeriodEnd = data.path("current_period_end").asText();
+        String metadataUserId = data.path("metadata").path("user_id").asText(null);
 
         SubscriptionTier tier = resolveTier(productId);
         LocalDate endDate = parseDate(currentPeriodEnd);
 
-        // email로 내부 사용자 조회
-        userRepository
-                .findByEmail(customerEmail)
-                .ifPresentOrElse(
-                        user ->
-                                subscriptionService.activateNewSubscription(
-                                        user.getId(), polarSubId, polarCustomerId, tier, endDate),
-                        () ->
-                                log.warn(
-                                        "[Polar Webhook] User not found for email: {}",
-                                        customerEmail));
+        // 1차: email로 조회, 2차: metadata user_id로 조회
+        Optional<User> userOpt = userRepository.findByEmail(customerEmail);
+        if (userOpt.isEmpty() && metadataUserId != null) {
+            try {
+                userOpt = userRepository.findById(Long.parseLong(metadataUserId));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        userOpt.ifPresentOrElse(
+                user -> {
+                    subscriptionService.activateNewSubscription(
+                            user.getId(), polarSubId, polarCustomerId, tier, endDate);
+                    paymentLogService.log(
+                            user.getId(),
+                            null,
+                            PaymentEventType.SUBSCRIPTION_CREATED,
+                            tier,
+                            polarSubId,
+                            null,
+                            polarCustomerId,
+                            "Webhook: 구독 생성 (" + tier.name() + ")",
+                            null);
+                },
+                () -> {
+                    log.error(
+                            "[Polar Webhook] User not found! email={}, metadataUserId={}",
+                            customerEmail,
+                            metadataUserId);
+                    paymentLogService.log(
+                            null,
+                            null,
+                            PaymentEventType.PAYMENT_FAILED,
+                            tier,
+                            polarSubId,
+                            null,
+                            polarCustomerId,
+                            "사용자 조회 실패: email=" + customerEmail,
+                            null);
+                });
     }
 
     private void handleSubscriptionUpdated(JsonNode data) {
@@ -134,26 +178,85 @@ public class PolarWebhookService {
 
         subscriptionService.syncFromPolar(
                 polarSubId, polarCustomerId, tier, endDate, cancelAtPeriodEnd);
+
+        // userId 조회 후 로깅
+        Long userId = resolveUserIdByPolarSubId(polarSubId);
+        Long subId = resolveSubIdByPolarSubId(polarSubId);
+        paymentLogService.log(
+                userId,
+                subId,
+                PaymentEventType.SUBSCRIPTION_UPDATED,
+                tier,
+                polarSubId,
+                null,
+                polarCustomerId,
+                "Webhook: 구독 업데이트 (cancelAtPeriodEnd=" + cancelAtPeriodEnd + ")",
+                null);
     }
 
     private void handleSubscriptionCanceled(JsonNode data) {
-        // 취소는 기간 만료 시 FREE로 변경 (cancel_at_period_end=true)
         String polarSubId = data.path("id").asText();
+        String polarCustomerId = data.path("customer").path("id").asText();
+        SubscriptionTier tier = resolveTier(data.path("product").path("id").asText());
+
         subscriptionService.syncFromPolar(
                 polarSubId,
-                data.path("customer").path("id").asText(),
-                resolveTier(data.path("product").path("id").asText()),
+                polarCustomerId,
+                tier,
                 parseDate(data.path("current_period_end").asText()),
                 true);
+
+        Long userId = resolveUserIdByPolarSubId(polarSubId);
+        Long subId = resolveSubIdByPolarSubId(polarSubId);
+        paymentLogService.log(
+                userId,
+                subId,
+                PaymentEventType.SUBSCRIPTION_CANCELED,
+                tier,
+                polarSubId,
+                null,
+                polarCustomerId,
+                "Webhook: 구독 취소 (기간 만료 시 해지)",
+                null);
     }
 
     private void handleSubscriptionRevoked(JsonNode data) {
-        // 즉시 FREE 다운그레이드
         String polarSubId = data.path("id").asText();
+        String polarCustomerId = data.path("customer").path("id").asText();
+        SubscriptionTier tier = resolveTier(data.path("product").path("id").asText());
+
+        // revoke 전에 userId 조회 (revoke 후 polarSubscriptionId가 null이 됨)
+        Long userId = resolveUserIdByPolarSubId(polarSubId);
+        Long subId = resolveSubIdByPolarSubId(polarSubId);
+
         subscriptionService.revokeFromPolar(polarSubId);
+        paymentLogService.log(
+                userId,
+                subId,
+                PaymentEventType.SUBSCRIPTION_REVOKED,
+                tier,
+                polarSubId,
+                null,
+                polarCustomerId,
+                "Webhook: 구독 즉시 해지",
+                null);
     }
 
     // ── 헬퍼 ──
+
+    private Long resolveUserIdByPolarSubId(String polarSubId) {
+        return subscriptionRepository
+                .findByPolarSubscriptionId(polarSubId)
+                .map(sub -> sub.getUser().getId())
+                .orElse(null);
+    }
+
+    private Long resolveSubIdByPolarSubId(String polarSubId) {
+        return subscriptionRepository
+                .findByPolarSubscriptionId(polarSubId)
+                .map(Subscription::getId)
+                .orElse(null);
+    }
 
     private SubscriptionTier resolveTier(String productId) {
         PolarProperties.Products products = polarProperties.getProducts();

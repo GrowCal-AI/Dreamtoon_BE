@@ -3,9 +3,13 @@ package com.dreamtoon.domain.subscription.controller;
 import com.dreamtoon.domain.subscription.dto.CheckoutRequest;
 import com.dreamtoon.domain.subscription.dto.CheckoutResponse;
 import com.dreamtoon.domain.subscription.dto.CustomerPortalResponse;
+import com.dreamtoon.domain.subscription.dto.PaymentLogResponse;
 import com.dreamtoon.domain.subscription.dto.UsageResponse;
+import com.dreamtoon.domain.subscription.service.PaymentLogService;
 import com.dreamtoon.domain.subscription.service.SubscriptionService;
+import com.dreamtoon.global.common.dto.request.PageRequest;
 import com.dreamtoon.global.common.dto.response.ApiResponse;
+import com.dreamtoon.global.common.dto.response.PageResponse;
 import com.dreamtoon.global.config.PolarProperties;
 import com.dreamtoon.infrastructure.payment.PolarApiClient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
+    private final PaymentLogService paymentLogService;
     private final PolarApiClient polarApiClient;
     private final PolarProperties polarProperties;
 
@@ -69,5 +74,32 @@ public class SubscriptionController {
         CustomerPortalResponse response =
                 subscriptionService.createCustomerPortalUrl(userId, polarApiClient);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(
+            summary = "구독 동기화",
+            description =
+                    "Polar.sh에서 현재 사용자의 **기존 구독 정보를 조회하여 로컬 DB에 동기화**합니다. "
+                            + "웹훅 누락으로 결제는 완료되었으나 구독 등급이 반영되지 않은 경우 호출하세요. "
+                            + "동기화 후 최신 사용량 정보를 반환합니다.")
+    @PostMapping("/sync")
+    public ResponseEntity<ApiResponse<UsageResponse>> syncSubscription(
+            @AuthenticationPrincipal Long userId) {
+        UsageResponse response =
+                subscriptionService.syncSubscriptionFromPolar(
+                        userId, polarApiClient, polarProperties);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "결제 이력 조회", description = "현재 사용자의 결제/구독 이벤트 이력을 페이지네이션으로 조회합니다.")
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse<PageResponse<PaymentLogResponse>>> getPaymentHistory(
+            @AuthenticationPrincipal Long userId, @ModelAttribute PageRequest pageRequest) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        PageResponse.of(
+                                paymentLogService
+                                        .getLogsByUserId(userId, pageRequest.toPageable())
+                                        .map(PaymentLogResponse::from))));
     }
 }

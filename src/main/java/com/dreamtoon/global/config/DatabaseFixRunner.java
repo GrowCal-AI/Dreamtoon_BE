@@ -55,6 +55,26 @@ public class DatabaseFixRunner implements CommandLineRunner {
     }
 
     private void migrateSubscriptionsColumns() {
+        // 먼저 기존 NULL 값을 DEFAULT로 채우기 (컬럼이 이미 존재하지만 NULL인 경우)
+        String[] nullFixes = {
+            "UPDATE subscriptions SET cancel_at_period_end = false WHERE cancel_at_period_end IS"
+                    + " NULL",
+            "UPDATE subscriptions SET premium_generation_count = 0 WHERE premium_generation_count"
+                    + " IS NULL",
+            "UPDATE subscriptions SET premium_trial_used = false WHERE premium_trial_used IS NULL",
+            "UPDATE subscriptions SET standard_generation_count = 0 WHERE standard_generation_count"
+                    + " IS NULL",
+            "UPDATE subscriptions SET library_count = 0 WHERE library_count IS NULL",
+            "UPDATE subscriptions SET favorite_count = 0 WHERE favorite_count IS NULL",
+        };
+        for (String sql : nullFixes) {
+            try {
+                jdbcTemplate.execute(sql);
+            } catch (Exception e) {
+                // 컬럼이 아직 없으면 무시
+            }
+        }
+
         String[] migrations = {
             "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS cancel_at_period_end boolean NOT"
                     + " NULL DEFAULT false",
@@ -66,6 +86,10 @@ public class DatabaseFixRunner implements CommandLineRunner {
                     + " NOT NULL DEFAULT 0",
             // 구 generation_count 컬럼이 DB에 남아있는 경우 DEFAULT 0 설정 (엔티티에서 제거된 컬럼)
             "ALTER TABLE subscriptions ALTER COLUMN generation_count SET DEFAULT 0",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS library_count integer NOT NULL"
+                    + " DEFAULT 0",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS favorite_count integer NOT NULL"
+                    + " DEFAULT 0",
         };
         for (String sql : migrations) {
             try {

@@ -1,8 +1,10 @@
 package com.dreamtoon.domain.subscription.controller;
 
+import com.dreamtoon.domain.subscription.dto.CancelSubscriptionResponse;
 import com.dreamtoon.domain.subscription.entity.SubscriptionTier;
 import com.dreamtoon.domain.subscription.service.SubscriptionService;
 import com.dreamtoon.global.common.dto.response.ApiResponse;
+import com.dreamtoon.infrastructure.payment.PolarApiClient;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminSubscriptionController {
 
     private final SubscriptionService subscriptionService;
+    private final PolarApiClient polarApiClient;
 
     @Operation(summary = "구독 티어 강제 변경 (개발/테스트용)")
     @PatchMapping("/users/{userId}/subscription")
@@ -34,6 +38,19 @@ public class AdminSubscriptionController {
         subscriptionService.forceSetTier(userId, request.getTier());
         return ResponseEntity.ok(
                 ApiResponse.success("User " + userId + " tier updated to " + request.getTier()));
+    }
+
+    @Operation(
+            summary = "구독 취소 (관리자 전용)",
+            description =
+                    "지정한 사용자의 구독을 기간 종료 시 해지 처리합니다. "
+                            + "Polar API를 통해 cancel_at_period_end=true로 설정합니다.")
+    @PostMapping("/users/{userId}/subscription/cancel")
+    public ResponseEntity<ApiResponse<CancelSubscriptionResponse>> cancelSubscription(
+            @PathVariable Long userId) {
+        CancelSubscriptionResponse response =
+                subscriptionService.cancelSubscription(userId, polarApiClient);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @Data

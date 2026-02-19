@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -99,6 +100,146 @@ public class PolarApiClient {
                     response.body());
             throw new RuntimeException(
                     "Polar portal 세션 생성 실패 [" + response.statusCode() + "]: " + response.body());
+        }
+
+        return objectMapper.readTree(response.body());
+    }
+
+    /**
+     * 구독 취소 (기간 종료 시 해지).
+     *
+     * @param polarSubscriptionId Polar.sh Subscription ID
+     */
+    public void cancelSubscription(String polarSubscriptionId) throws Exception {
+        ObjectNode body = objectMapper.createObjectNode();
+        body.put("cancel_at_period_end", true);
+
+        String jsonBody = objectMapper.writeValueAsString(body);
+
+        HttpRequest request =
+                HttpRequest.newBuilder()
+                        .uri(
+                                URI.create(
+                                        polarProperties.getBaseUrl()
+                                                + "/subscriptions/"
+                                                + polarSubscriptionId))
+                        .header("Authorization", "Bearer " + polarProperties.getApiKey())
+                        .header("Content-Type", "application/json")
+                        .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonBody))
+                        .build();
+
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            log.error(
+                    "[Polar] Subscription cancel failed: subId={}, status={}, body={}",
+                    polarSubscriptionId,
+                    response.statusCode(),
+                    response.body());
+            throw new RuntimeException(
+                    "Polar 구독 취소 실패 [" + response.statusCode() + "]: " + response.body());
+        }
+
+        log.info("[Polar] Subscription cancel requested: {}", polarSubscriptionId);
+    }
+
+    /**
+     * Polar 고객을 이메일로 조회.
+     *
+     * @param email 고객 이메일
+     * @return 고객 목록 JSON (items 배열 포함), 없으면 빈 items
+     */
+    public JsonNode searchCustomersByEmail(String email) throws Exception {
+        HttpRequest request =
+                HttpRequest.newBuilder()
+                        .uri(
+                                URI.create(
+                                        polarProperties.getBaseUrl()
+                                                + "/customers/?email="
+                                                + java.net.URLEncoder.encode(
+                                                        email, StandardCharsets.UTF_8)))
+                        .header("Authorization", "Bearer " + polarProperties.getApiKey())
+                        .GET()
+                        .build();
+
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            log.error(
+                    "[Polar] Customer search failed: email={}, status={}, body={}",
+                    email,
+                    response.statusCode(),
+                    response.body());
+            throw new RuntimeException(
+                    "Polar 고객 조회 실패 [" + response.statusCode() + "]: " + response.body());
+        }
+
+        return objectMapper.readTree(response.body());
+    }
+
+    /**
+     * 조직 전체 활성 구독 목록 조회 (metadata.user_id 기반 매칭용). 이메일 불일치 시 fallback으로 사용.
+     *
+     * @return 구독 목록 JSON (items 배열 포함)
+     */
+    public JsonNode listAllActiveSubscriptions() throws Exception {
+        HttpRequest request =
+                HttpRequest.newBuilder()
+                        .uri(
+                                URI.create(
+                                        polarProperties.getBaseUrl()
+                                                + "/subscriptions/?active=true&limit=100"))
+                        .header("Authorization", "Bearer " + polarProperties.getApiKey())
+                        .GET()
+                        .build();
+
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            log.error(
+                    "[Polar] All subscriptions list failed: status={}, body={}",
+                    response.statusCode(),
+                    response.body());
+            throw new RuntimeException(
+                    "Polar 전체 구독 조회 실패 [" + response.statusCode() + "]: " + response.body());
+        }
+
+        return objectMapper.readTree(response.body());
+    }
+
+    /**
+     * Polar 고객의 활성 구독 목록 조회.
+     *
+     * @param customerId Polar Customer ID
+     * @return 구독 목록 JSON (items 배열 포함)
+     */
+    public JsonNode listSubscriptions(String customerId) throws Exception {
+        HttpRequest request =
+                HttpRequest.newBuilder()
+                        .uri(
+                                URI.create(
+                                        polarProperties.getBaseUrl()
+                                                + "/subscriptions/?customer_id="
+                                                + customerId
+                                                + "&active=true"))
+                        .header("Authorization", "Bearer " + polarProperties.getApiKey())
+                        .GET()
+                        .build();
+
+        HttpResponse<String> response =
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            log.error(
+                    "[Polar] Subscription list failed: customerId={}, status={}, body={}",
+                    customerId,
+                    response.statusCode(),
+                    response.body());
+            throw new RuntimeException(
+                    "Polar 구독 조회 실패 [" + response.statusCode() + "]: " + response.body());
         }
 
         return objectMapper.readTree(response.body());

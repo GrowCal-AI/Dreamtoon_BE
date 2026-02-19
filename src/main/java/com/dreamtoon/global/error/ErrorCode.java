@@ -45,7 +45,10 @@ public enum ErrorCode {
             HttpStatus.FORBIDDEN, "SUB003", "무료 회원은 최대 10개까지 즐겨찾기 가능합니다. 프리미엄으로 업그레이드하세요."),
     PREMIUM_STYLE_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB004", "해당 기능은 유료 회원만 사용 가능합니다."),
     PREMIUM_FEATURES_NOT_ALLOWED(HttpStatus.FORBIDDEN, "SUB005", "해당 기능은 유료 회원만 사용 가능합니다."),
-    SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SUB006", "구독 정보를 찾을 수 없습니다.");
+    SUBSCRIPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SUB006", "구독 정보를 찾을 수 없습니다."),
+    SUBSCRIPTION_ALREADY_CANCELED(HttpStatus.CONFLICT, "SUB007", "이미 취소 예정인 구독입니다."),
+    CANCELLATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SUB008", "구독 취소 처리에 실패했습니다."),
+    SUBSCRIPTION_ALREADY_EXISTS(HttpStatus.CONFLICT, "SUB009", "이미 활성 구독이 존재합니다. 구독 정보를 동기화했습니다.");
 
     private final HttpStatus status;
     private final String code;
