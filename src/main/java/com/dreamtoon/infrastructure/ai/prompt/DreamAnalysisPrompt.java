@@ -119,16 +119,27 @@ public final class DreamAnalysisPrompt {
             int totalPanels) {
         String style = genre != null ? genre.getPromptTemplate() : "webtoon style, clean lines";
 
+        // 프리미엄 장르는 고유 스타일이 강하므로 "Korean manhwa" 수식을 붙이지 않음
+        // 스탠다드 장르(CUSTOM 등)는 Korean manhwa 베이스 유지
+        boolean isPremium = genre != null && genre.isPremium();
+        String artStyleInstruction =
+                isPremium
+                        ? style + ", high quality digital illustration, cinematic composition"
+                        : style + ", Korean manhwa, professional digital coloring, cinematic composition";
+
         return String.format(
                 """
                 %s
 
                 Character: %s
 
-                Art style: %s, Korean manhwa, professional digital coloring, cinematic composition.
+                Art style: %s
                 Portrait orientation. Expressive emotions, detailed background.
                 NO text, NO speech bubbles, NO letters, NO titles, NO logos, NO watermarks. Purely visual.
+                Family-friendly illustration. Fantastical and dreamlike mood. No realistic violence, \
+                no gore, no disturbing imagery. Scary elements depicted as whimsical and cartoonish, \
+                not threatening.
                 """,
-                sceneDescription, characterDNA, style);
+                sceneDescription, characterDNA, artStyleInstruction);
     }
 }
