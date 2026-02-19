@@ -57,8 +57,22 @@ public class AnalyticsService {
         Map<String, Integer> avgEmotions = new HashMap<>();
         emotionTotals.forEach((k, v) -> avgEmotions.put(k, v / finalCount));
 
+        // 꿈 단위 스트레스 계산 (DreamAnalysisService와 동일 공식)
+        double totalStress = 0;
+        int stressCount = 0;
+        for (Dream dream : dreams) {
+            if (dream.getEmotionScores() != null) {
+                Map<String, Integer> norm = normalizeEmotionKeys(dream.getEmotionScores());
+                double dreamStress =
+                        norm.getOrDefault("ANXIETY", 0) * 1.0
+                                + norm.getOrDefault("ANGER", 0) * 1.0
+                                + norm.getOrDefault("SADNESS", 0) * 0.5;
+                totalStress += Math.min(dreamStress, 100);
+                stressCount++;
+            }
+        }
+        int stress = stressCount == 0 ? 0 : (int) (totalStress / stressCount);
         int anxiety = avgEmotions.getOrDefault("ANXIETY", 0);
-        int stress = (anxiety + avgEmotions.getOrDefault("ANGER", 0)) / 2;
 
         return HealthIndexResponse.builder()
                 .stressLevel(stress)
