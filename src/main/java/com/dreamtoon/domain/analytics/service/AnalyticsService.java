@@ -4,7 +4,9 @@ import com.dreamtoon.domain.analytics.dto.EmotionAnalysisResponse;
 import com.dreamtoon.domain.analytics.dto.HealthIndexResponse;
 import com.dreamtoon.domain.analytics.dto.PatternAnalysisResponse;
 import com.dreamtoon.domain.dream.entity.Dream;
+import com.dreamtoon.domain.dream.entity.EmotionType;
 import com.dreamtoon.domain.dream.repository.DreamRepository;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,14 +42,16 @@ public class AnalyticsService {
                     .build();
         }
 
-        Map<String, Integer> emotionTotals = new HashMap<>();
+        Map<String, Integer> rawTotals = new HashMap<>();
         int count = 0;
         for (Dream dream : dreams) {
             if (dream.getEmotionScores() != null) {
-                dream.getEmotionScores().forEach((k, v) -> emotionTotals.merge(k, v, Integer::sum));
+                dream.getEmotionScores().forEach((k, v) -> rawTotals.merge(k, v, Integer::sum));
                 count++;
             }
         }
+
+        Map<String, Integer> emotionTotals = normalizeEmotionKeys(rawTotals);
 
         int finalCount = Math.max(count, 1);
         Map<String, Integer> avgEmotions = new HashMap<>();
@@ -72,17 +76,33 @@ public class AnalyticsService {
         List<Dream> dreams =
                 dreamRepository.findByUserId(userId, PageRequest.of(0, 100)).getContent();
 
-        Map<String, Integer> emotionTotals = new HashMap<>();
+        Map<String, Integer> rawTotals = new HashMap<>();
         for (Dream dream : dreams) {
             if (dream.getEmotionScores() != null) {
-                dream.getEmotionScores().forEach((k, v) -> emotionTotals.merge(k, v, Integer::sum));
+                dream.getEmotionScores().forEach((k, v) -> rawTotals.merge(k, v, Integer::sum));
             }
+        }
+
+        Map<String, Integer> emotionTotals = normalizeEmotionKeys(rawTotals);
+
+        List<EmotionAnalysisResponse.DailyEmotionData> dailyData = new ArrayList<>();
+        for (Dream dream : dreams) {
+            if (dream.getCreatedAt() == null) continue;
+            dailyData.add(
+                    EmotionAnalysisResponse.DailyEmotionData.builder()
+                            .date(dream.getCreatedAt().toLocalDate().toString())
+                            .primaryEmotion(
+                                    dream.getPrimaryEmotion() != null
+                                            ? dream.getPrimaryEmotion().getDescription()
+                                            : "평온")
+                            .sleepScore(calculateSleepScore(dream.getEmotionScores()))
+                            .build());
         }
 
         return EmotionAnalysisResponse.builder()
                 .period(period)
                 .emotionDistribution(emotionTotals)
-                .dailyData(Collections.emptyList())
+                .dailyData(dailyData)
                 .build();
     }
 
@@ -96,5 +116,58 @@ public class AnalyticsService {
                 .totalDreamCount(dreams.size())
                 .nightmareRatio(0.0)
                 .build();
+    }
+
+    // GPT가 반환하는 한글 키 중 EmotionType.description과 다른 변형
+    private static final Map<String, String> EMOTION_ALIASES =
+            Map.of(
+                    "놀람", "SURPRISE", // EmotionType.SURPRISE.description = "놀라움"
+                    "불편", "ANXIETY" // "불편"(discomfort)은 불안 계열로 합산
+                    );
+
+    /** 한글/소문자 감정 키를 영문 대문자(EmotionType.name())로 정규화 */
+    private Map<String, Integer> normalizeEmotionKeys(Map<String, Integer> raw) {
+        Map<String, Integer> normalized = new HashMap<>();
+        for (Map.Entry<String, Integer> e : raw.entrySet()) {
+            String key = e.getKey();
+            String normalizedKey = key;
+
+            // 1) EmotionType enum의 description/code로 매칭
+            boolean matched = false;
+            for (EmotionType type : EmotionType.values()) {
+                if (type.getDescription().equals(key) || type.getCode().equals(key)) {
+                    normalizedKey = type.name();
+                    matched = true;
+                    break;
+                }
+            }
+            // 2) 별칭 매칭 (놀람, 불편 등)
+            if (!matched && EMOTION_ALIASES.containsKey(key)) {
+                normalizedKey = EMOTION_ALIASES.get(key);
+            }
+
+            normalized.merge(normalizedKey, e.getValue(), Integer::sum);
+        }
+        return normalized;
+    }
+
+    /** 감정 점수 기반 수면 점수 계산 (1~5) */
+    private int calculateSleepScore(Map<String, Integer> emotionScores) {
+        if (emotionScores == null || emotionScores.isEmpty()) return 3;
+
+        Map<String, Integer> norm = normalizeEmotionKeys(emotionScores);
+        int negative =
+                norm.getOrDefault("ANXIETY", 0)
+                        + norm.getOrDefault("ANGER", 0)
+                        + norm.getOrDefault("SADNESS", 0);
+        int positive = norm.getOrDefault("JOY", 0) + norm.getOrDefault("PEACE", 0);
+
+        // 부정 감정이 높을수록 수면 점수 낮음, 긍정 감정이 높을수록 높음
+        int score = 3;
+        if (positive > negative + 30) score = 5;
+        else if (positive > negative) score = 4;
+        else if (negative > positive + 60) score = 1;
+        else if (negative > positive + 20) score = 2;
+        return score;
     }
 }

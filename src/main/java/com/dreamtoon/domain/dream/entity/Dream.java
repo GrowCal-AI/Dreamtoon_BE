@@ -178,11 +178,12 @@ public class Dream {
         this.processingStatus = ProcessingStatus.GENERATING;
     }
 
-    /** 웹툰 생성 완료 */
+    /** 웹툰 생성 완료 → 자동으로 라이브러리에 추가 */
     public void completeGeneration(List<String> webtoonImages) {
         this.webtoonImages = webtoonImages;
         this.processingStatus = ProcessingStatus.COMPLETED;
         this.errorMessage = null;
+        this.isInLibrary = true;
     }
 
     /** 처리 실패 */

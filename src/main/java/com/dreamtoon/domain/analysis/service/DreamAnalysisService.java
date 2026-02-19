@@ -70,9 +70,9 @@ public class DreamAnalysisService {
 
             // 가중치 적용: 불안(1.0), 분노(1.0), 슬픔(0.5)
             double dreamStress =
-                    scores.getOrDefault(EmotionType.ANXIETY.getCode(), 0) * 1.0
-                            + scores.getOrDefault(EmotionType.ANGER.getCode(), 0) * 1.0
-                            + scores.getOrDefault(EmotionType.SADNESS.getCode(), 0) * 0.5;
+                    getEmotionScore(scores, EmotionType.ANXIETY) * 1.0
+                            + getEmotionScore(scores, EmotionType.ANGER) * 1.0
+                            + getEmotionScore(scores, EmotionType.SADNESS) * 0.5;
 
             // 최대 300점이 나올 수 있으므로 100점으로 정규화 (대략 3으로 나눔)
             // 하지만 엄밀한 통계보다 경향성이 중요하므로 단순 평균 사용 후 조정
@@ -111,11 +111,11 @@ public class DreamAnalysisService {
             Map<String, Integer> scores = dream.getEmotionScores();
             if (scores == null) continue;
 
-            joy += scores.getOrDefault(EmotionType.JOY.getCode(), 0);
-            anxiety += scores.getOrDefault(EmotionType.ANXIETY.getCode(), 0);
-            anger += scores.getOrDefault(EmotionType.ANGER.getCode(), 0);
-            sadness += scores.getOrDefault(EmotionType.SADNESS.getCode(), 0);
-            peace += scores.getOrDefault(EmotionType.PEACE.getCode(), 0);
+            joy += getEmotionScore(scores, EmotionType.JOY);
+            anxiety += getEmotionScore(scores, EmotionType.ANXIETY);
+            anger += getEmotionScore(scores, EmotionType.ANGER);
+            sadness += getEmotionScore(scores, EmotionType.SADNESS);
+            peace += getEmotionScore(scores, EmotionType.PEACE);
             count++;
         }
 
@@ -171,5 +171,24 @@ public class DreamAnalysisService {
             return "긍정적인 에너지가 가득하네요! 이 기분을 유지하며 하루를 시작해보세요.";
         }
         return "평온한 상태를 유지하고 계십니다.";
+    }
+
+    // GPT가 반환하는 한글 키 중 EmotionType.description과 다른 변형
+    private static final Map<String, String> EMOTION_ALIASES =
+            Map.of(
+                    "놀람", "SURPRISE",
+                    "불편", "ANXIETY");
+
+    /** code(소문자 영어), description(한글), 별칭 모두로 감정 점수 조회 */
+    private int getEmotionScore(Map<String, Integer> scores, EmotionType type) {
+        int value =
+                scores.getOrDefault(type.getCode(), scores.getOrDefault(type.getDescription(), 0));
+        // 별칭에서 추가 점수 합산 (예: ANXIETY ← "불편", SURPRISE ← "놀람")
+        for (Map.Entry<String, String> alias : EMOTION_ALIASES.entrySet()) {
+            if (alias.getValue().equals(type.name())) {
+                value += scores.getOrDefault(alias.getKey(), 0);
+            }
+        }
+        return value;
     }
 }
