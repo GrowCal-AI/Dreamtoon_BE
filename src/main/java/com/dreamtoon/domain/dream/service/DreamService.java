@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /** 꿈 기록 및 웹툰 생성 서비스 (Blueprint v2.0) */
 @Slf4j
@@ -60,7 +62,14 @@ public class DreamService {
         dreamRepository.save(dream);
         subscriptionService.incrementStandardGeneration(userId);
 
-        dreamAiService.analyzeDreamAsync(dream.getId());
+        final Long dreamId = dream.getId();
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        dreamAiService.analyzeDreamAsync(dreamId);
+                    }
+                });
 
         log.info("Dream created (full), ID: {}", dream.getId());
         return DreamResponse.from(dream);
@@ -113,7 +122,13 @@ public class DreamService {
         dream.addDetails(request.getDetailedDescription(), request.getRealLifeContext());
         dreamRepository.save(dream);
 
-        dreamAiService.analyzeDreamAsync(dreamId);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        dreamAiService.analyzeDreamAsync(dreamId);
+                    }
+                });
 
         return DreamDetailsResponse.builder()
                 .dreamId(dreamId)
