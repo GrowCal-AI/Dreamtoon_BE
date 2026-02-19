@@ -64,6 +64,8 @@ public class DatabaseFixRunner implements CommandLineRunner {
                     + " DEFAULT false",
             "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS standard_generation_count integer"
                     + " NOT NULL DEFAULT 0",
+            // 구 generation_count 컬럼이 DB에 남아있는 경우 DEFAULT 0 설정 (엔티티에서 제거된 컬럼)
+            "ALTER TABLE subscriptions ALTER COLUMN generation_count SET DEFAULT 0",
         };
         for (String sql : migrations) {
             try {
