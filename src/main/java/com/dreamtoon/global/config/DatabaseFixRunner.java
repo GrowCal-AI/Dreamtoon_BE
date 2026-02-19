@@ -20,6 +20,9 @@ public class DatabaseFixRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         log.info("Checking and updating database constraints...");
 
+        // subscriptions 테이블 컬럼 마이그레이션 (NOT NULL 컬럼 추가 시 DEFAULT 필요)
+        migrateSubscriptionsColumns();
+
         try {
             // 1. Drop existing constraint
             String dropSql =
@@ -49,5 +52,22 @@ public class DatabaseFixRunner implements CommandLineRunner {
             log.error("Failed to update database constraints: {}", e.getMessage());
             // Do not rethrow to avoid preventing app startup, but log error
         }
+    }
+
+    private void migrateSubscriptionsColumns() {
+        String[] migrations = {
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS cancel_at_period_end boolean NOT NULL DEFAULT false",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS premium_generation_count integer NOT NULL DEFAULT 0",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS premium_trial_used boolean NOT NULL DEFAULT false",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS standard_generation_count integer NOT NULL DEFAULT 0",
+        };
+        for (String sql : migrations) {
+            try {
+                jdbcTemplate.execute(sql);
+            } catch (Exception e) {
+                log.warn("subscriptions 컬럼 마이그레이션 스킵: {}", e.getMessage());
+            }
+        }
+        log.info("subscriptions 컬럼 마이그레이션 완료");
     }
 }
