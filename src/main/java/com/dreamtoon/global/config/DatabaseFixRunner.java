@@ -56,10 +56,14 @@ public class DatabaseFixRunner implements CommandLineRunner {
 
     private void migrateSubscriptionsColumns() {
         String[] migrations = {
-            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS cancel_at_period_end boolean NOT NULL DEFAULT false",
-            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS premium_generation_count integer NOT NULL DEFAULT 0",
-            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS premium_trial_used boolean NOT NULL DEFAULT false",
-            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS standard_generation_count integer NOT NULL DEFAULT 0",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS cancel_at_period_end boolean NOT"
+                    + " NULL DEFAULT false",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS premium_generation_count integer"
+                    + " NOT NULL DEFAULT 0",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS premium_trial_used boolean NOT NULL"
+                    + " DEFAULT false",
+            "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS standard_generation_count integer"
+                    + " NOT NULL DEFAULT 0",
         };
         for (String sql : migrations) {
             try {
