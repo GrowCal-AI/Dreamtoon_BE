@@ -20,19 +20,10 @@ public class PolarProperties {
     private String portalReturnUrl;
 
     private Products products = new Products();
-    private Prices prices = new Prices();
 
     @Getter
     @Setter
     public static class Products {
-        private String plus;
-        private String pro;
-        private String ultra;
-    }
-
-    @Getter
-    @Setter
-    public static class Prices {
         private String plus;
         private String pro;
         private String ultra;

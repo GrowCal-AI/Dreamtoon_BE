@@ -26,15 +26,15 @@ public class PolarApiClient {
     /**
      * 결제 체크아웃 세션 생성.
      *
-     * @param productPriceId Polar.sh Price ID
+     * @param productId Polar.sh Product ID
      * @param customerEmail 결제할 사용자 이메일 (사전 입력용)
      * @param internalUserId 내부 user_id (Polar metadata에 저장)
      * @return 결제 URL 등이 포함된 응답 JSON
      */
-    public JsonNode createCheckout(String productPriceId, String customerEmail, Long internalUserId)
+    public JsonNode createCheckout(String productId, String customerEmail, Long internalUserId)
             throws Exception {
         ObjectNode body = objectMapper.createObjectNode();
-        body.put("product_price_id", productPriceId);
+        body.put("product_id", productId);
         body.put("success_url", polarProperties.getSuccessUrl());
         if (customerEmail != null && !customerEmail.isBlank()) {
             body.put("customer_email", customerEmail);

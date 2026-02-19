@@ -1,0 +1,3340 @@
+# Create Benefit
+Source: https://polar.sh/docs/api-reference/benefits/create
+
+post /v1/benefits/
+Create a benefit.
+
+**Scopes**: `benefits:write`
+
+
+
+# Delete Benefit
+Source: https://polar.sh/docs/api-reference/benefits/delete
+
+delete /v1/benefits/{id}
+Delete a benefit.
+
+> [!WARNING]
+> Every grants associated with the benefit will be revoked.
+> Users will lose access to the benefit.
+
+**Scopes**: `benefits:write`
+
+
+
+# Get Benefit
+Source: https://polar.sh/docs/api-reference/benefits/get
+
+get /v1/benefits/{id}
+Get a benefit by ID.
+
+**Scopes**: `benefits:read` `benefits:write`
+
+
+
+# List Benefits
+Source: https://polar.sh/docs/api-reference/benefits/list
+
+get /v1/benefits/
+List benefits.
+
+**Scopes**: `benefits:read` `benefits:write`
+
+
+
+# List Benefit Grants
+Source: https://polar.sh/docs/api-reference/benefits/list-grants
+
+get /v1/benefits/{id}/grants
+List the individual grants for a benefit.
+
+It's especially useful to check if a user has been granted a benefit.
+
+**Scopes**: `benefits:read` `benefits:write`
+
+
+
+# Update Benefit
+Source: https://polar.sh/docs/api-reference/benefits/update
+
+patch /v1/benefits/{id}
+Update a benefit.
+
+**Scopes**: `benefits:write`
+
+
+
+# Create Checkout Link
+Source: https://polar.sh/docs/api-reference/checkout-links/create
+
+post /v1/checkout-links/
+Create a checkout link.
+
+**Scopes**: `checkout_links:write`
+
+<Warning>
+  Looking to create a single use checkout session? Checkout Links are probably **not** what you're looking for.
+
+  Checkout Links are shareable links that generate checkout sessions when opened. They are very handy to start a purchase from your website or social media.
+
+  However, if you want to start a checkout for one of your user **inside** your product, you should use the [Checkout Sessions API](/api-reference/checkouts/create-session).
+</Warning>
+
+
+# Delete Checkout Link
+Source: https://polar.sh/docs/api-reference/checkout-links/delete
+
+delete /v1/checkout-links/{id}
+Delete a checkout link.
+
+**Scopes**: `checkout_links:write`
+
+
+
+# Get Checkout Link
+Source: https://polar.sh/docs/api-reference/checkout-links/get
+
+get /v1/checkout-links/{id}
+Get a checkout link by ID.
+
+**Scopes**: `checkout_links:read` `checkout_links:write`
+
+
+
+# List Checkout Links
+Source: https://polar.sh/docs/api-reference/checkout-links/list
+
+get /v1/checkout-links/
+List checkout links.
+
+**Scopes**: `checkout_links:read` `checkout_links:write`
+
+
+
+# Update Checkout Link
+Source: https://polar.sh/docs/api-reference/checkout-links/update
+
+patch /v1/checkout-links/{id}
+Update a checkout link.
+
+**Scopes**: `checkout_links:write`
+
+
+
+# Confirm Checkout Session from Client
+Source: https://polar.sh/docs/api-reference/checkouts/confirm-session-from-client
+
+post /v1/checkouts/client/{client_secret}/confirm
+Confirm a checkout session by client secret.
+
+Orders and subscriptions will be processed.
+
+
+
+# Create Checkout Session
+Source: https://polar.sh/docs/api-reference/checkouts/create-session
+
+post /v1/checkouts/
+Create a checkout session.
+
+**Scopes**: `checkouts:write`
+
+
+
+# Get Checkout Session
+Source: https://polar.sh/docs/api-reference/checkouts/get-session
+
+get /v1/checkouts/{id}
+Get a checkout session by ID.
+
+**Scopes**: `checkouts:read` `checkouts:write`
+
+
+
+# Get Checkout Session from Client
+Source: https://polar.sh/docs/api-reference/checkouts/get-session-from-client
+
+get /v1/checkouts/client/{client_secret}
+Get a checkout session by client secret.
+
+
+
+# List Checkout Sessions
+Source: https://polar.sh/docs/api-reference/checkouts/list-sessions
+
+get /v1/checkouts/
+List checkout sessions.
+
+**Scopes**: `checkouts:read` `checkouts:write`
+
+
+
+# Update Checkout Session
+Source: https://polar.sh/docs/api-reference/checkouts/update-session
+
+patch /v1/checkouts/{id}
+Update a checkout session.
+
+**Scopes**: `checkouts:write`
+
+
+
+# Update Checkout Session from Client
+Source: https://polar.sh/docs/api-reference/checkouts/update-session-from-client
+
+patch /v1/checkouts/client/{client_secret}
+Update a checkout session by client secret.
+
+
+
+# Create Custom Field
+Source: https://polar.sh/docs/api-reference/custom-fields/create
+
+post /v1/custom-fields/
+Create a custom field.
+
+**Scopes**: `custom_fields:write`
+
+
+
+# Delete Custom Field
+Source: https://polar.sh/docs/api-reference/custom-fields/delete
+
+delete /v1/custom-fields/{id}
+Delete a custom field.
+
+**Scopes**: `custom_fields:write`
+
+
+
+# Get Custom Field
+Source: https://polar.sh/docs/api-reference/custom-fields/get
+
+get /v1/custom-fields/{id}
+Get a custom field by ID.
+
+**Scopes**: `custom_fields:read` `custom_fields:write`
+
+
+
+# List Custom Fields
+Source: https://polar.sh/docs/api-reference/custom-fields/list
+
+get /v1/custom-fields/
+List custom fields.
+
+**Scopes**: `custom_fields:read` `custom_fields:write`
+
+
+
+# Update Custom Field
+Source: https://polar.sh/docs/api-reference/custom-fields/update
+
+patch /v1/custom-fields/{id}
+Update a custom field.
+
+**Scopes**: `custom_fields:write`
+
+
+
+# Get Customer Meter
+Source: https://polar.sh/docs/api-reference/customer-meters/get
+
+get /v1/customer-meters/{id}
+Get a customer meter by ID.
+
+**Scopes**: `customer_meters:read`
+
+
+
+# List Customer Meters
+Source: https://polar.sh/docs/api-reference/customer-meters/list
+
+get /v1/customer-meters/
+List customer meters.
+
+**Scopes**: `customer_meters:read`
+
+
+
+# null
+Source: https://polar.sh/docs/api-reference/customer-portal/downloadables/get
+
+get /v1/customer-portal/downloadables/{token}
+
+
+
+# List Downloadables
+Source: https://polar.sh/docs/api-reference/customer-portal/downloadables/list
+
+get /v1/customer-portal/downloadables/
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# Get Customer
+Source: https://polar.sh/docs/api-reference/customer-portal/get-customer
+
+get /v1/customer-portal/customers/me
+Get authenticated customer.
+
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# Get Organization
+Source: https://polar.sh/docs/api-reference/customer-portal/get-organization
+
+get /v1/customer-portal/organizations/{slug}
+Get a customer portal's organization by slug.
+
+
+
+# Activate License Key
+Source: https://polar.sh/docs/api-reference/customer-portal/license-keys/activate
+
+post /v1/customer-portal/license-keys/activate
+Activate a license key instance.
+
+> This endpoint doesn't require authentication and can be safely used on a public
+> client, like a desktop application or a mobile app.
+> If you plan to validate a license key on a server, use the `/v1/license-keys/activate`
+> endpoint instead.
+
+<Tip>
+  You only need to use this endpoint if you have device **activations** enabled on the license key benefit. You then use this endpoint to reserve an allocation for a specific device. Storing the unique activation ID from the response on the device and using it as extra validation in the [/validate](/api-reference/customer-portal/license-keys/validate) endpoint.
+
+  Not using **activations**? Just use the [/validate](/api-reference/customer-portal/license-keys/validate) endpoint directly instead.
+</Tip>
+
+
+# Deactivate License Key
+Source: https://polar.sh/docs/api-reference/customer-portal/license-keys/deactivate
+
+post /v1/customer-portal/license-keys/deactivate
+Deactivate a license key instance.
+
+> This endpoint doesn't require authentication and can be safely used on a public
+> client, like a desktop application or a mobile app.
+> If you plan to validate a license key on a server, use the `/v1/license-keys/deactivate`
+> endpoint instead.
+
+
+
+# Get License Key
+Source: https://polar.sh/docs/api-reference/customer-portal/license-keys/get
+
+get /v1/customer-portal/license-keys/{id}
+Get a license key.
+
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# List License Keys
+Source: https://polar.sh/docs/api-reference/customer-portal/license-keys/list
+
+get /v1/customer-portal/license-keys/
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# Validate License Key
+Source: https://polar.sh/docs/api-reference/customer-portal/license-keys/validate
+
+post /v1/customer-portal/license-keys/validate
+Validate a license key.
+
+> This endpoint doesn't require authentication and can be safely used on a public
+> client, like a desktop application or a mobile app.
+> If you plan to validate a license key on a server, use the `/v1/license-keys/validate`
+> endpoint instead.
+
+
+
+# Get Order
+Source: https://polar.sh/docs/api-reference/customer-portal/orders/get
+
+get /v1/customer-portal/orders/{id}
+Get an order by ID for the authenticated customer.
+
+
+
+# Get Order Invoice
+Source: https://polar.sh/docs/api-reference/customer-portal/orders/get-invoice
+
+get /v1/customer-portal/orders/{id}/invoice
+Get an order's invoice data.
+
+<Note>
+  The invoice must be generated first before it can be retrieved. You should call the [`POST /v1/customer-portal/orders/{id}/invoice`](/api-reference/customer-portal/orders/post-invoice) endpoint to generate the invoice.
+
+  If the invoice is not generated, you will receive a `404` error.
+</Note>
+
+
+# List Orders
+Source: https://polar.sh/docs/api-reference/customer-portal/orders/list
+
+get /v1/customer-portal/orders/
+List orders of the authenticated customer.
+
+
+
+# Update Order
+Source: https://polar.sh/docs/api-reference/customer-portal/orders/patch
+
+patch /v1/customer-portal/orders/{id}
+Update an order for the authenticated customer.
+
+
+
+# Generate Order Invoice
+Source: https://polar.sh/docs/api-reference/customer-portal/orders/post-invoice
+
+post /v1/customer-portal/orders/{id}/invoice
+Trigger generation of an order's invoice.
+
+<Warning>
+  Once the invoice is generated, it's permanent and cannot be modified.
+
+  Make sure the billing details (name and address) are correct before generating the invoice. You can update them before generating the invoice by calling the [`PATCH /v1/customer-portal/orders/{id}`](/api-reference/customer-portal/orders/patch) endpoint.
+</Warning>
+
+<Note>
+  After successfully calling this endpoint, you get a `202` response, meaning
+  the generation of the invoice has been scheduled. It usually only takes a few
+  seconds before you can retrieve the invoice using the [`GET /v1/customer-portal/orders/{id}/invoice`](/api-reference/customer-portal/orders/get-invoice) endpoint.
+
+  If you want a reliable notification when the invoice is ready, you can listen to the
+  [`order.updated`](/api-reference/webhooks/order.updated) webhook and check the [`is_invoice_generated` field](/api-reference/webhooks/order.updated#schema-data-is-invoice-generated).
+</Note>
+
+
+# Assign Seat
+Source: https://polar.sh/docs/api-reference/customer-portal/seats/assign
+
+post /v1/customer-portal/seats
+
+
+
+# List Seats
+Source: https://polar.sh/docs/api-reference/customer-portal/seats/list
+
+get /v1/customer-portal/seats
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# List Claimed Subscriptions
+Source: https://polar.sh/docs/api-reference/customer-portal/seats/list-subscriptions
+
+get /v1/customer-portal/seats/subscriptions
+List all subscriptions where the authenticated customer has claimed a seat.
+
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# Resend Invitation
+Source: https://polar.sh/docs/api-reference/customer-portal/seats/resend
+
+post /v1/customer-portal/seats/{seat_id}/resend
+
+
+
+# Revoke Seat
+Source: https://polar.sh/docs/api-reference/customer-portal/seats/revoke
+
+delete /v1/customer-portal/seats/{seat_id}
+
+
+
+# Create Customer Session
+Source: https://polar.sh/docs/api-reference/customer-portal/sessions/create
+
+post /v1/customer-sessions/
+Create a customer session.
+
+For organizations with `member_model_enabled`, this will automatically
+create a member session for the owner member of the customer.
+
+**Scopes**: `customer_sessions:write`
+
+
+
+# Cancel Subscription
+Source: https://polar.sh/docs/api-reference/customer-portal/subscriptions/cancel
+
+delete /v1/customer-portal/subscriptions/{id}
+Cancel a subscription of the authenticated customer.
+
+
+
+# Get Subscription
+Source: https://polar.sh/docs/api-reference/customer-portal/subscriptions/get
+
+get /v1/customer-portal/subscriptions/{id}
+Get a subscription for the authenticated customer.
+
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# List Subscriptions
+Source: https://polar.sh/docs/api-reference/customer-portal/subscriptions/list
+
+get /v1/customer-portal/subscriptions/
+List subscriptions of the authenticated customer.
+
+**Scopes**: `customer_portal:read` `customer_portal:write`
+
+
+
+# Update Subscription
+Source: https://polar.sh/docs/api-reference/customer-portal/subscriptions/update
+
+patch /v1/customer-portal/subscriptions/{id}
+Update a subscription of the authenticated customer.
+
+
+
+# Assign Seat
+Source: https://polar.sh/docs/api-reference/customer-seats/assign
+
+post /v1/customer-seats
+**Scopes**: `customer_seats:write`
+
+
+
+# Claim Seat
+Source: https://polar.sh/docs/api-reference/customer-seats/claim
+
+post /v1/customer-seats/claim
+
+
+
+# Get Claim Info
+Source: https://polar.sh/docs/api-reference/customer-seats/get-claim-info
+
+get /v1/customer-seats/claim/{invitation_token}
+
+
+
+# List Seats
+Source: https://polar.sh/docs/api-reference/customer-seats/list
+
+get /v1/customer-seats
+**Scopes**: `customer_seats:write`
+
+
+
+# Resend Invitation
+Source: https://polar.sh/docs/api-reference/customer-seats/resend
+
+post /v1/customer-seats/{seat_id}/resend
+**Scopes**: `customer_seats:write`
+
+
+
+# Revoke Seat
+Source: https://polar.sh/docs/api-reference/customer-seats/revoke
+
+delete /v1/customer-seats/{seat_id}
+**Scopes**: `customer_seats:write`
+
+
+
+# Create Customer
+Source: https://polar.sh/docs/api-reference/customers/create
+
+post /v1/customers/
+Create a customer.
+
+**Scopes**: `customers:write`
+
+
+
+# Delete Customer
+Source: https://polar.sh/docs/api-reference/customers/delete
+
+delete /v1/customers/{id}
+Delete a customer.
+
+This action cannot be undone and will immediately:
+- Cancel any active subscriptions for the customer
+- Revoke all their benefits
+- Clear any `external_id`
+
+Use it only in the context of deleting a user within your
+own service. Otherwise, use more granular API endpoints to cancel
+a specific subscription or revoke certain benefits.
+
+Note: The customers information will nonetheless be retained for historic
+orders and subscriptions.
+
+Set `anonymize=true` to also anonymize PII for GDPR compliance.
+
+**Scopes**: `customers:write`
+
+
+
+# Delete Customer by External ID
+Source: https://polar.sh/docs/api-reference/customers/delete-external
+
+delete /v1/customers/external/{external_id}
+Delete a customer by external ID.
+
+Immediately cancels any active subscriptions and revokes any active benefits.
+
+Set `anonymize=true` to also anonymize PII for GDPR compliance.
+
+**Scopes**: `customers:write`
+
+
+
+# Get Customer
+Source: https://polar.sh/docs/api-reference/customers/get
+
+get /v1/customers/{id}
+Get a customer by ID.
+
+**Scopes**: `customers:read` `customers:write`
+
+
+
+# Get Customer by External ID
+Source: https://polar.sh/docs/api-reference/customers/get-external
+
+get /v1/customers/external/{external_id}
+Get a customer by external ID.
+
+**Scopes**: `customers:read` `customers:write`
+
+
+
+# List Customers
+Source: https://polar.sh/docs/api-reference/customers/list
+
+get /v1/customers/
+List customers.
+
+**Scopes**: `customers:read` `customers:write`
+
+
+
+# Get Customer State
+Source: https://polar.sh/docs/api-reference/customers/state
+
+get /v1/customers/{id}/state
+Get a customer state by ID.
+
+The customer state includes information about
+the customer's active subscriptions and benefits.
+
+It's the ideal endpoint to use when you need to get a full overview
+of a customer's status.
+
+**Scopes**: `customers:read` `customers:write`
+
+
+
+# Get Customer State by External ID
+Source: https://polar.sh/docs/api-reference/customers/state-external
+
+get /v1/customers/external/{external_id}/state
+Get a customer state by external ID.
+
+The customer state includes information about
+the customer's active subscriptions and benefits.
+
+It's the ideal endpoint to use when you need to get a full overview
+of a customer's status.
+
+**Scopes**: `customers:read` `customers:write`
+
+
+
+# Update Customer
+Source: https://polar.sh/docs/api-reference/customers/update
+
+patch /v1/customers/{id}
+Update a customer.
+
+**Scopes**: `customers:write`
+
+
+
+# Update Customer by External ID
+Source: https://polar.sh/docs/api-reference/customers/update-external
+
+patch /v1/customers/external/{external_id}
+Update a customer by external ID.
+
+**Scopes**: `customers:write`
+
+
+
+# Create Discount
+Source: https://polar.sh/docs/api-reference/discounts/create
+
+post /v1/discounts/
+Create a discount.
+
+**Scopes**: `discounts:write`
+
+
+
+# Delete Discount
+Source: https://polar.sh/docs/api-reference/discounts/delete
+
+delete /v1/discounts/{id}
+Delete a discount.
+
+**Scopes**: `discounts:write`
+
+
+
+# Get Discount
+Source: https://polar.sh/docs/api-reference/discounts/get
+
+get /v1/discounts/{id}
+Get a discount by ID.
+
+**Scopes**: `discounts:read` `discounts:write`
+
+
+
+# List Discounts
+Source: https://polar.sh/docs/api-reference/discounts/list
+
+get /v1/discounts/
+List discounts.
+
+**Scopes**: `discounts:read` `discounts:write`
+
+
+
+# Update Discount
+Source: https://polar.sh/docs/api-reference/discounts/update
+
+patch /v1/discounts/{id}
+Update a discount.
+
+**Scopes**: `discounts:write`
+
+
+
+# Get Event
+Source: https://polar.sh/docs/api-reference/events/get
+
+get /v1/events/{id}
+Get an event by ID.
+
+**Scopes**: `events:read` `events:write`
+
+
+
+# Ingest Events
+Source: https://polar.sh/docs/api-reference/events/ingest
+
+post /v1/events/ingest
+Ingest batch of events.
+
+**Scopes**: `events:write`
+
+
+
+# List Events
+Source: https://polar.sh/docs/api-reference/events/list
+
+get /v1/events/
+List events.
+
+**Scopes**: `events:read` `events:write`
+
+
+
+# Complete File Upload
+Source: https://polar.sh/docs/api-reference/files/complete-upload
+
+post /v1/files/{id}/uploaded
+Complete a file upload.
+
+**Scopes**: `files:write`
+
+
+
+# Create File
+Source: https://polar.sh/docs/api-reference/files/create
+
+post /v1/files/
+Create a file.
+
+**Scopes**: `files:write`
+
+
+
+# Delete File
+Source: https://polar.sh/docs/api-reference/files/delete
+
+delete /v1/files/{id}
+Delete a file.
+
+**Scopes**: `files:write`
+
+
+
+# List Files
+Source: https://polar.sh/docs/api-reference/files/list
+
+get /v1/files/
+List files.
+
+**Scopes**: `files:read` `files:write`
+
+
+
+# Update File
+Source: https://polar.sh/docs/api-reference/files/update
+
+patch /v1/files/{id}
+Update a file.
+
+**Scopes**: `files:write`
+
+
+
+# API Overview
+Source: https://polar.sh/docs/api-reference/introduction
+
+Base URLs, authentication, pagination, rate limits, and the difference between the Core API and the Customer Portal API
+
+<CardGroup>
+  <Card title="Production Base URL" icon="globe">
+    `https://api.polar.sh/v1`
+  </Card>
+
+  <Card title="Sandbox Base URL" icon="flask">
+    `https://sandbox-api.polar.sh/v1`
+  </Card>
+
+  <Card title="Auth (Organization)" icon="key" href="/integrate/oat">
+    Use an **Organization Access Token (OAT)** in the `Authorization: Bearer`
+    header
+  </Card>
+
+  <Card title="Auth (Customer Portal)" icon="user-lock" href="/api-reference/customer-portal/sessions/create">
+    Use a **Customer Access Token** created via `/v1/customer-sessions/`
+  </Card>
+</CardGroup>
+
+## Base URLs
+
+| Environment | Base URL                          | Purpose                         |
+| ----------- | --------------------------------- | ------------------------------- |
+| Production  | `https://api.polar.sh/v1`         | Real customers & live payments  |
+| Sandbox     | `https://sandbox-api.polar.sh/v1` | Safe testing & integration work |
+
+<Info>
+  The sandbox environment is fully isolated—data, users, tokens, and
+  organizations created there do not affect production. Create separate tokens
+  in each environment.
+</Info>
+
+Read more: [Sandbox Environment](/integrate/sandbox)
+
+## Authentication
+
+### Organization Access Tokens (OAT)
+
+Use an **OAT** to act on behalf of your organization (manage products, prices, checkouts, orders, subscriptions, benefits, etc.).
+
+```http theme={null}
+Authorization: Bearer polar_oat_xxxxxxxxxxxxxxxxx
+```
+
+<Tip>
+  Create OATs in your organization settings. See: [Organization Access
+  Tokens](/integrate/oat)
+</Tip>
+
+<Warning>
+  Never expose an OAT in client-side code, public repos, or logs. If leaked, it
+  will be revoked automatically by our secret scanning integrations.
+</Warning>
+
+### Customer Access Tokens
+
+Do **not** use OATs in the browser. For customer-facing flows, [generate a **Customer Session**](/api-reference/customer-portal/sessions/create) server-side, then use the returned **customer access token** with the **Customer Portal API** to let a signed-in customer view their own orders, subscriptions, and benefits.
+
+## Core API vs Customer Portal API
+
+| Aspect               | Core API                                                                 | Customer Portal API                            |
+| -------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
+| Audience             | Your server / backend                                                    | One of your customer                           |
+| Auth Type            | Organization Access Token (OAT)                                          | Customer Access Token                          |
+| Scope                | Full org resources (products, orders, subscriptions, benefits, checkout) | Only the authenticated customer’s data         |
+| Typical Use          | Admin dashboards, internal tools, automation, provisioning               | Building a custom customer portal or gated app |
+| Token Creation       | Via dashboard (manual)                                                   | Via `/v1/customer-sessions/` (server-side)     |
+| Sensitive Operations | Yes (create/update products, issue refunds, etc.)                        | No (read/update only what the customer owns)   |
+
+<Note>
+  The Customer Portal API is a *restricted* surface designed for safe exposure
+  in user-facing contexts (after exchanging a session). It cannot perform
+  privileged org-level mutations like creating products or issuing refunds.
+</Note>
+
+## Quick Examples
+
+<CodeGroup>
+  ```bash curl (Production - Core API) theme={null}
+  curl https://api.polar.sh/v1/products/ \
+    -H "Authorization: Bearer $POLAR_OAT" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash curl (Sandbox - Core API) theme={null}
+  curl https://sandbox-api.polar.sh/v1/products/ \
+    -H "Authorization: Bearer $POLAR_OAT_SANDBOX" \
+    -H "Accept: application/json"
+  ```
+
+  ```bash curl (Customer Portal API) theme={null}
+  curl https://api.polar.sh/v1/customer-portal/orders/ \
+    -H "Authorization: Bearer $POLAR_CUSTOMER_TOKEN" \
+    -H "Accept: application/json"
+  ```
+</CodeGroup>
+
+## Using SDKs
+
+All official SDKs accept a `server` parameter for sandbox usage:
+
+<CodeGroup>
+  ```ts TypeScript theme={null}
+  import { Polar } from "@polar-sh/sdk";
+
+  const polar = new Polar({
+  accessToken: process.env.POLAR_ACCESS_TOKEN!,
+  server: "sandbox", // omit or use 'production' for live
+  });
+
+  ```
+
+  ```py Python theme={null}
+  from polar import Polar
+
+  client = Polar(
+      access_token=os.environ["POLAR_ACCESS_TOKEN"],
+      server="sandbox",
+  )
+  ```
+
+  ```go Go theme={null}
+  s := polargo.New(
+    polargo.WithServer("sandbox"),
+    polargo.WithSecurity(os.Getenv("POLAR_ACCESS_TOKEN")),
+  )
+  ```
+
+  ```php PHP theme={null}
+  $sdk = Polar\Polar::builder()
+      ->setServer('sandbox')
+      ->setSecurity(getenv('POLAR_ACCESS_TOKEN'))
+      ->build();
+  ```
+</CodeGroup>
+
+## Pagination
+
+List endpoints in the Polar API support pagination to help you efficiently retrieve large datasets. Use the `page` and `limit` query parameters to control pagination.
+
+### Query Parameters
+
+| Parameter | Type    | Default | Max   | Description                                      |
+| --------- | ------- | ------- | ----- | ------------------------------------------------ |
+| `page`    | integer | `1`     | -     | Page number, starting from 1                     |
+| `limit`   | integer | `10`    | `100` | Number of items to return per page (window size) |
+
+<Info>
+  The `page` parameter works as a window offset. For example, `page=2&limit=10`
+  means the API will skip the first 10 elements and return the next 10.
+</Info>
+
+### Response Format
+
+All paginated responses include a `pagination` object with metadata about the current page and total results:
+
+| Field         | Type    | Description                                                      |
+| ------------- | ------- | ---------------------------------------------------------------- |
+| `total_count` | integer | Total number of items matching your query across all pages       |
+| `max_page`    | integer | Total number of pages available, given the current `limit` value |
+
+### Example
+
+Let's say you want to fetch products with a limit of 100 items per page:
+
+<CodeGroup>
+  ```bash Request theme={null}
+  curl https://api.polar.sh/v1/products/?page=1&limit=100 \
+    -H "Authorization: Bearer $POLAR_OAT" \
+    -H "Accept: application/json"
+  ```
+
+  ```json Response theme={null}
+  {
+    "items": [
+      {
+        "id": "...",
+        "name": "Product 1",
+        ...
+      },
+      ...
+    ],
+    "pagination": {
+      "total_count": 250,
+      "max_page": 3
+    }
+  }
+  ```
+</CodeGroup>
+
+In this example:
+
+* `total_count=250` indicates there are 250 total products
+* `limit=100` means each page contains up to 100 products
+* `max_page=3` means you need to make 3 requests to retrieve all products (pages 1, 2, and 3)
+
+<Tip>
+  To retrieve all pages, increment the `page` parameter from `1` to `max_page`.
+  Our SDKs provide built-in pagination helpers to automatically iterate through
+  all pages.
+</Tip>
+
+## Rate Limits
+
+Polar API has rate limits to ensure fair usage and maintain performance. The limits are as follows:
+
+* **300 requests per minute** per organization/customer or OAuth2 Client.
+* **3 requests per second** for unauthenticated license key [validation](/api-reference/customer-portal/license-keys/validate), [activation](/api-reference/customer-portal/license-keys/activate), and [deactivation](/api-reference/customer-portal/license-keys/deactivate) endpoints.
+
+If you exceed the rate limit, you will receive a `429 Too Many Requests` response. The response will include a `Retry-After` header indicating how long you should wait before making another request.
+
+<Note>
+  Organizations requiring higher rate limits for production workloads may
+  contact our support team to discuss elevated limits.
+</Note>
+
+
+# Activate License Key
+Source: https://polar.sh/docs/api-reference/license-keys/activate
+
+post /v1/license-keys/activate
+Activate a license key instance.
+
+**Scopes**: `license_keys:write`
+
+
+
+# Deactivate License Key
+Source: https://polar.sh/docs/api-reference/license-keys/deactivate
+
+post /v1/license-keys/deactivate
+Deactivate a license key instance.
+
+**Scopes**: `license_keys:write`
+
+
+
+# Get License Key
+Source: https://polar.sh/docs/api-reference/license-keys/get
+
+get /v1/license-keys/{id}
+Get a license key.
+
+**Scopes**: `license_keys:read` `license_keys:write`
+
+
+
+# Get Activation
+Source: https://polar.sh/docs/api-reference/license-keys/get-activation
+
+get /v1/license-keys/{id}/activations/{activation_id}
+Get a license key activation.
+
+**Scopes**: `license_keys:read` `license_keys:write`
+
+
+
+# List License Keys
+Source: https://polar.sh/docs/api-reference/license-keys/list
+
+get /v1/license-keys/
+Get license keys connected to the given organization & filters.
+
+**Scopes**: `license_keys:read` `license_keys:write`
+
+
+
+# Update License Key
+Source: https://polar.sh/docs/api-reference/license-keys/update
+
+patch /v1/license-keys/{id}
+Update a license key.
+
+**Scopes**: `license_keys:write`
+
+
+
+# Validate License Key
+Source: https://polar.sh/docs/api-reference/license-keys/validate
+
+post /v1/license-keys/validate
+Validate a license key.
+
+**Scopes**: `license_keys:write`
+
+
+
+# Create Meter
+Source: https://polar.sh/docs/api-reference/meters/create
+
+post /v1/meters/
+Create a meter.
+
+**Scopes**: `meters:write`
+
+
+
+# Get Meter
+Source: https://polar.sh/docs/api-reference/meters/get
+
+get /v1/meters/{id}
+Get a meter by ID.
+
+**Scopes**: `meters:read` `meters:write`
+
+
+
+# Get Meter Quantities
+Source: https://polar.sh/docs/api-reference/meters/get-quantities
+
+get /v1/meters/{id}/quantities
+Get quantities of a meter over a time period.
+
+**Scopes**: `meters:read` `meters:write`
+
+
+
+# List Meters
+Source: https://polar.sh/docs/api-reference/meters/list
+
+get /v1/meters/
+List meters.
+
+**Scopes**: `meters:read` `meters:write`
+
+
+
+# Update Meter
+Source: https://polar.sh/docs/api-reference/meters/update
+
+patch /v1/meters/{id}
+Update a meter.
+
+**Scopes**: `meters:write`
+
+
+
+# Get Metrics
+Source: https://polar.sh/docs/api-reference/metrics/get
+
+get /v1/metrics/
+Get metrics about your orders and subscriptions.
+
+Currency values are output in cents.
+
+**Scopes**: `metrics:read`
+
+
+
+# Get Metrics Limits
+Source: https://polar.sh/docs/api-reference/metrics/get-limits
+
+get /v1/metrics/limits
+Get the interval limits for the metrics endpoint.
+
+**Scopes**: `metrics:read`
+
+
+
+# Authorize
+Source: https://polar.sh/docs/api-reference/oauth2/connect/authorize
+
+get /v1/oauth2/authorize
+
+
+
+# Get User Info
+Source: https://polar.sh/docs/api-reference/oauth2/connect/get-user-info
+
+get /v1/oauth2/userinfo
+Get information about the authenticated user.
+
+
+
+# Introspect Token
+Source: https://polar.sh/docs/api-reference/oauth2/connect/introspect-token
+
+post /v1/oauth2/introspect
+Get information about an access token.
+
+
+
+# Request Token
+Source: https://polar.sh/docs/api-reference/oauth2/connect/request-token
+
+post /v1/oauth2/token
+Request an access token using a valid grant.
+
+
+
+# Revoke Token
+Source: https://polar.sh/docs/api-reference/oauth2/connect/revoke-token
+
+post /v1/oauth2/revoke
+Revoke an access token or a refresh token.
+
+
+
+# Get Order
+Source: https://polar.sh/docs/api-reference/orders/get
+
+get /v1/orders/{id}
+Get an order by ID.
+
+**Scopes**: `orders:read`
+
+
+
+# Get Order Invoice
+Source: https://polar.sh/docs/api-reference/orders/get-invoice
+
+get /v1/orders/{id}/invoice
+Get an order's invoice data.
+
+**Scopes**: `orders:read`
+
+<Note>
+  The invoice must be generated first before it can be retrieved. You should call the [`POST /v1/orders/{id}/invoice`](/api-reference/orders/post-invoice) endpoint to generate the invoice.
+
+  If the invoice is not generated, you will receive a `404` error.
+</Note>
+
+
+# List Orders
+Source: https://polar.sh/docs/api-reference/orders/list
+
+get /v1/orders/
+List orders.
+
+**Scopes**: `orders:read`
+
+
+
+# Update Order
+Source: https://polar.sh/docs/api-reference/orders/patch
+
+patch /v1/orders/{id}
+Update an order.
+
+**Scopes**: `orders:write`
+
+
+
+# Generate Order Invoice
+Source: https://polar.sh/docs/api-reference/orders/post-invoice
+
+post /v1/orders/{id}/invoice
+Trigger generation of an order's invoice.
+
+**Scopes**: `orders:read`
+
+<Warning>
+  Once the invoice is generated, it's permanent and cannot be modified.
+
+  Make sure the billing details (name and address) are correct before generating the invoice. You can update them before generating the invoice by calling the [`PATCH /v1/orders/{id}`](/api-reference/orders/patch) endpoint.
+</Warning>
+
+<Note>
+  After successfully calling this endpoint, you get a `202` response, meaning
+  the generation of the invoice has been scheduled. It usually only takes a few
+  seconds before you can retrieve the invoice using the [`GET /v1/orders/{id}
+      /invoice`](/api-reference/orders/get-invoice) endpoint.
+
+  If you want a reliable notification when the invoice is ready, you can listen to the
+  [`order.updated`](/api-reference/webhooks/order.updated) webhook and check the [`is_invoice_generated` field](/api-reference/webhooks/order.updated#schema-data-is-invoice-generated).
+</Note>
+
+
+# Create Organization
+Source: https://polar.sh/docs/api-reference/organizations/create
+
+post /v1/organizations/
+Create an organization.
+
+**Scopes**: `organizations:write`
+
+
+
+# Get Organization
+Source: https://polar.sh/docs/api-reference/organizations/get
+
+GET /v1/organizations/{id}
+Get an organization by ID.
+
+**Scopes**: `organizations:read` `organizations:write`
+
+
+
+# List Organizations
+Source: https://polar.sh/docs/api-reference/organizations/list
+
+get /v1/organizations/
+List organizations.
+
+**Scopes**: `organizations:read` `organizations:write`
+
+
+
+# Update Organization
+Source: https://polar.sh/docs/api-reference/organizations/update
+
+patch /v1/organizations/{id}
+Update an organization.
+
+**Scopes**: `organizations:write`
+
+
+
+# Create Product
+Source: https://polar.sh/docs/api-reference/products/create
+
+post /v1/products/
+Create a product.
+
+**Scopes**: `products:write`
+
+
+
+# Get Product
+Source: https://polar.sh/docs/api-reference/products/get
+
+get /v1/products/{id}
+Get a product by ID.
+
+**Scopes**: `products:read` `products:write`
+
+
+
+# List Products
+Source: https://polar.sh/docs/api-reference/products/list
+
+get /v1/products/
+List products.
+
+**Scopes**: `products:read` `products:write`
+
+
+
+# Update Product
+Source: https://polar.sh/docs/api-reference/products/update
+
+patch /v1/products/{id}
+Update a product.
+
+**Scopes**: `products:write`
+
+
+
+# Update Product Benefits
+Source: https://polar.sh/docs/api-reference/products/update-benefits
+
+post /v1/products/{id}/benefits
+Update benefits granted by a product.
+
+**Scopes**: `products:write`
+
+
+
+# Create Refund
+Source: https://polar.sh/docs/api-reference/refunds/create
+
+post /v1/refunds/
+Create a refund.
+
+**Scopes**: `refunds:write`
+
+
+
+# List Refunds
+Source: https://polar.sh/docs/api-reference/refunds/list
+
+get /v1/refunds/
+List refunds.
+
+**Scopes**: `refunds:read` `refunds:write`
+
+
+
+# Create Subscription
+Source: https://polar.sh/docs/api-reference/subscriptions/create
+
+post /v1/subscriptions/
+Create a subscription programmatically.
+
+This endpoint only allows to create subscription on free products.
+For paid products, use the checkout flow.
+
+No initial order will be created and no confirmation email will be sent.
+
+**Scopes**: `subscriptions:write`
+
+
+
+# Get Subscription
+Source: https://polar.sh/docs/api-reference/subscriptions/get
+
+get /v1/subscriptions/{id}
+Get a subscription by ID.
+
+**Scopes**: `subscriptions:read` `subscriptions:write`
+
+
+
+# List Subscriptions
+Source: https://polar.sh/docs/api-reference/subscriptions/list
+
+get /v1/subscriptions/
+List subscriptions.
+
+**Scopes**: `subscriptions:read` `subscriptions:write`
+
+
+
+# Revoke Subscription
+Source: https://polar.sh/docs/api-reference/subscriptions/revoke
+
+delete /v1/subscriptions/{id}
+Revoke a subscription, i.e cancel immediately.
+
+**Scopes**: `subscriptions:write`
+
+
+
+# Update Subscription
+Source: https://polar.sh/docs/api-reference/subscriptions/update
+
+patch /v1/subscriptions/{id}
+Update a subscription.
+
+**Scopes**: `subscriptions:write`
+
+
+
+# benefit.created
+Source: https://polar.sh/docs/api-reference/webhooks/benefit.created
+
+
+
+
+
+# benefit.updated
+Source: https://polar.sh/docs/api-reference/webhooks/benefit.updated
+
+
+
+
+
+# benefit_grant.created
+Source: https://polar.sh/docs/api-reference/webhooks/benefit_grant.created
+
+
+
+
+
+# benefit_grant.cycled
+Source: https://polar.sh/docs/api-reference/webhooks/benefit_grant.cycled
+
+
+
+
+
+# benefit_grant.revoked
+Source: https://polar.sh/docs/api-reference/webhooks/benefit_grant.revoked
+
+
+
+
+
+# benefit_grant.updated
+Source: https://polar.sh/docs/api-reference/webhooks/benefit_grant.updated
+
+
+
+
+
+# checkout.created
+Source: https://polar.sh/docs/api-reference/webhooks/checkout.created
+
+
+
+
+
+# checkout.updated
+Source: https://polar.sh/docs/api-reference/webhooks/checkout.updated
+
+
+
+
+
+# customer.created
+Source: https://polar.sh/docs/api-reference/webhooks/customer.created
+
+
+
+
+
+# customer.deleted
+Source: https://polar.sh/docs/api-reference/webhooks/customer.deleted
+
+
+
+
+
+# customer.state_changed
+Source: https://polar.sh/docs/api-reference/webhooks/customer.state_changed
+
+
+
+
+
+# customer.updated
+Source: https://polar.sh/docs/api-reference/webhooks/customer.updated
+
+
+
+
+
+# customer_seat.assigned
+Source: https://polar.sh/docs/api-reference/webhooks/customer_seat.assigned
+
+
+
+
+
+# customer_seat.claimed
+Source: https://polar.sh/docs/api-reference/webhooks/customer_seat.claimed
+
+
+
+
+
+# customer_seat.revoked
+Source: https://polar.sh/docs/api-reference/webhooks/customer_seat.revoked
+
+
+
+
+
+# Create Webhook Endpoint
+Source: https://polar.sh/docs/api-reference/webhooks/endpoints/create
+
+post /v1/webhooks/endpoints
+Create a webhook endpoint.
+
+**Scopes**: `webhooks:write`
+
+
+
+# Delete Webhook Endpoint
+Source: https://polar.sh/docs/api-reference/webhooks/endpoints/delete
+
+delete /v1/webhooks/endpoints/{id}
+Delete a webhook endpoint.
+
+**Scopes**: `webhooks:write`
+
+
+
+# Get Webhook Endpoint
+Source: https://polar.sh/docs/api-reference/webhooks/endpoints/get
+
+get /v1/webhooks/endpoints/{id}
+Get a webhook endpoint by ID.
+
+**Scopes**: `webhooks:read` `webhooks:write`
+
+
+
+# List Webhook Endpoints
+Source: https://polar.sh/docs/api-reference/webhooks/endpoints/list
+
+get /v1/webhooks/endpoints
+List webhook endpoints.
+
+**Scopes**: `webhooks:read` `webhooks:write`
+
+
+
+# Update Webhook Endpoint
+Source: https://polar.sh/docs/api-reference/webhooks/endpoints/update
+
+patch /v1/webhooks/endpoints/{id}
+Update a webhook endpoint.
+
+**Scopes**: `webhooks:write`
+
+
+
+# order.created
+Source: https://polar.sh/docs/api-reference/webhooks/order.created
+
+
+
+
+
+# order.paid
+Source: https://polar.sh/docs/api-reference/webhooks/order.paid
+
+
+
+
+
+# order.refunded
+Source: https://polar.sh/docs/api-reference/webhooks/order.refunded
+
+
+
+
+
+# order.updated
+Source: https://polar.sh/docs/api-reference/webhooks/order.updated
+
+
+
+
+
+# organization.updated
+Source: https://polar.sh/docs/api-reference/webhooks/organization.updated
+
+
+
+
+
+# product.created
+Source: https://polar.sh/docs/api-reference/webhooks/product.created
+
+
+
+
+
+# product.updated
+Source: https://polar.sh/docs/api-reference/webhooks/product.updated
+
+
+
+
+
+# refund.created
+Source: https://polar.sh/docs/api-reference/webhooks/refund.created
+
+
+
+
+
+# refund.updated
+Source: https://polar.sh/docs/api-reference/webhooks/refund.updated
+
+
+
+
+
+# subscription.active
+Source: https://polar.sh/docs/api-reference/webhooks/subscription.active
+
+
+
+
+
+# subscription.canceled
+Source: https://polar.sh/docs/api-reference/webhooks/subscription.canceled
+
+
+
+
+
+# subscription.created
+Source: https://polar.sh/docs/api-reference/webhooks/subscription.created
+
+
+
+
+
+# subscription.revoked
+Source: https://polar.sh/docs/api-reference/webhooks/subscription.revoked
+
+
+
+
+
+# subscription.uncanceled
+Source: https://polar.sh/docs/api-reference/webhooks/subscription.uncanceled
+
+
+
+
+
+# subscription.updated
+Source: https://polar.sh/docs/api-reference/webhooks/subscription.updated
+
+
+
+
+
+# API Changelog
+Source: https://polar.sh/docs/changelog/api
+
+Stay up to date with the latest changes, improvements and deprecations to the Polar API.
+
+<Update label="2025-06-18">
+  ## Checkout API and Customer Session API changes
+
+  To be more consistent across our API, we've renamed `customer_external_id` field to `external_customer_id` in the Checkout API and Customer Session API.
+
+  * <Icon icon="circle-exclamation" /> **Deprecated**:
+    `customer_external_id` field in the Checkout API and Customer Session API. Use
+    `external_customer_id` instead.
+
+  ## Benefit metadata in Customer State
+
+  The customer state now includes the [benefit metadata](/api-reference/customers/state#response-benefit-metadata) in the `granted_benefits` list.
+</Update>
+
+<Update label="2025-06-17">
+  ## Webhook API endpoints are now documented
+
+  The API endpoints for managing webhooks are now documented in the API reference, and fully supported in our SDK.
+
+  [Read more](/api-reference/webhooks/endpoints/create)
+</Update>
+
+<Update label="2025-06-05">
+  ## Rate limits
+
+  To ensure fair usage and maintain performance, we've introduced rate limits for the API. The limits are as follows:
+
+  * **100 requests per second** per IP address.
+</Update>
+
+<Update label="2025-06-02">
+  ## Order invoice generation and retrieval
+
+  Until now, the invoice was generated automatically when the order was created, allowing you to call [`GET /v1/orders/{id}/invoice`](/api-reference/orders/get-invoice) and [`GET /v1/customer-portal/orders/{id}/invoice`](/api-reference/customer-portal/orders/get-invoice) endpoints without any prior action.
+
+  We now require you to explicitly generate the invoice by calling the [`POST /v1/orders/{id}/invoice`](/api-reference/orders/post-invoice) or [`POST /v1/customer-portal/orders/{id}/invoice`](/api-reference/customer-portal/orders/post-invoice) endpoints.
+
+  This change allows us to better handle the invoice generation process, and to allow the customer to change the billing details (name and address) before generating the invoice. This can be done through the [`PATCH /v1/orders/{id}`](/api-reference/orders/patch) or [`PATCH /v1/customer-portal/orders/{id}`](/api-reference/customer-portal/orders/patch) endpoints.
+</Update>
+
+<Update label="2025-04-16">
+  ## Benefit metadata support and floating point numbers in metadata
+
+  * <Icon icon="check" /> **Added**: Benefits now support
+    [metadata](/api-reference/benefits/create#body-metadata).
+  * <Icon icon="check" /> **Added**: Metadata values now
+    support floating-point numbers. Before, only strings, integers and booleans
+    were supported.
+</Update>
+
+<Update label="2025-03-25">
+  ## Checkout amount fields changes and depreciations
+
+  To be more consistent with the [Order schema changes](#2025-03-14), we've made some changes to the field related to amounts in the Checkout schema.
+
+  * <Icon icon="check" /> **Added**:
+    [`checkout.discount_amount`](/api-reference/checkouts/get-session#response-discount-amount).
+  * <Icon icon="check" /> **Added**:
+    [`checkout.net_amount`](/api-reference/checkouts/get-session#response-net-amount).
+  * <Icon icon="circle-exclamation" /> **Deprecated**:
+    `checkout.subtotal_amount`, use
+    [`checkout.net_amount`](/api-reference/checkouts/get-session#response-net-amount)
+    instead.
+</Update>
+
+<Update label="2025-03-20">
+  ## New order status and webhooks
+
+  Until now, Polar only kept track of fully processed, **paid** orders. To help you keep track of the order lifecycle, we've added a new status `pending`, which is a transitive state meaning the order is created but not paid yet. In most cases, the order will transition from `pending` to `paid` in a short time.
+
+  * <Icon icon="circle-exclamation" /> When receiving
+    `order.created` event, the order status might not be `paid`.
+  * <Icon icon="check" /> **Added**:
+    [`order.updated`](/api-reference/webhooks/order.updated) webhook, sent when
+    the order status changes or when it's partially or fully refunded.
+  * <Icon icon="check" /> **Added**:
+    [`order.paid`](/api-reference/webhooks/order.paid) webhook, sent when the
+    order is fully processed and paid.
+  * <Icon icon="check" /> **Added**:
+    [`Order.paid`](/api-reference/orders/get#response-paid) property to the order
+    schema.
+
+  <Info>
+    If you were relying on the `order.created` webhook to keep track of succesful
+    orders, we recommend you to switch to `order.paid`.
+  </Info>
+</Update>
+
+<Update label="2025-03-14">
+  ## Subscriptions and Orders schema changes
+
+  To prepare our next move to support usage-based billing, we've made some changes to the [`Subscription`](/api-reference/subscriptions/get) and [`Order`](/api-reference/orders/get) schemas. The main reason behind those is that we need to support multiple prices and items in a single subscription or order.
+
+  * <Icon icon="circle-exclamation" /> **Deprecated**:
+    `Subscription.price_id` and `Subscription.price`. Use the
+    `Subscription.prices` array instead.
+  * <Icon icon="circle-exclamation" /> **Deprecated**:
+    `Order.product_price_id` and `Order.product_price`. Use the `Order.items`
+    array instead.
+  * <Icon icon="circle-exclamation" /> **Deprecated**:
+    `Order.amount`. Use the `Order.net_amount` instead. It has the same value and
+    meaning, but the new name is more explicit.
+  * <Icon icon="check" /> **Added**:
+    `Order.subtotal_amount`, `Order.discount_amount`, and `Order.total_amount`
+    fields to provide a more detailed breakdown of the order amount.
+</Update>
+
+
+# Product Updates
+Source: https://polar.sh/docs/changelog/recent
+
+Stay up to date with the latest changes and improvements to Polar.
+
+<Update label="2026-01-31">
+  ## Team Member Management (B2B)
+
+  Complete team member management system for B2B customers:
+
+  * Owner and billing managers can add/remove team members
+  * Role-based access control (owner, billing\_manager, member)
+  * Member-specific benefit grants and portal access
+  * Team portal page with member list and management
+  * Member sessions (`polar_mst_`) preserve identity and permissions
+  * Members tab on customer detail pages
+
+  Perfect for B2B customers managing team access and permissions.
+
+  ### Explicit Currency Display
+
+  Currency symbols now show explicitly (e.g., `USD 123.45`) instead of just `$123.45` to prevent confusion for non-US dollar users.
+
+  ## Event & Metering Enhancements
+
+  ### Member-Level Event Attribution
+
+  Events now support member tracking:
+
+  * `member_id` and `external_member_id` fields
+  * Member validation during event ingestion
+  * B2B usage tracking at member level
+
+  ### Timezone Handling
+
+  Fixed timezone issues in meter quantities endpoint:
+
+  * Added `timezone` parameter
+  * Set database session timezone properly
+  * Correct date grouping for non-UTC users
+
+  ## Customer Portal Enhancements
+
+  ### Benefit Grants UI
+
+  * Complex benefit grants list with search and pagination
+  * Better display for benefit details
+  * Improved OAuth benefit grant buttons
+
+  ### Payment Retry Fixes
+
+  * 3DS modal display (popup instead of redirect)
+  * Retry persistence after 3DS cancellation
+  * Proper dunning management on manual retries
+
+  ## Discount Management
+
+  ### Redemption Count Optimization
+
+  * Added `redemptions_count` column to discounts table
+</Update>
+
+<Update label="2025-12-31">
+  ## System Events for Subscriptions
+
+  Expanded system events to provide detailed subscription lifecycle tracking:
+
+  * **Subscription cycled** - when billing periods roll over
+  * **Subscription canceled** - when subscriptions are canceled
+  * **Subscription past due** - when payment fails (separate from permanent revocation)
+  * All events include product IDs and relevant metadata
+  * Perfect for analytics and building custom workflows
+
+  ## iOS Widget
+
+  New iOS home screen and lock screen widget:
+
+  * Real-time revenue display
+  * Support for dark and light mode
+  * Multiple widget sizes
+  * Quick glance at your sales without opening the app
+
+  Built with `@bacons/apple-targets` for native iOS integration.
+
+  ## Product Management Improvements
+
+  Major UX improvements for managing products:
+
+  ### Sorting & Filtering
+
+  * Sort products by name, creation date, update date, and end date
+  * Custom pagination size (20, 50, 100 items per page)
+  * Product rows are clickable links for cmd+click support
+
+  ### Editing Experience
+
+  * Unsaved changes alert prevents accidental data loss
+  * Update button at top right for easier access
+  * Auto-save for most settings
+  * Fixed empty state flashing when sorting/filtering
+
+  ### File Management
+
+  * Client-side pagination for downloadable benefit files (10 per page)
+  * Better file upload error messages
+  * Fixed React state issues in benefit forms
+
+  ### Product Duplication
+
+  * Re-uploads images when duplicating to prevent shared references
+  * Deleting an image from a duplicate no longer affects the original
+
+  ## Search Improvements
+
+  Significant search infrastructure updates:
+
+  * Search vectors for full-text search
+  * Union queries for better performance
+  * PostgreSQL text search capabilities
+
+  ## Member Management
+
+  Enhanced member endpoint functionality:
+
+  * Added `member_id` to relevant API endpoints
+  * Improved B2B customer management
+
+  ## Mobile App Improvements
+
+  ### iOS Updates
+
+  * iOS widget for home and lock screen
+  * App rating prompts at appropriate times
+  * Login screen animations (fade in, Ken Burns effect)
+  * Fixed multi-account crash on settings
+  * Fixed scroll issues with many organizations
+  * Version bumped to 1.1.0
+
+  ### Android Support
+
+  * Full Android build support
+  * App store ready for both platforms
+  * Consistent design system across iOS and Android
+
+  ## Customer Meter Enhancements
+
+  Significant improvements to customer meter calculation:
+
+  * Speed improvements with optimized queries (avoided cartesian joins)
+  * Better activation logic for meters with events
+  * Fixed organization ID tracking
+  * Increased lock time to 30s for slow queries
+  * Debug information in window event spans
+  * Proper external customer ID handling
+
+  ## Webhook Management
+
+  Better webhook health tracking:
+
+  * Discord rate limit logging
+  * Missing event types added to schema
+  * Improved error handling
+  * Repository-based webhook service
+
+  ## Checkout Links
+
+  * Added checkout links to mobile app
+  * Better link management
+  * Share and track checkout performance on mobile
+
+  ## OAuth2 Improvements
+
+  * First-party clients auto-save grants
+  * No authorization prompt for trusted apps
+  * Better user experience for internal tools
+
+  ## Bug Fixes
+
+  * Fixed undefined organization in dashboard sidebar
+  * Fixed customer meter updates for soft-deleted customers
+  * Fixed seat and trial end updates for seat-based products
+  * Fixed tax calculation error handling
+  * Fixed product empty state flashing
+  * Fixed notifications on iOS simulator
+  * Fixed Switch rendering on Android
+  * Fixed Polar logo not linking to home
+  * Fixed image duplication on product creation
+  * Handle null Stripe refund reasons
+  * Fixed subscription fields in system events
+</Update>
+
+<Update label="2025-12-07">
+  ## Dispute & Chargeback Management
+
+  Complete dispute tracking and prevention system:
+
+  * Dispute model to track chargebacks from Stripe
+  * Chargeback Stop integration for rapid dispute resolution (RDR)
+  * Auto-refund on RDR disputes to prevent chargebacks
+  * Link refunds to disputes for better tracking
+  * Improved dispute event handling from Stripe webhooks
+
+  Helps reduce chargeback fees and protect your account standing.
+
+  ## Metrics API
+
+  New metrics filtering system:
+
+  * `metrics` query parameter to filter specific metrics
+  * Removed deprecated `focus_metrics` parameter
+  * Better performance by only calculating requested metrics
+
+  ## iOS App Updates
+
+  * App rating prompts at appropriate times
+  * iOS upsell banner on homepage
+  * Animations on login screen (fade in, Ken Burns effect, staggered elements)
+  * Fixed multi-account crash on settings screen
+  * Fixed onboarding redirect after org creation
+  * Fixed scroll issue with many orgs
+  * Version bumped to 1.1.0
+
+  ## Mobile App (Android)
+
+  Added Android support:
+
+  * Android targets in build scripts
+  * App store ready for both iOS and Android
+
+  ## Email Improvements
+
+  * Updated Polar logo in all emails
+  * Better email DNS validation
+  * Fixed invalid email domain issues
+
+  ## Worker Queue Management
+
+  Better task prioritization:
+
+  * Low, medium, and high priority queues
+  * Separate workers for different priorities
+  * Schedule tasks moved to high priority worker
+</Update>
+
+<Update label="2025-11-28">
+  ## Downloads Page
+
+  New dedicated downloads page at polar.sh/downloads for easy access to desktop and mobile apps.
+
+  ## Customer Balance Refunds
+
+  * Handle refunds on orders with customer balance applied
+  * Proper balance credit restoration
+  * Block refunds on specific orders via API flag
+
+  ## Worker Priority Queues
+
+  Introduced task prioritization system:
+
+  * Low priority queue for background tasks
+  * Medium priority queue for standard tasks
+  * High priority queue for time-sensitive operations
+  * Separate workers consuming from each queue
+
+  Ensures critical tasks get processed first.
+
+  ## Rate Limiting
+
+  * New restricted rate limit group for abusive patterns
+  * Better rate limit handling across endpoints
+
+  ## Email Validation
+
+  Added DNS validation for email addresses across checkout, customer creation, and user management to prevent typos and invalid domains.
+
+  ## Event Query Optimization
+
+  Massive performance improvements:
+
+  * Removed unnecessary ordering from event queries (3x faster)
+  * Better customer latest event queries
+  * New indexes on events table
+  * Optimized IN queries for customer meters
+
+  ## Mobile App Improvements
+
+  * Account deletion functionality
+  * Proper logout and login flow fixes
+  * Better error handling
+  * Login screen animations with Ken Burns effect
+
+  ## Bug Fixes
+
+  * Fixed settings scroll with many organizations
+  * Fixed app onboarding redirect
+  * Fixed organization service name in Logfire
+  * Fixed customer meter organization ID tracking
+  * Fixed bitwise SQL operator parentheses
+</Update>
+
+<Update label="2025-11-21">
+  ## Customer Balance
+
+  Customer balance system built on top of wallet infrastructure:
+
+  * Track customer credit balances
+  * Apply balances automatically to invoices
+  * API support for balance management
+  * Foundation for store credit and refund credits
+
+  ## Members API
+
+  New members management system for B2B customers:
+
+  * GET `/v1/members` endpoint with pagination
+  * Filter members by customer ID
+  * Auto-create owner member when customer is created
+  * Override owner member details via API
+  * Members included in customer endpoints
+  * Proper organization scoping and access control
+
+  Perfect for managing team members across B2B customer accounts.
+
+  ## Sign in with Apple
+
+  Added Apple OAuth for authentication:
+
+  * Apple OAuth integration
+
+  ## Ad-hoc Checkout Pricing
+
+  Create checkouts with dynamic pricing that override catalog prices:
+
+  * Useful for custom deals, usage-based pricing, or testing
+  * Supports all price types (fixed, free, custom)
+  * Full API and SDK support
+
+  [Read more](/docs/features/checkout/session#ad-hoc-prices)
+
+  ## Churn Rate
+
+  New churn rate metric on analytics dashboard:
+
+  * Track subscription cancellations over time
+  * Understand retention patterns
+  * Available on homepage and customers page
+
+  ## Event Labels
+
+  Events now have customizable labels:
+
+  * System events get readable labels automatically
+  * User events can have custom labels
+  * Labels shown throughout events UI
+  * Edit labels via event type settings
+
+  Makes events more readable and meaningful for your team.
+
+  ## Spans View
+
+  New spans interface for hierarchical event tracking (hidden for now):
+
+  * List and detail views for event spans
+  * Charts and sparklines for visualization
+  * Time-series data with proper timezone handling
+  * Cost aggregation across event hierarchies
+
+  ## Metrics Performance
+
+  Significant performance improvements for analytics:
+
+  * Optimized metrics queries with window functions
+  * Better date range bounds handling
+  * Indexes on subscription date columns
+  * Cumulative revenue includes full history
+  * Fixed timezone and interval issues
+
+  ## Invoice Numbering
+
+  Changed default invoice numbering to per-customer (was organization-wide):
+
+  * Each customer starts invoice numbering at 1
+  * Hides sales volume from individual customers
+  * Can still switch to organization-wide in settings
+
+  ## Tax & Billing
+
+  * Show taxable amount after discount in checkout
+  * Fixed tax ID formatting (was showing raw strings)
+  * Fixed Stripe coupon name length validation
+  * Fixed conflicting invoice numbering issues
+
+  ## Checkout Improvements
+
+  * Persist business name across checkouts
+  * Hide cookie consent banner when logging in via app
+  * Fixed expired checkout intent handling
+
+  ## Bug Fixes
+
+  * Fixed 404 after deleting customers, benefits, or checkout links
+  * Fixed product price configurator validation
+  * Fixed custom field number constraint validation
+  * Fixed benefit capitalization in customer portal
+  * Fixed organization cache after profile picture update
+  * Fixed social link parsing
+
+  ## Mobile App
+
+  * Continue with Apple support
+  * Disabled tablet support (phone-only for now)
+  * Fixed EAS build configuration
+  * Removed demo mode
+  * Better workspace integration
+</Update>
+
+<Update label="2025-11-14">
+  ## Trial Abuse Prevention
+
+  Prevent customers from redeeming multiple trials with email aliases or different payment methods:
+
+  * Email normalization strips `+aliases` to detect duplicates
+  * Payment method fingerprinting tracks card usage
+  * Enable via Settings → Subscription → "Prevent trial abuse"
+  * Blocked customers see error and can still subscribe without trial
+  * Checkout parameter `allow_trial` to force disable trials
+
+  Perfect for controlling trial costs while still allowing new customers to subscribe.
+
+  ## Event Types & Aggregation
+
+  New event types system for better organization and analytics:
+
+  * Event types automatically created for events with the same name
+  * Custom display names for better readability
+  * Statistics endpoint for event aggregation
+  * Event closure tables for efficient hierarchy queries
+
+  ## Mobile App (Beta)
+
+  Polar mobile app added to the monorepo:
+
+  * React Native implementation with Expo
+  * Expo workflow for development and builds
+  * Shared workspace with web dashboard
+  * Foundation for mobile-first experiences
+
+  ## Webhook Events
+
+  Skipped events now properly tracked:
+
+  * Events skipped when endpoint disabled no longer count as failures
+  * Prevents false positives in health checks
+  * Better webhook reliability metrics
+
+  ## File Uploads
+
+  Large file upload support:
+
+  * Handles files larger than memory limits
+  * Multipart upload handling
+  * SHA256 validation per part
+  * Better progress tracking
+
+  ## Subscription Management
+
+  ### Billing Period Control
+
+  New API to change current billing period end date:
+
+  * Useful for custom billing arrangements
+  * Prorations calculated automatically
+  * Prevented on already-cancelled subscriptions
+
+  ### Payout Improvements
+
+  * Increased minimum payout amounts for certain currencies
+  * Better error logging for Stripe payout failures
+
+  ## UI & UX
+
+  ### Analytics Improvements
+
+  * Fixed timezone issues with date range selection
+  * Better interval formatting in legends
+  * Improved preset intervals ("this year", "last year")
+  * Consistent date handling across dashboard
+
+  ### Customer Portal
+
+  * Fixed overflowing invoice action buttons
+  * Improved mobile experience
+
+  ### Settings
+
+  * Auto-prefix social media URLs
+  * Removed seat-based billing toggle (now standard)
+
+  ## Bug Fixes
+
+  * Fixed `allow_trial` parameter handling
+  * Fixed dark mode colors across dashboard
+  * Fixed tax rate limiting in sandbox environment
+  * Fixed Stripe trial redemption error handling
+  * Fixed member invitation dialog Enter key submission
+  * Fixed large file upload memory issues
+  * Fixed metrics organization filtering
+</Update>
+
+<Update label="2025-11-07">
+  ## Hierarchical Events & Spans
+
+  Events can now be organized hierarchically with parent-child relationships, perfect for tracking complex workflows:
+
+  * Create event spans with `parent_id` reference
+  * Use `external_id` as idempotency key to prevent duplicate events
+  * View nested events in the dashboard
+  * Navigate event hierarchies with dedicated event detail pages
+  * Query transitive closure for efficient sub-hierarchy analysis
+
+  This enables use cases like tracking LLM requests with multiple steps, or multi-phase order fulfillment workflows.
+
+  ## Master-Detail Layout
+
+  New master-detail layout pattern across the dashboard:
+
+  * List view on the left, detail view on the right
+  * Proper nested routing for direct linking
+  * Better navigation and state management
+  * Improved querystring handling
+
+  Applied to customers, subscriptions, events, and more.
+
+  ## Improved Date Range Picker
+
+  Better date range selection throughout analytics:
+
+  * Fixed "this year" and "last year" presets
+  * Smart interval selection based on date range
+  * Consistent behavior across all views
+  * Better timezone handling
+
+  ## Settings Auto-Save
+
+  Settings now auto-save as you type instead of requiring manual save button clicks. Includes proper debouncing and error handling for a smoother experience.
+
+  ## Customer Management Enhancements
+
+  ### Product Subscription View
+
+  Product overview now shows active subscriptions table, making it easier to see who's using each product.
+
+  ### Customer Filtering
+
+  Filter subscriptions by cancellation status - find subscriptions that will cancel at period end.
+
+  ### Benefit Grants
+
+  Added direct links to customers and subscriptions from benefit grants overview for easier navigation.
+
+  ## Account Management
+
+  * Email notifications when unlinking accounts from organizations
+  * Fixed OAuth account disconnection for users with multiple accounts on the same platform
+
+  ## Bug Fixes
+
+  * Fixed customer update trying to set email to None when explicitly provided
+  * Fixed payment method handling when soft-deleted methods are updated from Stripe
+  * Added maximum length validation to customer names
+  * Fixed customer portal theming
+  * Fixed subscription double cycling with proper locking mechanisms
+  * Fixed Mintlify docs CSP configuration
+</Update>
+
+<Update label="2025-10-31">
+  ## Cost Insights
+
+  We've launched Cost Insights - a powerful way to track and analyze costs associated with usage. Now you can:
+
+  * Track costs per event with sub-cent precision
+  * View cost analytics across your dashboard
+  * See cost breakdowns by customer and product
+  * Monitor cost trends with dedicated charts
+
+  Perfect for understanding unit economics and profitability of your usage-based offerings.
+
+  [Read more](/features/usage-billing/cost-insights)
+
+  ## Webhook Management
+
+  ### Auto-Disable Failing Webhooks
+
+  Webhooks that continuously fail (10+ consecutive failures by default) are now automatically disabled to save resources. You can manually re-enable them from the dashboard once the issue is fixed.
+
+  ### Email Notifications for Webhook Failures
+
+  When webhooks are automatically disabled due to continuous failures, all organization members receive an email notification with details and steps to re-enable.
+
+  ## Benefit Revocation Grace Period
+
+  Configure a grace period for benefit revocation when subscription payments fail. Instead of immediately revoking benefits, you can now give customers time to resolve payment issues:
+
+  * Immediate revocation (default)
+  * Grace period matching payment retry window
+
+  This applies to both regular benefits and customer seat benefits.
+
+  ## Customer Portal Enhancements
+
+  ### Upcoming Charge Display
+
+  Subscription detail pages now show the upcoming charge amount and date, including:
+
+  * Trial end dates with first charge amount
+  * Next billing cycle charges for active subscriptions
+  * Automatic updates when subscriptions change
+
+  ### Usage & Metering View
+
+  Improved the customer usage view:
+
+  * Respect archived meters - they no longer appear in usage tracking
+  * Better empty states for customers with granted credits
+  * Create customer meters automatically when meter credits are granted
+
+  ### Navigation & UX Improvements
+
+  * Fixed navigation highlighting on mobile
+  * Better handling of expired login codes
+  * Removed unnecessary scrolling
+  * Can't switch plans during trial period (not supported yet)
+
+  ## Seat Management Updates
+
+  * API support for assigning seats programmatically
+  * \$0/seat pricing now allowed for seat-based tiers
+  * Fixed eager loading issues with customer seats
+  * Better webhooks for customer seat events
+
+  ## Invoice Numbering
+
+  Two invoice numbering modes:
+
+  * **Organization-wide** (default) - Sequential across all customers
+  * **Per-customer** - Each customer has independent invoice numbering starting at 1
+
+  Useful when you want to hide sales volume from customers.
+
+  ## System Events
+
+  New system events automatically created for:
+
+  * Orders paid
+  * Orders refunded
+  * Customer creation
+  * Customer updates
+
+  These events are available in the events explorer with cost tracking where applicable.
+
+  ## Discount Management
+
+  Improved discount code selection with a searchable combobox instead of a dropdown, making it easier to find specific codes.
+
+  ## Bug Fixes
+
+  * Fixed customer meter matching to include external customer IDs
+  * Fixed Indian GST tax validation
+  * Fixed subscription dunning process when payment is deleted
+  * Fixed order confirmation emails for orders without products
+</Update>
+
+<Update label="2025-10-24">
+  ## Seat-Based Pricing for One-Time Products
+
+  You can now offer seat-based pricing for one-time purchases, not just subscriptions. Customers can select the number of seats during checkout, and you can manage seats for one-time orders through both the dashboard and API.
+
+  This extends our seat management capabilities to all product types, giving you more flexibility in how you price and package your offerings.
+
+  ## Ability to Change Subscription Seats
+
+  Customers can now change the number of seats on their active subscriptions directly from the Customer Portal. The changes are prorated automatically, making it easy for teams to scale up or down as needed.
+
+  ## Flexible Subscription Intervals
+
+  We've added support for flexible subscription intervals beyond monthly and yearly. You can now create subscriptions with custom billing periods:
+
+  * Daily subscriptions
+  * Weekly subscriptions
+  * Custom intervals (e.g., every 2 weeks, every 3 months)
+
+  Configure the interval count when creating or updating subscription products through both the dashboard and API.
+
+  ## Subscription Creation API
+
+  We've launched a new API endpoint to create subscriptions programmatically. This enables you to set up subscriptions directly without requiring customers to go through the checkout flow.
+
+  [Read more](/api-reference/subscriptions/create)
+
+  ## Enhanced Email Confirmations
+
+  Order confirmation emails now include:
+
+  * **Invoice PDFs attached** - Invoices are automatically generated and attached to confirmation emails for one-time purchases
+  * **Order details** - Complete breakdown of what was purchased
+  * **Benefits list** - Clear view of all benefits the customer will receive
+
+  ## Customer Portal Improvements
+
+  ### Seat Management
+
+  Customers with seat-based subscriptions can now:
+
+  * View all active seats
+  * Add or remove seats (with automatic proration)
+  * Manage team members directly from the portal
+
+  ### URL Encoding Fix
+
+  Fixed an issue where email addresses with special characters (like `+` signs in email aliases) weren't properly encoded in customer portal links, causing the wrong email to be pre-filled.
+
+  ## Events & Metering
+
+  ### Cost Tracking
+
+  Events can now include cost metadata, enabling you to track costs associated with usage. Costs are displayed throughout the events explorer and analytics.
+
+  ### Event Explorer Enhancements
+
+  * Metadata filtering - Search and filter events by metadata fields
+  * Customer filtering - Filter events by specific customers
+  * Query search - Full-text search across event data
+  * Improved event cards with better timestamps and cost visualization
+
+  ## Order Export
+
+  You can now export orders to CSV directly from the dashboard. Filter by product and the export will respect your current filters, making it easy to analyze sales data.
+
+  ## OAuth2 Flow Improvements
+
+  * If no scope is passed in the authorize request, the client's default scope is now used automatically
+  * Improved organization selector UI in the OAuth2 authorization flow
+
+  ## Checkout Improvements
+
+  * Fixed seat selector visibility on mobile devices
+  * Server-side prefilling of checkout link query parameters
+  * Improved discount code validation flow
+
+  ## Statement Descriptor Enhancement
+
+  First payments after a trial period now include "TRIAL OVER" in the statement descriptor, making it clearer to customers why they're being charged.
+
+  ## Bug Fixes
+
+  * Fixed customer state API for trialing subscriptions
+  * Fixed broken customer links in events explorer
+  * Fixed discount duration calculation for very long durations (capped at 999 months)
+</Update>
+
+<Update label="2025-10-17">
+  ## Ability to update subscription to an updated price of the product
+
+  Merchants can now [update existing subscriptions](https://polar.sh/docs/api-reference/subscriptions/update#subscriptionupdateproduct) from archived pricing schemes to current ones within the same product.
+
+  * Enables migration from grandfathered pricing to current pricing schemes
+  * Prorations calculated using active subscription prices
+  * In the dashboard, a small badge **Upgrade pricing** will indicate that you can update to the same product, but with the new pricing scheme.
+
+  <img />
+
+  ## New IP ranges
+
+  From **October 27th, 2025**, [new IP ranges](https://polar.sh/docs/integrate/webhooks/delivery#ip-allowlist) will be added.
+
+  ## Improved Subscription Cancellation Flow
+
+  [Benefits](https://polar.sh/docs/features/benefits/introduction) attached to the subscription [are now automatically revoked](https://github.com/polarsource/polar/pull/7271) when the subscription is canceled.
+
+  ## Ability to specify External ID
+
+  [External ID can now be specified](https://github.com/polarsource/polar/pull/7275) during creation of a customer via the dashboard.
+
+  <img />
+
+  ## Ability to set Return URL for Checkouts and Customer Portal
+
+  A Return URL can now be set while generating a [checkout session](https://polar.sh/docs/api-reference/checkouts/create-session#body-return-url-one-of-0) or a [customer portal session](https://polar.sh/docs/api-reference/customer-portal/sessions/create#body-one-of-0-return-url-one-of-0). This allows you to preserve the context for the end users who visit either if they wish to go back to the application.
+
+  ## Ability to search Customers via their External ID
+
+  The [List Customers API](https://polar.sh/docs/api-reference/customers/list) now accepts Customer's External ID [in the **query** parameter](https://polar.sh/docs/api-reference/customers/list#parameter-one-of-0).
+
+  ## Ability to disable automatic customer emails
+
+  Via the organization settings, you can now disable the emails we automatically send to customers on certain events. This gives you the ability to own the communications with the customers.
+
+  <img />
+</Update>
+
+<Update label="2025-10-10">
+  ## Launched In-Product Chat Support for Merchants
+
+  <img />
+
+  We're excited to introduce a chat widget to the Polar dashboard, making it easier than ever for merchants to get help directly within the product.
+
+  ## Improved Checkout Flow for Invalid Discount Code
+
+  Previously, if you entered an invalid discount code during checkout, you couldn't continue even after removing the code. Now, clearing the discount input lets you proceed smoothly with the checkout process.
+
+  ## Improved Customer Portal Rate Limits
+
+  We've made several improvements to the Customer Portal to handle authentication rate limits more gracefully:
+
+  * The portal now clearly shows 401 and 429 errors on the OTP (one-time password) page.
+  * If you hit a 429 (too many requests), you'll be redirected to a clear `/too-many-requests` page.
+</Update>
+
+<Update label="2025-10-01">
+  ## Launched Subscription Trials
+
+  You can now offer [trial periods](/docs/features/trials) for new subscriptions! This highly requested feature allows you to let customers experience your product before their first payment is due. Trials can be configured in both the dashboard and API when creating or updating subscription products.
+
+  ## Always display taxes line item in the checkout
+
+  We've improved our checkout experience to always display taxes (vs lazy loading them on country selection), making charges more transparent for your customers regardless of whether taxes apply to their purchase.
+
+  ## Do not calculate taxes on free or zero-amount orders
+
+  Orders with a zero amount (such as promotional products) will no longer have taxes calculated, resulting in a clearer and more accurate order summary for your customers.
+
+  ## Add confirmation modal for deleting discounts
+
+  When deleting a discount, you'll now see a confirmation modal to help prevent accidental deletions and provide extra clarity on the impact of your actions.
+
+  ## Fix infinite rendering loop with date picker
+
+  Resolved a bug where selecting dates in the date picker could cause an infinite rendering loop, improving reliability for date-related forms.
+
+  ## Require opt-in if you will be charged immediately
+
+  Users must now explicitly confirm immediate charges or credits when switching subscription intervals, with the UI providing clearer, contextual explanations of invoicing outcomes.
+
+  ## Check for `expires_at` when activating license keys
+
+  License key activation now correctly checks the `expires_at` date, ensuring that only valid, non-expired license keys can be activated.
+
+  ## Fix customer state for trialing subscriptions
+
+  The [Customer State API](/docs/api-reference/customers/state) now properly handles customers with `trialing` subscriptions, so your integrations and dashboards always show an accurate subscription status.
+</Update>
+
+<Update label="2025-09-22">
+  ## Improved preview of next invoice in Customer Portal
+
+  We've enhanced the Customer Portal to provide a clearer and more accurate preview of your next invoice. The overview now updates automatically after subscription changes, and you can preview upcoming charges with all relevant taxes and discounts included.
+
+  ## Cancellation metrics
+
+  <img />
+
+  We've added detailed cancellation metrics, giving you clearer insights into subscription cancellations and their impact on your business performance.
+</Update>
+
+<Update label="2025-09-12">
+  ## Webhooks payload now includes timestamp
+
+  We've updated our webhooks server implementation to [include a timestamp in each payload](https://github.com/polarsource/polar/pull/6770), in line with the Standard Webhooks specification.
+
+  This change ensures that every webhook payload contains precise event timing, making it easier to trace and debug webhook deliveries, and to meet integration requirements for external platforms.
+</Update>
+
+<Update label="2025-09-05">
+  ## Meter management improvements
+
+  We've made it easier to manage your meters with new UI functionality for archiving and unarchiving meters directly from the dashboard.
+
+  You can now archive meters that are no longer needed, which helps keep your meter list organized. Archived meters can be unarchived if you need to use them again. Note that meters cannot be archived if they are still attached to active products or referenced by active benefits.
+
+  ## Metrics accuracy improvements
+
+  We've improved the accuracy of our metrics by excluding unpaid orders from all calculations. Previously, orders in pending status were included in metrics, which could lead to inflated numbers.
+
+  Now, only successfully paid and refunded orders are included in metrics calculations, giving you a more accurate view of your actual business performance.
+
+  ## Enhanced customer email branding
+
+  We've improved the branding of emails sent to your customers by using organization-specific 'From' and 'Reply-to' addresses.
+
+  Customer emails now appear to come from your organization (e.g., "YourOrg (via Polar)") with replies directed to your organization's email address, providing a more professional and branded experience for your customers.
+</Update>
+
+<Update label="2025-06-12">
+  ## Update subscription discount
+
+  We've added the ability to update the discount on a subscription. This allows you to add, remove, or change the discount applied to a subscription at any time.
+
+  This feature is both available through the [API](/api-reference/subscriptions/update) and the dashboard.
+</Update>
+
+<Update label="2025-06-05">
+  ## Payout Reverse Invoices
+
+  We've added the ability to generate reverse invoices for payouts directly from the Payouts page. This feature allows you to easily create an invoice that details the sales made on your behalf, minus our fees.
+
+  [Read more](/features/finance/payouts#reverse-invoices)
+</Update>
+
+<Update label="2025-05-22">
+  ## Business Purchase Option on Checkout
+
+  We've added a new "I'm purchasing as a business" checkbox to the Checkout flow. When selected, customers are required to provide their business billing name and complete billing address.
+</Update>
+
+<Update label="2025-05-19">
+  ## Enhanced Attribution for Checkout Links
+
+  We've added support for `reference_id` and UTM parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`) as query parameters for Checkout Links. These parameters are automatically stored in the Checkout metadata, allowing you to track the source of your traffic and conversions more effectively.
+
+  [Read more](/features/checkout/links#store-attribution-and-reference-metadata)
+</Update>
+
+<Update label="2025-05-15">
+  ## Checkouts and payments insights
+
+  We've added a new **Checkouts** tab under the **Sales**, where you can review all the checkout sessions, successful or not. You can filter them by customer email, status, and product. You can also see the payment attempts for each checkout session, including the reason for any failed or declined payments.
+
+  <img />
+
+  <img />
+
+  The payment attempts information is also available on each order.
+
+  Besides, we've also added new analytics around checkouts: total number of checkouts, successful checkouts, and conversion rate.
+</Update>
+
+<Update label="2025-03-11">
+  ## Zapier integration officially launched
+
+  We're excited to announce the official launch of our [Zapier integration](https://zapier.com/apps/polar/integrations)! Get started now and connect Polar to 2,000+ other web services.
+
+  <Note>
+    We've focused on **triggers** (webhooks) for now, so you can react to events in Polar and trigger actions in other apps.
+
+    Need to perform actions in Polar? Tell us about your use case [here](https://github.com/orgs/polarsource/discussions/new?category=integrations\&labels=integrations%2Fzapier) and we'll consider adding more actions in the future.
+  </Note>
+</Update>
+
+<Update label="2025-03-05">
+  ## Customer State
+
+  Maybe one of our neatest features to date! Customer State is a concept allowing you to query for the current state of a customer, including their **active subscriptions** and **granted [benefits](/features/benefits/introduction)**, in a single [API call](/api-reference/customers/state-external) or single [webhook event](/api-reference/webhooks/customer.state_changed).
+
+  Combined with the [External ID](/features/customer-management#external-id) feature, you can get up-and-running in minutes.
+
+  [Read more](/integrate/customer-state)
+</Update>
+
+<Update label="2025-03-04">
+  ## Better Auth Plugin
+
+  Integrating authentication and billing for your users has never been easier.
+
+  <img />
+
+  [Better Auth](https://www.better-auth.com/) is an open source authentication framework for
+  TypeScript that is quickly becoming a favorite amongst developers. Today, we're
+  thrilled to have shipped a Polar plugin for Better Auth - in collaboration with them.
+
+  Checkout our [integration guide](/integrate/sdk/adapters/better-auth).
+</Update>
+
+<Update label="2025-02-27">
+  ## Customer External ID
+
+  We've added support for an `external_id` field on Customers. We believe this will greatly simplify the reconciliation process between your system and Polar.
+
+  Previously, the recommended way to reconcile with your users was to use `metadata`. However, this was not always the most convenient method, especially if you needed to fetch a Customer from our API.
+
+  With `external_id`, you can now fetch a Customer directly by their external ID through dedicated `GET`, `PATCH`, and `DELETE` endpoints. You don't even need to store Polar's internal ID in your system anymore! [Read more](/features/customer-management#external-id)
+
+  Of course, you can also directly preset `external_customer_id` when creating a Checkout Session, and it will automatically be set on the newly created Customer after a successful checkout. [Read more](/features/checkout/session#external-customer-id)
+</Update>
+
+<Update label="2025-02-19">
+  ## Polar's take on Product variants
+
+  We've released big changes to how we handle products and pricing, allowing us to support a unique approach to what the industry typically calls **variants** 🔥
+
+  We believe having a single product with multiple pricing models and benefits adds unneccessary complexity to the user and to the API. Instead, we chose to treat everything as a product, giving you maximum flexibility about the pricing and benefits you want to offer.
+
+  Thus, we introduce support for **multiple products** at checkout, allowing customers to switch between them before purchasing. Typically, you can offer a monthly and a yearly product, with specific pricing and benefits for each.
+
+  <img />
+
+  <img />
+
+  This is available right now using the [Checkout Session API](/features/checkout/session) and [Checkout Links](/features/checkout/links).
+
+  ### Depreciations
+
+  * Products can no longer have both a monthly and yearly pricing. Existing products still work, but you'll see a warning like this when trying to edit their pricing:
+
+  <Frame>
+    <img />
+
+    <img />
+  </Frame>
+
+  ### API changes
+
+  * The `product_id` and `product_price_id` fields are deprecated in the [Checkout Session API](/api-reference/checkouts/create-session). You should now use the `products` field to specify the products you want to include in the checkout.
+  * The `type` and `recurring_interval` fields on `ProductPrice` are deprecated. `recurring_interval` is now set directly on `Product`.
+</Update>
+
+
+# Analytics
+Source: https://polar.sh/docs/features/analytics
+
+
+
+## Sales Metrics
+
+Polar offers a professional metrics dashboard out of the box. So you can stay focused on increasing revenue vs. how to measure it.
+
+<img />
+
+<img />
+
+**Missing any metrics?** [Let us know so we can add it.](https://github.com/orgs/polarsource/discussions/categories/feature-requests)
+
+### Filters
+
+You can easily slice and dice metrics with the filters below.
+
+### Period
+
+Change the time period in the X-axis to one of:
+
+* Yearly
+* Monthly
+* Weekly
+* Daily
+* Hourly
+
+### Timeframe
+
+You can choose a date range to view all metrics for.
+
+### Product
+
+By default metrics reflect the total across all products. However, you can specify individual products or subscription tiers to filter metrics by.
+
+## Metrics
+
+* **Revenue**: How much revenue you've earned before fees.
+* **Orders**: How many product sales and subscription payments have been made.
+* **Average Order Value (AOV)**: The average earning per order, i.e. revenue / orders.
+* **One-Time Products**: Amount of products sold.
+* **One-Time Products Revenue**: Amount of revenue earned from products.
+* **New Subscriptions**: Amount of new subscriptions.
+* **New Subscription Revenue**: Amount of revenue earned from new subscriptions.
+* **Renewed Subscriptions**: Amount of renewed subscriptions.
+* **Renewed Subscription Revenue**: Amount of revenue earned from renewed subscriptions.
+* **Active Subscriptions**: Amount of active subscriptions (new + renewed).
+* **Monthly Recurring Revenue (MRR)**: Amount of revenue earned from active subscriptions.
+* **Checkouts**: Number of created checkouts.
+* **Succeeded Checkouts**: Number of successful checkouts, i.e. checkouts that lead to a new order or subscription.
+* **Checkouts Conversion Rate**: The percentage of successful checkouts out of all created checkouts.
+
+## Cost Metrics
+
+* **Costs**: How much costs you've incurred.
+* **Cumulative Costs**: How much costs you've incurred over time.
+* **Cost Per User**: The average cost per active user.
+* **Gross Margin**: The gross margin, i.e. revenue - costs.
+* **Gross Margin Percentage**: The gross margin percentage, i.e. gross margin / revenue.
+* **Net Cashflow**: The net cashflow, i.e. revenue - costs.
+* **Monthly Recurring Cost (MRC)**: The monthly recurring cost, i.e. costs / active subscriptions.
+* **Return on Investment (ROI)**: The return on investment, i.e. (revenue - costs) / costs.
+
+
+# Credits Benefit
+Source: https://polar.sh/docs/features/benefits/credits
+
+Create your own Credits benefit
+
+The Credits benefit allows you to credit a customer's Usage Meter balance.
+
+<img />
+
+<img />
+
+## Crediting Usage Meter Balance
+
+The Credits benefit will credit a customer's Usage Meter balance at different points in time depending on the type of product purchased.
+
+### Subscription Products
+
+The customer will be credited the amount of units specified in the benefit at the beginning of every subscription cycle period — monthly or yearly.
+
+### One-Time Products
+
+The customer will be credited the amount of units specified in the benefit once at the time of purchase.
+
+## Rollover unused credits
+
+You can choose to rollover unused credits to the next billing cycle. This means that if a customer doesn't use all of their credits in a given billing cycle, the remaining credits will be added to their balance for the next billing cycle. To enable this feature, check the "Rollover unused credits" checkbox when creating or editing the Credits benefit.
+
+<Note>
+  If you change the rollover setting for a benefit, it will only apply to new
+  credits issued after the change. Existing credits will not be affected.
+</Note>
+
+
+# Custom Benefit
+Source: https://polar.sh/docs/features/benefits/custom
+
+Create your own Custom benefit
+
+You can add a simple, custom benefit, which allows you to attach a note to paying customers.
+
+## **Custom Notes**
+
+Secret message only customers can see, e.g [Cal.com](http://Cal.com) link, private email for support etc.
+
+For custom integrations you can also distinguish benefits granted to customers to offer even more bespoke user benefits.
+
+
+# Automate Discord Invites & Roles
+Source: https://polar.sh/docs/features/benefits/discord-access
+
+Sell Discord access & roles with ease
+
+<img />
+
+Automating Discord server invites and roles for customers or subscribers is super easy and powerful with Polar.
+
+* Fully automated Discord server invitations
+* You can even setup multiple Discord servers, or...
+* Offer different roles for different subscription tiers or products
+
+## Create Discord Benefit
+
+<img />
+
+<img />
+
+Click on `Connect your Discord server`. You'll be redirected to Discord where you can grant the Polar App for your desired server.
+
+Next, you'll be prompted to approve the permissions our app requires to function. It needs all of them.
+
+### **Manage Roles**
+
+Access to your Discord roles. You'll be able to select which ones to grant to your customers later.
+
+### **Kick Members**
+
+Ability to kick members who have this benefit and connected Discord with Polar.
+
+### **Create Invite**
+
+Ability to invite members who purchase a product or subscribes to a tier with this benefit.
+
+You're now redirected back to Polar and can finish setting up the Discord benefit on our end.
+
+### **Connected Discord server**
+
+The Discord server you connected cannot be changed. However, you can create multiple benefits and connect more Discord servers if you want.
+
+### **Granted role**
+
+Which Discord role do you want to grant as part of this benefit?
+
+## Adding Benefit to Product
+
+Head over to the product you want to associate this new Discord benefit with. You should be able to toggle the benefit in the bottom of the Edit Product form.
+
+
+# Automate Customer File Downloads
+Source: https://polar.sh/docs/features/benefits/file-downloads
+
+Offer digital file downloads with ease
+
+<img />
+
+## Sell Digital Products
+
+You can easily offer customers and subscribers access to downloadable files with Polar.
+
+* Up to 10GB per file
+* Upload any type of file - from ebooks to full-fledged applications
+* SHA-256 checksum validation throughout for you and your customers (if desired)
+* Customers get a signed & personal downloadable URL
+
+## Create Downloadable Benefit
+
+1. Go to `Benefits` in the Dashboard sidebar
+2. Click `+ Add Benefit` to create a new benefit
+3. Choose `File Downloads` as the `Type`
+
+You can now upload the files you want to offer as downloadables for customers.
+
+1. Drag & drop files to the dropzone (`Feed me some bytes`)
+2. Or click on that area to open a file browser
+
+### Change filename
+
+Click on the filename to change it inline.
+
+### Change order of files
+
+You can drag and drop the files in the order you want.
+
+### Review SHA-256 checksum
+
+Click on the contextual menu dots and then `Copy SHA-256 Checksum`
+
+### Delete a file
+
+Click on the contextual menu dots and then `Delete` in the menu.
+
+**Active subscribers & customers will lose access too!**
+
+Deleting a file permanently deletes it from Polar and our S3 buckets except for the metadata. Disable the file instead if you don't want it permanently deleted.
+
+### Disable & Enable Files
+
+You can disable files at any point to prevent new customers getting access to it.
+
+**Existing customers retain their access**
+
+Customers who purchased before the file was disabled will still have access to legacy files. Only new customers will be impacted.
+
+**Enabling or adding files grants access retroactively**
+
+In case you add more files or re-enable existing ones, all current customers and subscribers with the benefit will be granted access.
+
+
+# Automate Private GitHub Repo(s) Access
+Source: https://polar.sh/docs/features/benefits/github-access
+
+Sell premium GitHub repository access with ease
+
+<img />
+
+## Sell GitHub Repository Access
+
+With Polar you can seamlessly offer your customers and subscribers automated access to private GitHub repositories.
+
+* Fully automated collaborator invites
+* Unlimited repositories (via multiple benefits) from your organization(s)
+* Users get access upon subscribing & removed on cancellation
+* Or get lifetime access upon paying a one-time price (product)
+
+### **Use cases**
+
+* Sponsorware
+* Access to private GitHub discussions & issues for sponsors
+* Early access to new feature development before upstream push
+* Premium educational materials & code
+* Self-hosting products
+* Courses, starter kits, open core software & more...
+
+## Create GitHub Repository Benefit
+
+1. Go to `Benefits` in the sidebar
+2. Click `+ New Benefit` to create a new benefit
+3. Choose `GitHub Repository Access` as the `Type`
+
+You first need to `Connect your GitHub Account` and install a dedicated Polar App for this benefit across the repositories you want to use it with.
+
+* Click `Connect your GitHub Account`
+
+<Info>
+  **Why do I need to connect GitHub again and install a separate app?**
+
+  This feature requires permission to manage repository collaborators. GitHub Apps does not support progressive permission scope requests. So instead of requesting this sensitive permission from all users (unnecessarily) in our core GitHub Login this feature uses a standalone app instead.
+</Info>
+
+Once you've authorized our dedicated GitHub App for this feature you'll be redirected back to Polar and the benefit form - now connected and updated.
+
+### **Repository**
+
+Select the desired repository you want to automate collaborator invites for.
+
+<Info>
+  **Why can I only connect organization repositories vs. personal ones?**
+
+  GitHub does not support granular permissions for collaborators on personal repositories - granting them all write permissions instead. Since collaborators would then be able to push changes, releases and more, we do not support personal repositories by default.Want this still? Reach out to us and we can enable it.
+</Info>
+
+### **Role**
+
+Select the role you want to grant collaborators.
+
+* **Read (Default & Highly recommended)**
+* Triage
+* Write
+* Maintain
+* Admin
+
+Read access (read-only) is what 99.9% of cases should use and the others are highly discouraged unless you have special use cases & absolutely know the impact of these permissions. Checkout the [GitHub documentation](https://docs.github.com/en/organizations/managing-user-access-to-your-organizations-repositories/managing-repository-roles/repository-roles-for-an-organization#permissions-for-each-role) for reference.
+
+<Info>
+  Anyone with read access to a repository can create a pull request [(source)](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
+</Info>
+
+<Info>
+  **Additional Costs for Paid GitHub Organizations**
+
+  GitHub treats collaborators as a seat and they will incurr charges accordingly to your billing unless you're using a free GitHub organization plan. So make sure to confirm you're on a free plan OR charge sufficiently to offset the costs you'll need to pay to GitHub.
+</Info>
+
+
+# Automated Benefits
+Source: https://polar.sh/docs/features/benefits/introduction
+
+
+
+Polar offers built-in benefit (entitlements) automation for common upsells within the developer &
+designer ecosystem with more to come.
+
+* [**Credits**](/features/benefits/credits). A simple benefit that allows you to credit a customer's Usage Meter balance.
+* [**License Keys**](/features/benefits/license-keys). Software license keys that you can customize the branding of.
+* [**File Downloads**](/features/benefits/file-downloads). Downloadable files of any kind up to 10GB each.
+* [**GitHub Repository Access**](/features/benefits/github-access). Automatically invite subscribers to private GitHub repo(s).
+* [**Discord Invite**](/features/benefits/discord-access). Automate invitations and granting of roles to subscribers and customers.
+
+## Product & Subscription Benefits
+
+Product and subscription benefits are standalone resources in Polar - connected to one or many products or subscription tiers.
+
+This approach is a bit different from other platforms, but offers many advantages:
+
+* Easy to enable the same benefit across multiple products & subscriptions
+* You can change a benefit in one place vs. many
+* No duplicate data or work (error prone)
+* More intuitive UI for you and your customers
+
+**How customers get access to benefits:**
+
+* ✅ Active subscribers of tiers with the benefit enabled
+* ✅ Customers who bought a product with the benefit (lifetime access)
+* ❌ Subscribers with an expired subscription (cancelled)
+* ❌ Users who are not customers
+
+## Creating & Managing Benefits
+
+You can manage benefits in two ways:
+
+1. Directly within a product create/edit form
+2. Or via `Benefits` in your dashboard
+
+
+# Automate Customer License Key Management
+Source: https://polar.sh/docs/features/benefits/license-keys
+
+Sell license key access to your service, software or APIs with ease
+
+<img />
+
+You can easily sell software license keys with Polar without having to deal with sales tax or hosting an API to validate them in real-time. License keys with Polar come with a lot of powerful features built-in.
+
+* Brandable prefixes, e.g `POLAR_*****`
+* Automatic expiration after `N` days, months or years
+* Limited number of user activations, e.g devices
+* Custom validation conditions
+* Usage quotas per license key
+* Automatic revokation upon cancelled subscriptions
+
+## Create License Key Benefit
+
+1. Go to `Benefits` in the sidebar
+2. Click `+ New Benefit` to create a new benefit
+3. Choose `License Keys` as the `Type`
+
+### Custom Branding
+
+Make your license keys standout with brandable prefixes, e.g `MYAPP_<AUTO_GENERATED_UUID4>`
+
+### Automatic Expiration
+
+Want license keys to expire automatically after a certain time period from when the customer bought them? No problem.
+
+### Activation Limits
+
+You can require license keys to be activated before future validation. A great feature in case you want to limit license key usage to a certain number of devices, IPs or other conditions.
+
+**Enable user to deactivate instances via Polar.** Instead of building your own custom admin for customers to manage their activation instances - leave it to Polar instead.
+
+### Usage Limit
+
+Offering OpenAI tokens or anything else with a variable usage cost? You can set a custom usage quota per license key and increment usage upon validation.
+
+## Customer Experience
+
+Once customers buy your product or subscribes to your tier, they will automatically receive a unique license key. It's easily accessible to them under their purchases page.
+
+Customers can:
+
+* View & copy their license key
+* See expiration date (if applicable)
+* See usage left (if applicable)
+* Deactivate activations (if enabled)
+
+## Integrate API
+
+It's super easy and straightforward to integrate Polar license keys into your application, library or API.
+
+### Activate License Keys (Optional)
+
+In case you've setup license keys to have a maximum amount of activation instances, e.g user devices. You'll then need to create an activation instance prior to validating license keys / activation.
+
+**No activation limit?** You can skip this step.
+
+```bash Terminal theme={null}
+curl -X POST https://api.polar.sh/v1/customer-portal/license-keys/activate
+-H "Content-Type: application/json"
+-d '{
+  "key": "1C285B2D-6CE6-4BC7-B8BE-ADB6A7E304DA",
+  "organization_id": "fda84e25-7b55-4d67-916d-60ead04ff61f",
+  "label": "hello",
+  "conditions": { "major_version": 1 },
+  "meta": { "ip": "84.19.145.194" }
+}'
+```
+
+<ParamField type="string">
+  Replace with the users license key (from input in your app).
+</ParamField>
+
+<ParamField type="string">
+  Replace with your organization ID here found in your settings.
+</ParamField>
+
+<ParamField type="string">
+  Set a label to associate with this specific activation.
+</ParamField>
+
+<ParamField type="object">
+  JSON object with custom conditions to validate against in the future, e.g IP, mac address, major version etc.
+</ParamField>
+
+<ParamField type="object">
+  JSON object with metadata to store for the users activation.
+</ParamField>
+
+#### **Response (200 OK)**
+
+```json theme={null}
+{
+  "id": "b6724bc8-7ad9-4ca0-b143-7c896fcbb6fe",
+  "license_key_id": "508176f7-065a-4b5d-b524-4e9c8a11ed63",
+  "label": "hello",
+  "meta": {
+    "ip": "84.19.145.194"
+  },
+  "created_at": "2024-09-02T13:48:13.251621Z",
+  "modified_at": null,
+  "license_key": {
+    "id": "508176f7-065a-4b5d-b524-4e9c8a11ed63",
+    "organization_id": "fda84e25-7b55-4d67-916d-60ead04ff61f",
+    "user_id": "d910050c-be66-4ca0-b4cc-34fde514f227",
+    "benefit_id": "32a8eda4-56cf-4a94-8228-792d324a519e",
+    "key": "1C285B2D-6CE6-4BC7-B8BE-ADB6A7E304DA",
+    "display_key": "****-E304DA",
+    "status": "granted",
+    "limit_activations": 3,
+    "usage": 0,
+    "limit_usage": 100,
+    "validations": 0,
+    "last_validated_at": null,
+    "expires_at": "2026-08-30T08:40:34.769148Z"
+  }
+}
+```
+
+### Validate License Keys
+
+For each session of your premium app, library or API, we recommend you validate the users license key via the
+[`/v1/customer-portal/license-keys/validate`](/api-reference/customer-portal/license-keys/validate) endpoint.
+
+```bash Terminal theme={null}
+curl -X POST https://api.polar.sh/v1/customer-portal/license-keys/validate
+-H "Content-Type: application/json"
+-d '{
+  "key": "1C285B2D-6CE6-4BC7-B8BE-ADB6A7E304DA",
+  "organization_id": "fda84e25-7b55-4d67-916d-60ead04ff61f",
+  "activation_id": "b6724bc8-7ad9-4ca0-b143-7c896fcbb6fe",
+  "conditions": { "major_version": 1 },
+  "increment_usage": 15
+}'
+```
+
+<ParamField type="string">
+  Replace with the users license key (from input in your app).
+</ParamField>
+
+<ParamField type="string">
+  Replace with your organization ID here found in your settings.
+</ParamField>
+
+<ParamField type="string">
+  The activation ID to validate - required in case activations limit is enabled and used (above).
+</ParamField>
+
+<ParamField type="object">
+  In case of activation instances. Same exact JSON object as upon registration of the activation.
+</ParamField>
+
+<ParamField type="integer">
+  In case you want to increment usage upon validation.
+</ParamField>
+
+#### **Response (200 OK)**
+
+```json theme={null}
+{
+  "id": "508176f7-065a-4b5d-b524-4e9c8a11ed63",
+  "organization_id": "fda84e25-7b55-4d67

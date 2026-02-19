@@ -212,17 +212,17 @@ public class SubscriptionService {
                                         new com.dreamtoon.global.error.EntityNotFoundException(
                                                 ErrorCode.USER_NOT_FOUND));
 
-        String priceId =
+        String productId =
                 switch (tier) {
-                    case PLUS -> polarProperties.getPrices().getPlus();
-                    case PRO -> polarProperties.getPrices().getPro();
-                    case ULTRA -> polarProperties.getPrices().getUltra();
+                    case PLUS -> polarProperties.getProducts().getPlus();
+                    case PRO -> polarProperties.getProducts().getPro();
+                    case ULTRA -> polarProperties.getProducts().getUltra();
                     default -> throw new BusinessException(ErrorCode.INVALID_REQUEST);
                 };
 
         try {
             com.fasterxml.jackson.databind.JsonNode result =
-                    polarApiClient.createCheckout(priceId, user.getEmail(), userId);
+                    polarApiClient.createCheckout(productId, user.getEmail(), userId);
             return com.dreamtoon.domain.subscription.dto.CheckoutResponse.builder()
                     .checkoutId(result.path("id").asText())
                     .checkoutUrl(result.path("url").asText())
