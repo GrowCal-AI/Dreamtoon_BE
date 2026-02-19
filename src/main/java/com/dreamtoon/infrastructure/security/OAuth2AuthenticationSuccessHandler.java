@@ -57,14 +57,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        // 배포 환경(HTTPS)에서는 SameSite=None; Secure 설정이 필요할 수 있음
-        // 현재는 기본적인 HttpOnly 쿠키 설정
         jakarta.servlet.http.Cookie refreshCookie =
                 new jakarta.servlet.http.Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false); // 로컬: false, 프로덕션: true (SSL 적용 시 true 권장)
+        refreshCookie.setSecure(true); // HTTPS 환경 필수
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7일
         response.addCookie(refreshCookie);
+        // 프론트(dreamics.ai.kr)와 백엔드가 다른 도메인: cross-origin 쿠키 전송을 위해 SameSite=None 필요
+        response.setHeader(
+                "Set-Cookie",
+                String.format(
+                        "refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; Secure; SameSite=None",
+                        refreshToken, 7 * 24 * 60 * 60));
     }
 }
