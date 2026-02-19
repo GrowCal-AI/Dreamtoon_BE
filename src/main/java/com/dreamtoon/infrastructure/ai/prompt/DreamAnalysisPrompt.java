@@ -2,6 +2,7 @@ package com.dreamtoon.infrastructure.ai.prompt;
 
 import com.dreamtoon.domain.dream.entity.EmotionType;
 import com.dreamtoon.domain.dream.entity.Genre;
+import java.util.List;
 
 /** GPT-4o 꿈 분석 및 DALL-E 4컷 만화 프롬프트 (Blueprint v3.0) */
 public final class DreamAnalysisPrompt {
@@ -143,5 +144,48 @@ public final class DreamAnalysisPrompt {
                 not threatening.
                 """,
                 sceneDescription, characterDNA, artStyleInstruction);
+    }
+
+    /**
+     * 4컷 장면 묘사 전체를 단일 2x2 그리드 만화 이미지로 생성하기 위한 프롬프트.
+     *
+     * @param scenes 4개 장면 묘사 리스트 (영어)
+     * @param characterDNA 주인공 외모 묘사 (영어)
+     * @param genre 선택 장르
+     */
+    public static String createComicStripPrompt(
+            List<String> scenes, String characterDNA, Genre genre) {
+        String style = genre != null ? genre.getPromptTemplate() : "webtoon style, clean lines";
+        boolean isPremium = genre != null && genre.isPremium();
+        String artStyle =
+                isPremium
+                        ? style + ", high quality digital illustration, cinematic composition"
+                        : style
+                                + ", Korean manhwa, professional digital coloring, cinematic"
+                                + " composition";
+
+        return String.format(
+                """
+                A single square image divided into exactly 4 equal comic panels in a 2x2 grid layout, \
+                with clear black borders separating each panel.
+
+                Panel 1 (top-left): %s
+
+                Panel 2 (top-right): %s
+
+                Panel 3 (bottom-left): %s
+
+                Panel 4 (bottom-right): %s
+
+                Character appearing throughout all panels: %s
+
+                Art style for all panels: %s
+                Expressive emotions, detailed backgrounds. Consistent character appearance across all panels.
+                NO text, NO speech bubbles, NO letters, NO titles, NO logos, NO watermarks. Purely visual.
+                Family-friendly illustration. Fantastical and dreamlike mood. No realistic violence, \
+                no gore, no disturbing imagery. Scary elements depicted as whimsical and cartoonish, \
+                not threatening.
+                """,
+                scenes.get(0), scenes.get(1), scenes.get(2), scenes.get(3), characterDNA, artStyle);
     }
 }

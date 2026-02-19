@@ -24,29 +24,40 @@ public enum Genre {
             "ghibli",
             "지브리",
             "몽글몽글한 감성",
-            "studio ghibli style, hand-drawn watercolor, soft nature backgrounds, whimsical"
-                    + " atmosphere, gentle warm tones",
+            "Studio Ghibli inspired illustration, painterly watercolor textures, visible"
+                    + " brushstrokes, Hayao Miyazaki aesthetic, soft natural lighting, lush organic"
+                    + " backgrounds, simplified rounded character proportions with large expressive"
+                    + " eyes, warm muted earth tones, NOT digital art, NOT sharp outlines,"
+                    + " impressionistic painterly backgrounds, hand-painted cel animation look",
             true),
     MARVEL(
             "marvel",
             "마블",
             "히어로 코믹스 스타일",
-            "american superhero comic style, bold ink outlines, halftone dot shading, dynamic"
-                    + " action poses, dramatic lighting",
+            "Marvel Comics illustration style, bold thick black ink outlines, Ben-Day halftone"
+                    + " dot shading, vibrant saturated primary superhero colors, dynamic action"
+                    + " poses with exaggerated muscular anatomy, dramatic high-contrast lighting,"
+                    + " classic American comic book panel composition, Jack Kirby energy lines,"
+                    + " flat color fills with strong shadows, NOT manga, NOT anime, NOT webtoon",
             true),
     LEGO(
             "lego",
             "레고",
             "귀여운 블록 세계",
-            "toy brick figure style, blocky plastic characters, bright primary colors, smooth"
-                    + " plastic texture, cheerful toy world",
+            "official LEGO minifigure style, classic cylindrical head with printed face,"
+                + " rectangular blocky torso, claw-shaped hands, smooth shiny plastic texture,"
+                + " bright primary colors, brick-built environment and backgrounds, toy photography"
+                + " aesthetic, 3D rendered official LEGO set look, cheerful playful toy world",
             true),
     ANIMAL_CROSSING(
             "animal-crossing",
             "모동숲",
             "포근한 동물의 숲",
-            "cute chibi village life style, soft pastel colors, rounded friendly characters,"
-                    + " cozy nature setting, warm comfortable atmosphere",
+            "Nintendo Animal Crossing official art style, super deformed chibi proportions with"
+                    + " oversized round head and tiny round body, large dot eyes, extremely soft"
+                    + " pastel color palette, cozy peaceful village life, warm gentle lighting,"
+                    + " rounded organic shapes, cute anthropomorphic characters, official Nintendo"
+                    + " game art aesthetic, NOT realistic, NOT detailed anatomy",
             true),
 
     // ── 내부 확장 장르 (CUSTOM 모드에서 AI가 자동 선택) ──

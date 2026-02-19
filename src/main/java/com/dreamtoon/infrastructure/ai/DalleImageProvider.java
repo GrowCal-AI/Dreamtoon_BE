@@ -27,7 +27,7 @@ public class DalleImageProvider implements ImageGenerationProvider {
                         .withQuality("standard")
                         .withN(1)
                         .withWidth(1024)
-                        .withHeight(1792)
+                        .withHeight(1024)
                         .build();
 
         ImagePrompt imagePrompt = new ImagePrompt(prompt, options);

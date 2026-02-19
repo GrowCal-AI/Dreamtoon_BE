@@ -9,11 +9,7 @@ import com.dreamtoon.infrastructure.ai.prompt.DreamAnalysisPrompt;
 import com.dreamtoon.infrastructure.storage.GcsStorageService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -27,9 +23,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class DreamAiService {
 
     private static final int WEBTOON_PANEL_COUNT = 4;
-
-    /** 4컷 이미지를 확실히 동시 생성하기 위한 전용 스레드 풀 (4개 고정) */
-    private final ExecutorService imageGenerationPool = Executors.newFixedThreadPool(4);
 
     private final OpenAiClient openAiClient;
     private final ImageGenerationProvider imageGenerationProvider;
@@ -175,45 +168,10 @@ public class DreamAiService {
             }
             log.info("[STORYBOARD] 4-panel storyboard ready for dream ID: {}", dreamId);
 
-            // ── 2단계: 각 장면을 이미지 생성 프로바이더로 병렬 생성 (재시도 포함) ──
-            final List<String> finalScenes = List.copyOf(sceneDescriptions);
-            final String finalCharDNA = characterDNA;
+            // ── 2단계: 4컷 만화 단일 이미지 생성 ──
             log.info("[IMAGE] Using provider: {}", imageGenerationProvider.getProviderName());
-
-            List<CompletableFuture<String>> futures = new ArrayList<>();
-            for (int panel = 1; panel <= WEBTOON_PANEL_COUNT; panel++) {
-                final int panelNum = panel;
-                final String sceneDesc = finalScenes.get(panel - 1);
-                CompletableFuture<String> future =
-                        CompletableFuture.supplyAsync(
-                                () ->
-                                        generateSinglePanel(
-                                                dreamId, panelNum, sceneDesc, finalCharDNA, dream),
-                                imageGenerationPool);
-                futures.add(future);
-            }
-
-            // 각 패널 결과를 개별적으로 수집 (실패한 것은 null)
-            List<String> imageUrls = new ArrayList<>();
-            for (int i = 0; i < futures.size(); i++) {
-                try {
-                    imageUrls.add(futures.get(i).join());
-                } catch (Exception e) {
-                    log.error(
-                            "[PANEL {}] Final failure for dream ID: {}: {}",
-                            i + 1,
-                            dreamId,
-                            e.getMessage());
-                    imageUrls.add(null);
-                }
-            }
-
-            // null이 아닌 성공한 패널만 필터링
-            List<String> successUrls = imageUrls.stream().filter(url -> url != null).toList();
-
-            if (successUrls.isEmpty()) {
-                throw new RuntimeException("모든 패널 생성 실패");
-            }
+            String comicUrl = generateComicStrip(dreamId, sceneDescriptions, characterDNA, dream);
+            List<String> successUrls = List.of(comicUrl);
 
             // DB 커넥션을 짧게 사용: 완료 결과 저장만
             final Dream completedDream = dream;
@@ -224,11 +182,7 @@ public class DreamAiService {
                         dreamRepository.save(completedDream);
                     });
 
-            log.info(
-                    "[ASYNC] Webtoon generation completed for dream ID: {} ({}/{} panels)",
-                    dreamId,
-                    successUrls.size(),
-                    WEBTOON_PANEL_COUNT);
+            log.info("[ASYNC] Webtoon generation completed for dream ID: {}", dreamId);
         } catch (Exception e) {
             log.error("[ASYNC] Webtoon generation failed for dream ID: {}", dreamId, e);
             final Dream failedDream = dream;
@@ -240,48 +194,37 @@ public class DreamAiService {
         }
     }
 
-    /** 단일 패널 이미지 생성 (재시도 시 프롬프트 완화) */
-    private String generateSinglePanel(
-            Long dreamId, int panelNum, String sceneDesc, String characterDNA, Dream dream) {
-        int maxRetries = 3;
+    /** 4컷 만화를 단일 이미지로 생성 (재시도 시 프롬프트 완화) */
+    private String generateComicStrip(
+            Long dreamId, List<String> scenes, String characterDNA, Dream dream) {
+        int maxRetries = 2;
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                String currentScene = sceneDesc;
-                // 2차 시도부터는 프롬프트를 더 안전하게 완화 (content policy 회피)
+                List<String> currentScenes = scenes;
                 if (attempt >= 2) {
-                    currentScene = softenPromptForRetry(sceneDesc);
-                    log.info("[PANEL {}] Retrying with softened prompt", panelNum);
+                    currentScenes = scenes.stream().map(this::softenPromptForRetry).toList();
+                    log.info("[COMIC] Retrying with softened scenes");
                 }
 
                 log.info(
-                        "[PANEL {}] Attempt {}/{} via {} on thread: {}",
-                        panelNum,
+                        "[COMIC] Attempt {}/{} via {} on thread: {}",
                         attempt,
                         maxRetries,
                         imageGenerationProvider.getProviderName(),
                         Thread.currentThread().getName());
+
                 String prompt =
-                        DreamAnalysisPrompt.createWebtoonPanelPrompt(
-                                currentScene,
-                                characterDNA,
-                                dream.getSelectedGenre(),
-                                panelNum,
-                                WEBTOON_PANEL_COUNT);
+                        DreamAnalysisPrompt.createComicStripPrompt(
+                                currentScenes, characterDNA, dream.getSelectedGenre());
                 String tempUrl = imageGenerationProvider.generateImage(prompt);
-                String gcsPrefix = String.format("webtoon/dream_%d/panel_%d", dreamId, panelNum);
+                String gcsPrefix = String.format("webtoon/dream_%d/comic_strip", dreamId);
                 String gcsUrl = gcsStorageService.uploadImageFromUrl(tempUrl, gcsPrefix);
-                log.info("[PANEL {}] Done: {}", panelNum, gcsUrl);
+                log.info("[COMIC] Done: {}", gcsUrl);
                 return gcsUrl;
             } catch (Exception e) {
-                log.warn(
-                        "[PANEL {}] Attempt {}/{} failed: {}",
-                        panelNum,
-                        attempt,
-                        maxRetries,
-                        e.getMessage());
+                log.warn("[COMIC] Attempt {}/{} failed: {}", attempt, maxRetries, e.getMessage());
                 if (attempt == maxRetries) {
-                    throw new RuntimeException(
-                            "Panel " + panelNum + " 생성 실패 (재시도 소진): " + e.getMessage(), e);
+                    throw new RuntimeException("Comic strip 생성 실패 (재시도 소진): " + e.getMessage(), e);
                 }
             }
         }
