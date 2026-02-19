@@ -64,6 +64,14 @@ public class SecurityConfig {
                                                 "/api/v1/auth/refresh", "/api/v1/auth/logout")
                                         .permitAll()
 
+                                        // Polar.sh Webhook (서명으로 자체 검증)
+                                        .requestMatchers("/api/v1/webhooks/polar")
+                                        .permitAll()
+
+                                        // 비회원 체험 API
+                                        .requestMatchers("/api/v1/guest/**")
+                                        .permitAll()
+
                                         // Authenticated endpoints
                                         .requestMatchers("/api/v1/dreams/**")
                                         .authenticated()

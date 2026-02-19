@@ -64,11 +64,20 @@ public class GptImageProvider implements ImageGenerationProvider {
                     httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
+                String rawBody = response.body();
+                String errorMsg;
+                try {
+                    JsonNode errorNode = objectMapper.readTree(rawBody);
+                    errorMsg = errorNode.path("error").path("message").asText(rawBody);
+                } catch (Exception parseEx) {
+                    errorMsg = rawBody;
+                }
                 log.error(
-                        "[GPT-Image-1] API error: status={}, body={}",
+                        "[GPT-Image-1] API error: status={}, message={}",
                         response.statusCode(),
-                        response.body());
-                throw new RuntimeException("GPT-Image-1 API 오류: " + response.statusCode());
+                        errorMsg);
+                throw new RuntimeException(
+                        "GPT-Image-1 API 오류 [" + response.statusCode() + "]: " + errorMsg);
             }
 
             JsonNode root = objectMapper.readTree(response.body());

@@ -39,7 +39,7 @@ public final class DreamAnalysisPrompt {
                     "불안": 0,
                     "분노": 0,
                     "슬픔": 0,
-                    "놀람": 0,
+                    "놀라움": 0,
                     "평온": 0
                   },
                   "insight": "AI 코칭 메시지 (100자 이내)"

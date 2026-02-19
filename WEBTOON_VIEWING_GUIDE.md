@@ -26,7 +26,7 @@ open /tmp/dreamtoon_webtoons/webtoons/
 
 ### 2. **API로 URL 확인**
 ```bash
-curl -s -X GET "http://localhost:8080/api/v1/dreams/3" \\
+curl -s -X GET "http://localhost:8080/api/v1/dreams/3" \
   -H "Authorization: Bearer <TOKEN>" | jq '.data.webtoonImages'
 ```
 
@@ -40,36 +40,9 @@ curl -s -X GET "http://localhost:8080/api/v1/dreams/3" \\
 ]
 ```
 
-### 3. **LocalStack S3에서 직접 다운로드**
+### 3. **DB에서 확인**
 ```bash
-# LocalStack에서 로컬로 복사
-docker exec dreamtoon-localstack awslocal s3 cp \\
-  s3://dreamtoon-dev-bucket/webtoon/ \\
-  /tmp/webtoons/ --recursive
-
-# 컨테이너에서 호스트로 복사
-docker cp dreamtoon-localstack:/tmp/webtoons /tmp/dreamtoon_webtoons/
-
-# 확인
-ls -lh /tmp/dreamtoon_webtoons/webtoons/
-```
-
-### 4. **LocalStack S3 목록 확인**
-```bash
-docker exec dreamtoon-localstack awslocal s3 ls s3://dreamtoon-dev-bucket/webtoon/
-```
-
-**출력:**
-```
-2026-02-17 12:21:45    3034341 20260217_212144_c5d345a6.png
-2026-02-17 12:22:03    1905743 20260217_212203_f425f77e.png
-2026-02-17 12:22:22    2308940 20260217_212222_9d947e72.png
-2026-02-17 12:22:44    2777742 20260217_212244_3eb189fa.png
-```
-
-### 5. **DB에서 확인**
-```bash
-docker exec dreamtoon-postgres psql -U postgres -d dreamtoon_dev -c \\
+docker exec dreamtoon-postgres psql -U postgres -d dreamtoon_dev -c \
   "SELECT id, title, processing_status, webtoon_images FROM dreams WHERE id=3;"
 ```
 
@@ -90,15 +63,11 @@ docker exec dreamtoon-postgres psql -U postgres -d dreamtoon_dev -c \\
 
 ## 🌐 프로덕션 환경에서는?
 
-실제 AWS S3를 사용하면 이미지 URL이 공개 URL이 되어 브라우저에서 바로 볼 수 있습니다:
+실제 GCP Storage를 사용하면 이미지 URL이 공개 URL이 되어 브라우저에서 바로 볼 수 있습니다:
 
 ```
-https://dreamtoon-prod-bucket.s3.ap-northeast-2.amazonaws.com/webtoon/xxx.png
+https://storage.googleapis.com/dreamtoon-prod-bucket/webtoon/xxx.png
 ```
-
-하지만 로컬 개발 환경(LocalStack)에서는:
-- URL은 생성되지만 외부에서 접근 불가
-- 위의 방법으로 다운로드해서 확인해야 함
 
 ---
 

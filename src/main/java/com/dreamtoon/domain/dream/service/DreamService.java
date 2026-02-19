@@ -39,7 +39,8 @@ public class DreamService {
     /** FE 통합 꿈 생성 (감정 → 내용 → 스타일 한번에) */
     @Transactional
     public DreamResponse createDreamFull(Long userId, CreateDreamFullRequest request) {
-        if (!subscriptionService.canGenerate(userId)) {
+        // 스탠다드 쿼터 체크 (꿈 생성 = 스탠다드 이미지 소비)
+        if (!subscriptionService.canGenerateStandard(userId)) {
             throw new BusinessException(ErrorCode.GENERATION_LIMIT_EXCEEDED);
         }
 
@@ -57,7 +58,7 @@ public class DreamService {
                         .title(request.getTitle())
                         .build();
         dreamRepository.save(dream);
-        subscriptionService.incrementGenerationCount(userId);
+        subscriptionService.incrementStandardGeneration(userId);
 
         dreamAiService.analyzeDreamAsync(dream.getId());
 
@@ -67,7 +68,7 @@ public class DreamService {
 
     @Transactional
     public InitiateDreamResponse initiateDream(Long userId, InitiateDreamRequest request) {
-        if (!subscriptionService.canGenerate(userId)) {
+        if (!subscriptionService.canGenerateStandard(userId)) {
             throw new BusinessException(ErrorCode.GENERATION_LIMIT_EXCEEDED);
         }
 
@@ -78,7 +79,7 @@ public class DreamService {
 
         Dream dream = Dream.builder().user(user).dreamContent(request.getDreamContent()).build();
         dreamRepository.save(dream);
-        subscriptionService.incrementGenerationCount(userId);
+        subscriptionService.incrementStandardGeneration(userId);
 
         log.info("Dream initiated, ID: {}", dream.getId());
         return InitiateDreamResponse.builder()
@@ -147,7 +148,23 @@ public class DreamService {
             throw new BusinessException(ErrorCode.DREAM_INVALID_STATE);
         }
 
-        dream.selectGenre(request.getSelectedGenre());
+        com.dreamtoon.domain.dream.entity.Genre selectedGenre = request.getSelectedGenre();
+
+        // 프리미엄 필터 쿼터 체크
+        if (selectedGenre.isPremium()) {
+            if (!subscriptionService.canGeneratePremium(userId)) {
+                throw new BusinessException(ErrorCode.PREMIUM_STYLE_NOT_ALLOWED);
+            }
+            subscriptionService.incrementPremiumGeneration(userId);
+        } else {
+            // 스탠다드 필터는 스탠다드 쿼터 소비
+            if (!subscriptionService.canGenerateStandard(userId)) {
+                throw new BusinessException(ErrorCode.GENERATION_LIMIT_EXCEEDED);
+            }
+            subscriptionService.incrementStandardGeneration(userId);
+        }
+
+        dream.selectGenre(selectedGenre);
         dreamRepository.save(dream);
 
         dreamAiService.generateWebtoonAsync(dreamId);

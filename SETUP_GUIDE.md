@@ -20,7 +20,7 @@
 - PostgreSQL Driver
 - Querydsl
 - Lombok
-- AWS S3 (Spring Cloud AWS)
+
 - Springdoc OpenAPI (Swagger)
 - Hypersistence Utils (JSONB 지원)
 ```
@@ -105,7 +105,7 @@ cp .env.example .env
 # - OPENAI_API_KEY
 # - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 # - KAKAO_CLIENT_ID, KAKAO_CLIENT_SECRET
-# - AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_BUCKET
+
 # - JWT_SECRET (최소 256비트)
 ```
 
@@ -149,8 +149,8 @@ http://localhost:8080/swagger-ui.html
 - [ ] DALL-E 3를 통한 이미지 생성
 - [ ] 감정 분석 및 DHI 점수 산출
 
-#### 우선순위 2: AWS S3 통합
-- [ ] `S3StorageService.java` 생성
+#### 우선순위 2: GCP Storage 통합
+- [ ] `GcsStorageService.java` 생성
 - [ ] 이미지 업로드/다운로드 기능
 - [ ] 이미지 URL 관리
 

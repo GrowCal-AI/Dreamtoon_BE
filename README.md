@@ -11,7 +11,7 @@
 - **Database**: PostgreSQL (JSONB 지원)
 - **AI**: Spring AI (OpenAI GPT-4o, DALL-E 3)
 - **Security**: Spring Security + OAuth2 (Google, Kakao)
-- **Storage**: AWS S3
+- **Storage**: GCP Google Cloud Storage
 - **ORM**: Spring Data JPA + Querydsl
 - **Build Tool**: Gradle (Groovy)
 
@@ -92,7 +92,6 @@ cp .env.example .env
 `.env` 파일을 열어 필요한 값들을 설정합니다:
 - OpenAI API Key
 - OAuth2 Client ID/Secret (Google, Kakao)
-- AWS Credentials
 - JWT Secret
 
 #### 2. PostgreSQL 실행 (Docker)
@@ -220,11 +219,6 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 KAKAO_CLIENT_ID=your-kakao-client-id
 KAKAO_CLIENT_SECRET=your-kakao-client-secret
 
-# AWS S3 (선택사항)
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-AWS_S3_BUCKET=dreamtoon-dev-bucket
-
 # JWT (필수)
 JWT_SECRET=your-jwt-secret-key-must-be-at-least-256-bits-long
 ```
@@ -288,7 +282,7 @@ docker-compose up
 - [ ] Spring AI를 통한 실제 GPT-4o 장면 분할 구현
 - [ ] DALL-E 3 이미지 생성 비동기 처리
 - [ ] 감정 분석 및 DHI 점수 산출 로직 구현
-- [ ] AWS S3 이미지 업로드 구현
+- [ ] GCP Storage 이미지 업로드 구현
 - [ ] 테스트 코드 작성
 - [ ] CI/CD 파이프라인 구축
 

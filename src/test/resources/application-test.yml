@@ -43,10 +43,7 @@ jwt:
   expiration: 3600000
   refresh-expiration: 604800000  # 7일 (테스트용)
 
-AWS_ACCESS_KEY_ID: test-access-key
-AWS_SECRET_ACCESS_KEY: test-secret-key
-AWS_S3_BUCKET: test-bucket
-AWS_REGION: ap-northeast-2
+
 
 logging:
   level:

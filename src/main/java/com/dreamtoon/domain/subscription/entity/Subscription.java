@@ -34,89 +34,156 @@ public class Subscription {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @Column(name = "generation_count", nullable = false)
-    private Integer generationCount = 0;
+    // ── 스탠다드 이미지 쿼터 ──
+    @Column(name = "standard_generation_count", nullable = false)
+    private Integer standardGenerationCount = 0;
 
-    @Column(name = "quota_reset_date")
-    private LocalDate quotaResetDate;
+    // ── 프리미엄 이미지 쿼터 ──
+    @Column(name = "premium_generation_count", nullable = false)
+    private Integer premiumGenerationCount = 0;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    /** 회원가입 최초 1회 무료 프리미엄 사용 여부 (영구, 리셋 안 됨) */
+    @Column(name = "premium_trial_used", nullable = false)
+    private Boolean premiumTrialUsed = false;
 
+    // ── 기타 쿼터 ──
     @Column(name = "library_count", nullable = false)
     private Integer libraryCount = 0;
 
     @Column(name = "favorite_count", nullable = false)
     private Integer favoriteCount = 0;
 
+    @Column(name = "quota_reset_date")
+    private LocalDate quotaResetDate;
+
+    // ── Polar.sh 결제 정보 ──
+    @Column(name = "polar_subscription_id")
+    private String polarSubscriptionId;
+
+    @Column(name = "polar_customer_id")
+    private String polarCustomerId;
+
+    @Column(name = "subscription_end_date")
+    private LocalDate subscriptionEndDate;
+
+    @Column(name = "cancel_at_period_end", nullable = false)
+    private Boolean cancelAtPeriodEnd = false;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @Builder
     public Subscription(User user, SubscriptionTier tier) {
         this.user = user;
         this.tier = tier != null ? tier : SubscriptionTier.FREE;
         this.isActive = true;
-        this.generationCount = 0;
+        this.standardGenerationCount = 0;
+        this.premiumGenerationCount = 0;
+        this.premiumTrialUsed = false;
         this.libraryCount = 0;
         this.favoriteCount = 0;
+        this.cancelAtPeriodEnd = false;
         this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
     }
 
-    // === 비즈니스 메서드 ===
+    // === 스탠다드 이미지 쿼터 ===
 
-    /** 생성 횟수 증가 */
-    public void incrementGenerationCount() {
-        this.generationCount++;
-    }
-
-    /** 월별 생성 횟수 초기화 (매월 1일 실행) */
-    public void resetMonthlyGenerationCount() {
-        this.generationCount = 0;
-        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
-    }
-
-    /** 프리미엄으로 업그레이드 */
-    public void upgradeToPremium() {
-        this.tier = SubscriptionTier.PREMIUM;
-    }
-
-    /** 무료로 다운그레이드 */
-    public void downgradeToFree() {
-        this.tier = SubscriptionTier.FREE;
-    }
-
-    /** 구독 비활성화 */
-    public void deactivate() {
-        this.isActive = false;
-    }
-
-    /** 구독 재활성화 */
-    public void activate() {
-        this.isActive = true;
-    }
-
-    /** 생성 가능 여부 확인 */
-    public boolean canGenerate() {
+    public boolean canGenerateStandard() {
         if (!isActive) return false;
-        if (tier.isUnlimitedGenerations()) return true;
-        return generationCount < tier.getMaxGenerations();
+        if (tier.isUnlimitedStandard()) return true;
+        return standardGenerationCount < tier.getMaxStandardGenerations();
     }
 
-    /** 라이브러리 추가 가능 여부 (현재 라이브러리 수를 외부에서 전달) */
+    public void incrementStandardGenerationCount() {
+        this.standardGenerationCount++;
+    }
+
+    // === 프리미엄 이미지 쿼터 ===
+
+    /** 프리미엄 필터 사용 가능 여부 (trial 포함) */
+    public boolean canGeneratePremium() {
+        if (!isActive) return false;
+        // 무료 회원: trial 1회만
+        if (tier == SubscriptionTier.FREE) {
+            return !premiumTrialUsed;
+        }
+        if (tier.isUnlimitedPremium()) return true;
+        return premiumGenerationCount < tier.getMaxPremiumGenerations();
+    }
+
+    public void incrementPremiumGenerationCount() {
+        if (tier == SubscriptionTier.FREE) {
+            this.premiumTrialUsed = true;
+        } else {
+            this.premiumGenerationCount++;
+        }
+    }
+
+    // === 라이브러리 / 즐겨찾기 ===
+
     public boolean canAddToLibrary(long currentLibraryCount) {
         if (!isActive) return false;
         if (tier.isUnlimitedLibrary()) return true;
         return currentLibraryCount < tier.getMaxLibraryItems();
     }
 
-    /** 즐겨찾기 추가 가능 여부 (현재 즐겨찾기 수를 외부에서 전달) */
     public boolean canFavorite(long currentFavoriteCount) {
         if (!isActive) return false;
         if (tier.isUnlimitedFavorites()) return true;
         return currentFavoriteCount < tier.getMaxFavorites();
     }
 
-    /** 프리미엄 기능 사용 가능 여부 */
-    public boolean canUsePremiumFeatures() {
-        return isActive && tier.isPremiumFeaturesAllowed();
+    // === 월별 쿼터 리셋 ===
+
+    public void resetMonthlyQuota() {
+        this.standardGenerationCount = 0;
+        this.premiumGenerationCount = 0;
+        // premiumTrialUsed는 영구 — 리셋하지 않음
+        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
+    }
+
+    // === Polar.sh 구독 동기화 ===
+
+    public void activateSubscription(
+            String polarSubscriptionId,
+            String polarCustomerId,
+            SubscriptionTier newTier,
+            LocalDate endDate) {
+        this.polarSubscriptionId = polarSubscriptionId;
+        this.polarCustomerId = polarCustomerId;
+        this.tier = newTier;
+        this.isActive = true;
+        this.subscriptionEndDate = endDate;
+        this.cancelAtPeriodEnd = false;
+    }
+
+    public void markCancelAtPeriodEnd(boolean cancel) {
+        this.cancelAtPeriodEnd = cancel;
+    }
+
+    public void revokeSubscription() {
+        this.tier = SubscriptionTier.FREE;
+        this.isActive = true; // FREE 상태로 계속 활성
+        this.polarSubscriptionId = null;
+        this.subscriptionEndDate = null;
+        this.cancelAtPeriodEnd = false;
+    }
+
+    /** 관리자/테스트용 티어 강제 변경 */
+    public void forceSetTier(SubscriptionTier tier) {
+        this.tier = tier;
+        this.isActive = true;
+        this.standardGenerationCount = 0;
+        this.premiumGenerationCount = 0;
+        this.quotaResetDate = LocalDate.now().withDayOfMonth(1).plusMonths(1);
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    public void activate() {
+        this.isActive = true;
     }
 }

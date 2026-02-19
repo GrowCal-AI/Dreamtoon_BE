@@ -12,34 +12,41 @@ public class UsageResponse {
 
     private SubscriptionTier tier;
     private Boolean isActive;
-    private Integer generationCount;
-    private Integer maxGenerations;
+    private Integer standardGenerationCount;
+    private Integer maxStandardGenerations;
+    private Integer premiumGenerationCount;
+    private Integer maxPremiumGenerations;
+    private Boolean premiumTrialUsed;
     private Long libraryCount;
     private Integer maxLibrary;
     private Long favoriteCount;
     private Integer maxFavorites;
     private LocalDate quotaResetDate;
-    private Boolean canGenerate;
+    private Boolean canGenerateStandard;
+    private Boolean canGeneratePremium;
     private Boolean canAddToLibrary;
     private Boolean canFavorite;
-    private Boolean canUsePremiumFeatures;
 
     public static UsageResponse from(
             Subscription subscription, long libraryCount, long favoriteCount) {
+        SubscriptionTier tier = subscription.getTier();
         return UsageResponse.builder()
-                .tier(subscription.getTier())
+                .tier(tier)
                 .isActive(subscription.getIsActive())
-                .generationCount(subscription.getGenerationCount())
-                .maxGenerations(subscription.getTier().getMaxGenerations())
+                .standardGenerationCount(subscription.getStandardGenerationCount())
+                .maxStandardGenerations(tier.getMaxStandardGenerations())
+                .premiumGenerationCount(subscription.getPremiumGenerationCount())
+                .maxPremiumGenerations(tier.getMaxPremiumGenerations())
+                .premiumTrialUsed(subscription.getPremiumTrialUsed())
                 .libraryCount(libraryCount)
-                .maxLibrary(subscription.getTier().getMaxLibraryItems())
+                .maxLibrary(tier.getMaxLibraryItems())
                 .favoriteCount(favoriteCount)
-                .maxFavorites(subscription.getTier().getMaxFavorites())
+                .maxFavorites(tier.getMaxFavorites())
                 .quotaResetDate(subscription.getQuotaResetDate())
-                .canGenerate(subscription.canGenerate())
+                .canGenerateStandard(subscription.canGenerateStandard())
+                .canGeneratePremium(subscription.canGeneratePremium())
                 .canAddToLibrary(subscription.canAddToLibrary(libraryCount))
                 .canFavorite(subscription.canFavorite(favoriteCount))
-                .canUsePremiumFeatures(subscription.canUsePremiumFeatures())
                 .build();
     }
 }

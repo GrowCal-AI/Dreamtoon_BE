@@ -75,6 +75,23 @@ image:
   gpt-image:
     quality: ${GPT_IMAGE_QUALITY:medium}  # low | medium | high
 
+# Polar.sh 결제 연동
+polar:
+  api-key: ${POLAR_API_KEY:}
+  webhook-secret: ${POLAR_WEBHOOK_SECRET:}
+  base-url: https://api.polar.sh/v1
+  sandbox: ${POLAR_SANDBOX:false}
+  products:
+    plus: ${POLAR_PRODUCT_PLUS:}
+    pro: ${POLAR_PRODUCT_PRO:}
+    ultra: ${POLAR_PRODUCT_ULTRA:}
+  prices:
+    plus: ${POLAR_PRICE_PLUS:}
+    pro: ${POLAR_PRICE_PRO:}
+    ultra: ${POLAR_PRICE_ULTRA:}
+  success-url: ${POLAR_SUCCESS_URL:http://localhost:3000/payment/success}
+  portal-return-url: ${POLAR_PORTAL_RETURN_URL:http://localhost:3000/settings}
+
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET}

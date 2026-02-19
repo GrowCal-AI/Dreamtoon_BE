@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -68,6 +69,15 @@ public class GlobalExceptionHandler {
         log.error("BusinessException", e);
         final ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.getStatus()).body(ApiResponse.error(e.getMessage()));
+    }
+
+    /** 존재하지 않는 정적 리소스 요청 (404) - 봇/스캐너 요청 등 */
+    @ExceptionHandler(NoResourceFoundException.class)
+    protected ResponseEntity<ApiResponse<Object>> handleNoResourceFoundException(
+            NoResourceFoundException e) {
+        log.warn("NoResourceFoundException: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("요청한 리소스를 찾을 수 없습니다."));
     }
 
     /** 그 외 예상치 못한 예외 */

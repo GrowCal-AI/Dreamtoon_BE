@@ -37,8 +37,12 @@ public class Dream {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
+
+    /** 비회원 꿈 접근 토큰 (UUID). 비회원 전용, 회원 꿈은 null. */
+    @Column(name = "guest_token", length = 36)
+    private String guestToken;
 
     // === 사용자 입력 데이터 ===
 
@@ -115,12 +119,14 @@ public class Dream {
     @Builder
     public Dream(
             User user,
+            String guestToken,
             String dreamContent,
             EmotionType primaryEmotion,
             Genre selectedGenre,
             String title,
             List<String> tags) {
         this.user = user;
+        this.guestToken = guestToken;
         this.dreamContent = dreamContent;
         this.primaryEmotion = primaryEmotion;
         this.selectedGenre = selectedGenre;
