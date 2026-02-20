@@ -99,7 +99,8 @@ public class SecurityConfig {
                                         .successHandler(oAuth2AuthenticationSuccessHandler))
                 .addFilterBefore(
                         oAuth2RedirectUriFilter,
-                        OAuth2AuthorizationRequestRedirectFilter.class) // OAuth 시작 전에 redirect_uri 쿠키 저장
+                        OAuth2AuthorizationRequestRedirectFilter
+                                .class) // OAuth 시작 전에 redirect_uri 쿠키 저장
                 .addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);

@@ -43,6 +43,12 @@ jwt:
   expiration: 3600000
   refresh-expiration: 604800000  # 7일 (테스트용)
 
+app:
+  oauth2:
+    allowed-redirect-uris:
+      - http://localhost:5173
+      - http://localhost:3000
+
 
 
 logging:
