@@ -18,6 +18,7 @@ public class LibraryItemResponse {
     private String title;
     private String thumbnailUrl; // webtoonImages 첫 번째 또는 null
     private Genre genre;
+    private String genreName; // 장르 한국어 표시명 (예: "지브리", "맞춤형")
     private Boolean isFavorite;
     private LocalDateTime createdAt;
 }

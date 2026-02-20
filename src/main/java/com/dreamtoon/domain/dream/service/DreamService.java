@@ -182,7 +182,13 @@ public class DreamService {
         dream.selectGenre(selectedGenre);
         dreamRepository.save(dream);
 
-        dreamAiService.generateWebtoonAsync(dreamId);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        dreamAiService.generateWebtoonAsync(dreamId);
+                    }
+                });
 
         return WebtoonGenerateResponse.builder()
                 .dreamId(dreamId)
@@ -260,6 +266,10 @@ public class DreamService {
                                                                 ? d.getWebtoonImages().get(0)
                                                                 : null)
                                                 .genre(d.getSelectedGenre())
+                                                .genreName(
+                                                        d.getSelectedGenre() != null
+                                                                ? d.getSelectedGenre().getName()
+                                                                : null)
                                                 .isFavorite(d.getIsFavorite())
                                                 .createdAt(d.getCreatedAt())
                                                 .build())

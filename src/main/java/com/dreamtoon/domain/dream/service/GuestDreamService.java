@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 비회원 꿈 미리보기 서비스.
@@ -92,7 +94,13 @@ public class GuestDreamService {
         dream.selectGenre(selectedGenre);
         dreamRepository.save(dream);
 
-        dreamAiService.generateWebtoonAsync(dreamId);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        dreamAiService.generateWebtoonAsync(dreamId);
+                    }
+                });
 
         return WebtoonGenerateResponse.builder()
                 .dreamId(dreamId)
