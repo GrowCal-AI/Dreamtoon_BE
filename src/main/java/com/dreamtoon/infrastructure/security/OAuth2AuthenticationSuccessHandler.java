@@ -1,6 +1,7 @@
 package com.dreamtoon.infrastructure.security;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -45,15 +46,36 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // Access Token은 리다이렉트 URL 쿼리 파라미터로 전달
         addRefreshTokenCookie(response, refreshToken);
 
-        // 프론트엔드 리다이렉트 (Access Token 포함)
+        // 쿠키에 저장된 redirect_uri가 있으면 해당 주소로, 없으면 기본 frontendUrl로 리다이렉트
+        String baseUrl = resolveRedirectUri(request, response);
+
         String targetUrl =
                 org.springframework.web.util.UriComponentsBuilder.fromUriString(
-                                frontendUrl + "/oauth/callback")
+                                baseUrl + "/oauth/callback")
                         .queryParam("accessToken", accessToken)
                         .build()
                         .toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    /** OAuth2RedirectUriFilter가 저장한 쿠키를 읽어 리다이렉트 대상 URL을 결정하고 쿠키를 삭제한다. */
+    private String resolveRedirectUri(HttpServletRequest request, HttpServletResponse response) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (OAuth2RedirectUriFilter.REDIRECT_URI_COOKIE_NAME.equals(cookie.getName())) {
+                    String uri = cookie.getValue();
+                    // 쿠키 즉시 삭제
+                    Cookie clear = new Cookie(OAuth2RedirectUriFilter.REDIRECT_URI_COOKIE_NAME, "");
+                    clear.setPath("/");
+                    clear.setMaxAge(0);
+                    response.addCookie(clear);
+                    log.debug("OAuth redirect_uri 쿠키에서 읽음: {}", uri);
+                    return uri;
+                }
+            }
+        }
+        return frontendUrl;
     }
 
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {

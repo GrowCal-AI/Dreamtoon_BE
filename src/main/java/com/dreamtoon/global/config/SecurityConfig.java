@@ -4,6 +4,7 @@ import com.dreamtoon.global.logging.RequestLoggingFilter;
 import com.dreamtoon.infrastructure.security.CustomOAuth2UserService;
 import com.dreamtoon.infrastructure.security.JwtAuthenticationFilter;
 import com.dreamtoon.infrastructure.security.OAuth2AuthenticationSuccessHandler;
+import com.dreamtoon.infrastructure.security.OAuth2RedirectUriFilter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,6 +29,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2RedirectUriFilter oAuth2RedirectUriFilter;
 
     @org.springframework.beans.factory.annotation.Value("${FRONTEND_URL:http://localhost:5173}")
     private String frontendUrl;
@@ -94,6 +97,9 @@ public class SecurityConfig {
                                                         userInfo.userService(
                                                                 customOAuth2UserService))
                                         .successHandler(oAuth2AuthenticationSuccessHandler))
+                .addFilterBefore(
+                        oAuth2RedirectUriFilter,
+                        OAuth2AuthorizationRequestRedirectFilter.class) // OAuth 시작 전에 redirect_uri 쿠키 저장
                 .addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class);
