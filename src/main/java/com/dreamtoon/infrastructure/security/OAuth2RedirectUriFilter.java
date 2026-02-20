@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +28,15 @@ public class OAuth2RedirectUriFilter extends OncePerRequestFilter {
 
     private final List<String> allowedRedirectUris;
 
+    // @Value는 YAML 리스트를 List<String>으로 직접 주입할 수 없으므로, 콤마 구분 문자열로 받아서 변환
     public OAuth2RedirectUriFilter(
-            @Value("${app.oauth2.allowed-redirect-uris}") List<String> allowedRedirectUris) {
-        this.allowedRedirectUris = allowedRedirectUris;
+            @Value("${app.oauth2.allowed-redirect-uris:}") String allowedRedirectUrisConfig) {
+        this.allowedRedirectUris =
+                allowedRedirectUrisConfig.isBlank()
+                        ? List.of()
+                        : Arrays.stream(allowedRedirectUrisConfig.split(","))
+                                .map(String::trim)
+                                .toList();
     }
 
     @Override
