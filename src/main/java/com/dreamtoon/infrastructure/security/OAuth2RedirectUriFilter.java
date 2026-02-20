@@ -2,7 +2,6 @@ package com.dreamtoon.infrastructure.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -48,11 +47,12 @@ public class OAuth2RedirectUriFilter extends OncePerRequestFilter {
             String redirectUri = request.getParameter("redirect_uri");
             if (redirectUri != null) {
                 if (allowedRedirectUris.contains(redirectUri)) {
-                    Cookie cookie = new Cookie(REDIRECT_URI_COOKIE_NAME, redirectUri);
-                    cookie.setPath("/");
-                    cookie.setHttpOnly(true);
-                    cookie.setMaxAge(300); // 5분 (OAuth 흐름 완료 시간 이내)
-                    response.addCookie(cookie);
+                    // SameSite=None; Secure 필요: 카카오→백엔드 콜백이 cross-site 리다이렉트이므로
+                    response.addHeader(
+                            "Set-Cookie",
+                            String.format(
+                                    "%s=%s; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=300",
+                                    REDIRECT_URI_COOKIE_NAME, redirectUri));
                     log.debug("OAuth redirect_uri 쿠키 저장: {}", redirectUri);
                 } else {
                     log.warn("허용되지 않은 redirect_uri 요청 무시: {}", redirectUri);
