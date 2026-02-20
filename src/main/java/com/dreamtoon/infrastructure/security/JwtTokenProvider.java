@@ -80,7 +80,11 @@ public class JwtTokenProvider {
     /** JWT 토큰 유효성 검증 */
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .clockSkewSeconds(30)
+                    .build()
+                    .parseSignedClaims(token);
             return true;
         } catch (JwtException e) {
             log.error("JWT validation error: {}", e.getMessage());
