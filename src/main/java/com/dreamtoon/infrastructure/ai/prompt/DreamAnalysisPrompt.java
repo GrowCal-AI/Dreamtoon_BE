@@ -34,7 +34,7 @@ public final class DreamAnalysisPrompt {
                 최소 2개 이상의 감정에 10 이상의 점수를 부여하세요.
                 {
                   "title": "꿈 제목 (10자 이내)",
-                  "analysis": "꿈 해석 (200자 이내)",
+                  "analysis": "꿈 해석 (250자 이내)",
                   "emotionScores": {
                     "기쁨": 0,
                     "불안": 0,
