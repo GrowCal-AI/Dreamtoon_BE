@@ -1,6 +1,7 @@
 package com.dreamtoon.global.config;
 
 import com.dreamtoon.domain.dream.entity.Genre;
+import com.dreamtoon.domain.user.entity.SocialProvider;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,27 @@ public class DatabaseFixRunner implements CommandLineRunner {
 
         // subscriptions 테이블 컬럼 마이그레이션 (NOT NULL 컬럼 추가 시 DEFAULT 필요)
         migrateSubscriptionsColumns();
+
+        // social_provider CHECK constraint 업데이트 (LOCAL 추가)
+        try {
+            String dropProviderSql =
+                    "ALTER TABLE users DROP CONSTRAINT IF EXISTS users_social_provider_check";
+            jdbcTemplate.execute(dropProviderSql);
+
+            String providerValues =
+                    Arrays.stream(SocialProvider.values())
+                            .map(Enum::name)
+                            .collect(Collectors.joining("', '", "'", "'"));
+            String addProviderSql =
+                    String.format(
+                            "ALTER TABLE users ADD CONSTRAINT users_social_provider_check CHECK"
+                                    + " (social_provider IN (%s))",
+                            providerValues);
+            jdbcTemplate.execute(addProviderSql);
+            log.info("Updated constraint 'users_social_provider_check' with values: {}", providerValues);
+        } catch (Exception e) {
+            log.warn("social_provider constraint 업데이트 스킵: {}", e.getMessage());
+        }
 
         try {
             // 1. Drop existing constraint

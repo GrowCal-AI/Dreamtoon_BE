@@ -58,6 +58,13 @@ public class SecurityConfig {
                                         .requestMatchers("/api/v1/auth/test-login")
                                         .permitAll()
 
+                                        // Email auth endpoints
+                                        .requestMatchers(
+                                                "/api/v1/auth/email-login",
+                                                "/api/v1/auth/email-register",
+                                                "/api/v1/auth/email-signin")
+                                        .permitAll()
+
                                         // OAuth2 login (Spring Security 기본 경로)
                                         .requestMatchers("/oauth2/**", "/login/oauth2/**")
                                         .permitAll()

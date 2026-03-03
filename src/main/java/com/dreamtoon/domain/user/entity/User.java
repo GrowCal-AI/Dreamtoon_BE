@@ -36,6 +36,9 @@ public class User {
     @Column(name = "social_id", nullable = false)
     private String socialId;
 
+    @Column(name = "password")
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -54,11 +57,13 @@ public class User {
             String nickname,
             SocialProvider socialProvider,
             String socialId,
+            String password,
             Role role) {
         this.email = email;
         this.nickname = nickname;
         this.socialProvider = socialProvider;
         this.socialId = socialId;
+        this.password = password;
         this.role = role;
     }
 

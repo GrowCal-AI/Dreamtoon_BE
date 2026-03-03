@@ -1,5 +1,7 @@
 package com.dreamtoon.domain.user.controller;
 
+import com.dreamtoon.domain.subscription.entity.SubscriptionTier;
+import com.dreamtoon.domain.subscription.service.SubscriptionService;
 import com.dreamtoon.domain.user.dto.TokenResponse;
 import com.dreamtoon.domain.user.entity.Role;
 import com.dreamtoon.domain.user.entity.SocialProvider;
@@ -16,6 +18,7 @@ import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -32,6 +35,7 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final SubscriptionService subscriptionService;
 
     @Operation(
             summary = "카카오 소셜 로그인",
@@ -85,6 +89,111 @@ public class AuthController {
                 ApiResponse.success(
                         "테스트 토큰이 발급되었습니다. Swagger의 'Authorize' 버튼을 눌러 Bearer 토큰을 입력하세요.",
                         response));
+    }
+
+    @Operation(
+            summary = "이메일 로그인",
+            description =
+                    "이메일만으로 로그인합니다. 해당 이메일의 사용자가 없으면 자동 생성됩니다. "
+                            + "test@jocoding.net 계정은 ULTRA 플랜이 자동 부여됩니다.")
+    @PostMapping("/email-login")
+    public ResponseEntity<ApiResponse<TestTokenResponse>> emailLogin(
+            @Parameter(description = "로그인할 이메일 주소") @RequestParam String email) {
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseGet(
+                                () ->
+                                        userRepository.save(
+                                                User.builder()
+                                                        .email(email)
+                                                        .nickname(email.split("@")[0])
+                                                        .socialProvider(SocialProvider.LOCAL)
+                                                        .socialId(email)
+                                                        .role(Role.ROLE_USER)
+                                                        .build()));
+
+        // test@jocoding.net → ULTRA 플랜 자동 부여
+        if ("test@jocoding.net".equalsIgnoreCase(email)) {
+            subscriptionService.forceSetTier(user.getId(), SubscriptionTier.ULTRA);
+        }
+
+        String accessToken =
+                jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), "ROLE_USER");
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "이메일 로그인 성공", new TestTokenResponse(accessToken, refreshToken)));
+    }
+
+    @Operation(
+            summary = "이메일 회원가입",
+            description = "이메일 + 비밀번호로 회원가입합니다. 이미 존재하는 이메일이면 409 에러를 반환합니다.")
+    @PostMapping("/email-register")
+    public ResponseEntity<ApiResponse<TestTokenResponse>> emailRegister(
+            @RequestBody EmailAuthRequest request) {
+
+        if (userRepository.existsByEmail(request.email())) {
+            return ResponseEntity.status(409)
+                    .body(ApiResponse.error("이미 사용 중인 이메일입니다."));
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        User user =
+                userRepository.save(
+                        User.builder()
+                                .email(request.email())
+                                .nickname(request.email().split("@")[0])
+                                .socialProvider(SocialProvider.LOCAL)
+                                .socialId(request.email())
+                                .password(encoder.encode(request.password()))
+                                .role(Role.ROLE_USER)
+                                .build());
+
+        String accessToken =
+                jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), "ROLE_USER");
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
+        return ResponseEntity.ok(
+                ApiResponse.success("회원가입 성공", new TestTokenResponse(accessToken, refreshToken)));
+    }
+
+    @Operation(
+            summary = "이메일 로그인 (비밀번호)",
+            description = "이메일 + 비밀번호로 로그인합니다.")
+    @PostMapping("/email-signin")
+    public ResponseEntity<ApiResponse<TestTokenResponse>> emailSignin(
+            @RequestBody EmailAuthRequest request) {
+
+        User user =
+                userRepository
+                        .findByEmail(request.email())
+                        .orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.error("등록되지 않은 이메일입니다."));
+        }
+
+        if (user.getPassword() == null) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.error("소셜 로그인으로 가입한 계정입니다. 소셜 로그인을 이용해 주세요."));
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(request.password(), user.getPassword())) {
+            return ResponseEntity.status(401)
+                    .body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
+        }
+
+        String accessToken =
+                jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), "ROLE_USER");
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
+        return ResponseEntity.ok(
+                ApiResponse.success("로그인 성공", new TestTokenResponse(accessToken, refreshToken)));
     }
 
     @Operation(
@@ -155,4 +264,6 @@ public class AuthController {
     }
 
     public record TestTokenResponse(String accessToken, String refreshToken) {}
+
+    public record EmailAuthRequest(String email, String password) {}
 }
