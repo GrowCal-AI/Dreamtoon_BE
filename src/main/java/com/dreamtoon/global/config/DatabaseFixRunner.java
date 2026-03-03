@@ -40,7 +40,9 @@ public class DatabaseFixRunner implements CommandLineRunner {
                                     + " (social_provider IN (%s))",
                             providerValues);
             jdbcTemplate.execute(addProviderSql);
-            log.info("Updated constraint 'users_social_provider_check' with values: {}", providerValues);
+            log.info(
+                    "Updated constraint 'users_social_provider_check' with values: {}",
+                    providerValues);
         } catch (Exception e) {
             log.warn("social_provider constraint 업데이트 스킵: {}", e.getMessage());
         }

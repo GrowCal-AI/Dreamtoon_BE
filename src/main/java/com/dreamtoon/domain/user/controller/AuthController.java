@@ -136,8 +136,7 @@ public class AuthController {
             @RequestBody EmailAuthRequest request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            return ResponseEntity.status(409)
-                    .body(ApiResponse.error("이미 사용 중인 이메일입니다."));
+            return ResponseEntity.status(409).body(ApiResponse.error("이미 사용 중인 이메일입니다."));
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -160,21 +159,15 @@ public class AuthController {
                 ApiResponse.success("회원가입 성공", new TestTokenResponse(accessToken, refreshToken)));
     }
 
-    @Operation(
-            summary = "이메일 로그인 (비밀번호)",
-            description = "이메일 + 비밀번호로 로그인합니다.")
+    @Operation(summary = "이메일 로그인 (비밀번호)", description = "이메일 + 비밀번호로 로그인합니다.")
     @PostMapping("/email-signin")
     public ResponseEntity<ApiResponse<TestTokenResponse>> emailSignin(
             @RequestBody EmailAuthRequest request) {
 
-        User user =
-                userRepository
-                        .findByEmail(request.email())
-                        .orElse(null);
+        User user = userRepository.findByEmail(request.email()).orElse(null);
 
         if (user == null) {
-            return ResponseEntity.status(401)
-                    .body(ApiResponse.error("등록되지 않은 이메일입니다."));
+            return ResponseEntity.status(401).body(ApiResponse.error("등록되지 않은 이메일입니다."));
         }
 
         if (user.getPassword() == null) {
@@ -184,8 +177,7 @@ public class AuthController {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (!encoder.matches(request.password(), user.getPassword())) {
-            return ResponseEntity.status(401)
-                    .body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
+            return ResponseEntity.status(401).body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
         }
 
         String accessToken =
